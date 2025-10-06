@@ -2826,7 +2826,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                     await reply(sock, from, `🎵 Encontrado: *${firstResult.name}* - ${firstResult.artists}\n📥 Baixando...`);
 
-                    const downloadUrl = `https://nayan-video-downloader.vercel.app/spotify?url=${encodeURIComponent(spotifyLink)}`;
+                    const downloadUrl = `https://www.api.neext.online/spotify?url=${encodeURIComponent(spotifyLink)}`;
                     const downloadResponse = await axios.get(downloadUrl, {
                         timeout: 30000,
                         headers: {
@@ -2834,7 +2834,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         }
                     });
 
-                    if (!downloadResponse.data || downloadResponse.data.status !== 200 || !downloadResponse.data.result) {
+                    if (!downloadResponse.data || !downloadResponse.data.result) {
                         await reagirMensagem(sock, message, "❌");
                         await reply(sock, from, "❌ Erro ao baixar a música. Tente novamente.");
                         break;
