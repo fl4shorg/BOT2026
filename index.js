@@ -2836,8 +2836,8 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                     await reply(sock, from, `🎵 Encontrado: *${firstResult.name}* - ${firstResult.artists}\n📥 Baixando...`);
 
-                    const apiUrl = `https://api.nekolabs.my.id/downloader/spotify/v1?url=${encodeURIComponent(spotifyLink)}`;
-                    console.log(`📥 [PLAY] Chamando API de download: ${apiUrl}`);
+                    const apiUrl = `https://www.api.neext.online/download/spotify?url=${encodeURIComponent(spotifyLink)}`;
+                    console.log(`📥 [PLAY] Chamando API Neext de download: ${apiUrl}`);
                     
                     const response = await axios.get(apiUrl, {
                         timeout: 40000,
@@ -2846,10 +2846,10 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         }
                     });
 
-                    console.log(`📥 [PLAY] Resposta da API:`, JSON.stringify(response.data, null, 2));
+                    console.log(`📥 [PLAY] Resposta da API Neext:`, JSON.stringify(response.data, null, 2));
 
-                    if (!response.data || !response.data.data || response.data.data.status !== 'success') {
-                        console.error("❌ [PLAY] API retornou erro:", response.data);
+                    if (!response.data || response.data.status !== 'success' || !response.data.data) {
+                        console.error("❌ [PLAY] API Neext retornou erro:", response.data);
                         await reagirMensagem(sock, message, "❌");
                         await reply(sock, from, "❌ Não foi possível processar esta música. API retornou erro.");
                         break;
