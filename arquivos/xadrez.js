@@ -40,7 +40,7 @@ function gerarImagemTabuleiro(fen, ultimaJogada = null) {
     const fenSimples = fen.split(' ')[0];
     
     // Usa API do Lichess com coordenadas visíveis e sem marca d'água
-    let url = `https://lichess1.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown&coordinates=1&lastMove=${ultimaJogada || ''}`;
+    let url = `https://lichess.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown&coordinates=1&lastMove=${ultimaJogada || ''}`;
     
     return url;
 }
