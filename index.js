@@ -388,12 +388,14 @@ async function botEhAdmin(sock, groupId) {
         if (botIdOriginal.includes(':')) {
             const baseId = botIdOriginal.split(':')[0];
             possibleBotIds.push(baseId + '@s.whatsapp.net');
+            possibleBotIds.push(baseId + '@lid');
             possibleBotIds.push(baseId);
         }
         
-        // Se não terminar com @s.whatsapp.net, adiciona
-        if (!botIdOriginal.endsWith('@s.whatsapp.net')) {
+        // Se não terminar com @s.whatsapp.net ou @lid, adiciona ambos
+        if (!botIdOriginal.endsWith('@s.whatsapp.net') && !botIdOriginal.endsWith('@lid')) {
             possibleBotIds.push(botIdOriginal + '@s.whatsapp.net');
+            possibleBotIds.push(botIdOriginal + '@lid');
         }
         
         console.log(`🔍 Verificando se bot é admin - IDs possíveis:`, possibleBotIds);
@@ -404,14 +406,18 @@ async function botEhAdmin(sock, groupId) {
             possibleBotIds.some(botId => {
                 // Comparação exata
                 if (p.id === botId) return true;
-                // Comparação sem sufixo
-                if (p.id.split('@')[0] === botId.split('@')[0]) return true;
+                // Comparação apenas do número (sem @sufixo)
+                const pNumber = p.id.split('@')[0].split(':')[0];
+                const botNumber = botId.split('@')[0].split(':')[0];
+                if (pNumber === botNumber) return true;
                 return false;
             })
         );
         
         if (!botParticipant) {
             console.log(`⚠️ Bot não encontrado na lista de participantes do grupo ${groupId}`);
+            console.log(`⚠️ Números dos participantes:`, groupMetadata.participants.map(p => p.id.split('@')[0].split(':')[0]));
+            console.log(`⚠️ Número do bot:`, botIdOriginal.split('@')[0].split(':')[0]);
             return false;
         }
         
