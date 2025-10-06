@@ -1732,16 +1732,15 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             await reagirMensagem(sock, message, "⏳");
 
             try {
-                // API para ATTP - cria sticker animado com texto piscando
-                const apiUrl = `https://api.neext.online/sticker/attp?text=${encodeURIComponent(text)}`;
+                // API Widipe para ATTP - cria sticker animado com texto piscando
+                const apiUrl = `https://widipe.com/attp?text=${encodeURIComponent(text)}`;
                 console.log(`🔗 Chamando API ATTP: ${apiUrl}`);
 
                 const response = await axios.get(apiUrl, {
                     responseType: 'arraybuffer',
                     timeout: 30000,
                     headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                        'Accept': '*/*'
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                     }
                 });
 
