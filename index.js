@@ -2802,17 +2802,25 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 }
 
                 const query = args.join(' ');
+                console.log(`🔍 [PLAY] Buscando música: "${query}"`);
 
                 await reagirMensagem(sock, message, "🔍");
                 await reply(sock, from, "🎵 Buscando e baixando música, aguarde...");
 
                 try {
                     const searchUrl = `https://nayan-video-downloader.vercel.app/spotify-search?name=${encodeURIComponent(query)}&limit=5`;
+                    console.log(`🔍 [PLAY] URL de busca: ${searchUrl}`);
+                    
                     const searchResponse = await axios.get(searchUrl, {
-                        timeout: 15000,
+                        timeout: 20000,
                         headers: {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                         }
+                    });
+
+                    console.log(`🔍 [PLAY] Resposta da busca recebida:`, {
+                        status: searchResponse.data?.status,
+                        resultCount: searchResponse.data?.results?.length || 0
                     });
 
                     if (!searchResponse.data || searchResponse.data.status !== 200 || !searchResponse.data.results || searchResponse.data.results.length === 0) {
@@ -2823,43 +2831,69 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                     const firstResult = searchResponse.data.results[0];
                     const spotifyLink = firstResult.link;
+                    console.log(`✅ [PLAY] Música encontrada: "${firstResult.name}" - ${firstResult.artists}`);
+                    console.log(`🔗 [PLAY] Link Spotify: ${spotifyLink}`);
 
                     await reply(sock, from, `🎵 Encontrado: *${firstResult.name}* - ${firstResult.artists}\n📥 Baixando...`);
 
                     const apiUrl = `https://api.nekolabs.my.id/downloader/spotify/v1?url=${encodeURIComponent(spotifyLink)}`;
+                    console.log(`📥 [PLAY] Chamando API de download: ${apiUrl}`);
+                    
                     const response = await axios.get(apiUrl, {
-                        timeout: 30000,
+                        timeout: 40000,
                         headers: {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                         }
                     });
 
+                    console.log(`📥 [PLAY] Resposta da API de download:`, {
+                        status: response.data?.status,
+                        hasResult: !!response.data?.result,
+                        hasDownloadUrl: !!response.data?.result?.downloadUrl
+                    });
+
                     if (!response.data || !response.data.status || !response.data.result) {
+                        console.error("❌ [PLAY] API retornou dados inválidos:", response.data);
                         await reagirMensagem(sock, message, "❌");
-                        await reply(sock, from, "❌ Não foi possível baixar esta música do Spotify. Verifique o link.");
+                        await reply(sock, from, "❌ Não foi possível processar esta música. API não retornou dados válidos.");
                         break;
                     }
 
                     const result = response.data.result;
                     
                     if (!result.downloadUrl) {
+                        console.error("❌ [PLAY] Link de download não encontrado no resultado:", result);
                         await reagirMensagem(sock, message, "❌");
                         await reply(sock, from, "❌ Link de download não encontrado para esta música.");
                         break;
                     }
 
+                    console.log(`📥 [PLAY] Baixando áudio de: ${result.downloadUrl}`);
                     const audioResponse = await axios({
                         method: 'GET',
                         url: result.downloadUrl,
                         responseType: 'arraybuffer',
-                        timeout: 60000
+                        timeout: 90000,
+                        maxContentLength: 50 * 1024 * 1024,
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
                     });
 
                     const audioBuffer = Buffer.from(audioResponse.data);
+                    console.log(`✅ [PLAY] Áudio baixado com sucesso! Tamanho: ${(audioBuffer.length / 1024 / 1024).toFixed(2)} MB`);
+
+                    if (audioBuffer.length < 1000) {
+                        console.error("❌ [PLAY] Áudio muito pequeno, pode estar corrompido");
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ Arquivo de áudio inválido ou corrompido.");
+                        break;
+                    }
 
                     let thumbnailBuffer = null;
                     if (result.cover) {
                         try {
+                            console.log(`📸 [PLAY] Baixando capa de: ${result.cover}`);
                             const thumbnailResponse = await axios({
                                 method: 'GET',
                                 url: result.cover,
@@ -2867,15 +2901,17 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                                 timeout: 10000
                             });
                             thumbnailBuffer = Buffer.from(thumbnailResponse.data);
+                            console.log(`✅ [PLAY] Capa baixada! Tamanho: ${(thumbnailBuffer.length / 1024).toFixed(2)} KB`);
                         } catch (err) {
-                            console.log("❌ Erro ao baixar capa do Spotify:", err.message);
+                            console.log("⚠️ [PLAY] Erro ao baixar capa (continuando sem capa):", err.message);
                         }
                     }
 
+                    console.log(`📤 [PLAY] Enviando áudio para WhatsApp...`);
                     await sock.sendMessage(from, {
                         audio: audioBuffer,
                         mimetype: 'audio/mp4',
-                        fileName: `${result.title} - ${result.artist}.mp3`,
+                        fileName: `${result.title || firstResult.name} - ${result.artist || firstResult.artists}.mp3`,
                         jpegThumbnail: thumbnailBuffer,
                         contextInfo: {
                             forwardingScore: 100000,
@@ -2885,8 +2921,8 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                                 newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
                             },
                             externalAdReply: {
-                                title: `🎵 ${result.title}`,
-                                body: `🎤 ${result.artist} • ⏱️ ${result.duration}`,
+                                title: `🎵 ${result.title || firstResult.name}`,
+                                body: `🎤 ${result.artist || firstResult.artists} • ⏱️ ${result.duration || ''}`,
                                 thumbnailUrl: result.cover || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
                                 mediaType: 2,
                                 sourceUrl: spotifyLink,
@@ -2895,22 +2931,32 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         }
                     }, { quoted: selinho2 });
 
+                    console.log(`✅ [PLAY] Áudio enviado com sucesso!`);
                     await reagirMensagem(sock, message, "✅");
 
                 } catch (apiError) {
                     await reagirMensagem(sock, message, "❌");
-                    console.error("❌ Erro na API Spotify:", apiError);
+                    console.error("❌ [PLAY] Erro detalhado:", {
+                        message: apiError.message,
+                        code: apiError.code,
+                        response: apiError.response?.data,
+                        status: apiError.response?.status
+                    });
                     
                     if (apiError.code === 'ECONNABORTED' || apiError.code === 'ETIMEDOUT') {
-                        await reply(sock, from, "⏱️ Timeout ao processar música. Tente novamente.");
+                        await reply(sock, from, "⏱️ Timeout ao processar música. A API demorou muito para responder. Tente novamente.");
+                    } else if (apiError.response?.status === 404) {
+                        await reply(sock, from, "❌ API não encontrou esta música. Tente com outro nome.");
+                    } else if (apiError.response?.status >= 500) {
+                        await reply(sock, from, "❌ API do Spotify está fora do ar. Tente novamente mais tarde.");
                     } else {
-                        await reply(sock, from, "❌ Erro ao baixar música do Spotify. Tente novamente mais tarde.");
+                        await reply(sock, from, `❌ Erro ao baixar música: ${apiError.message || 'Desconhecido'}. Tente novamente.`);
                     }
                     break;
                 }
 
             } catch (error) {
-                console.error("❌ Erro no comando Play Spotify:", error);
+                console.error("❌ [PLAY] Erro geral no comando:", error);
                 await reagirMensagem(sock, message, "❌");
                 await reply(sock, from, "❌ Erro ao baixar música. Tente novamente mais tarde.");
             }
