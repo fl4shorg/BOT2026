@@ -116,6 +116,7 @@ function obterMenuMembro() {
 
 🎲 *DIVERSÃO:*
 • \`${prefix}chance [texto]\` - Calcula chance de algo acontecer
+• \`${prefix}correio [número]/[mensagem]\` - Envia mensagem anônima
 
 🏷️ *STICKERS:*
 • \`${prefix}s\` - Converte mídia em sticker

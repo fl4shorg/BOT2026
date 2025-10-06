@@ -1784,6 +1784,76 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
+        case 'chance': {
+            const pergunta = args.join(' ').trim();
+            
+            if (!pergunta) {
+                const config = obterConfiguracoes();
+                await reagirMensagem(sock, message, "❓");
+                await reply(sock, from, 
+                    `❓ *CALCULADORA DE CHANCES*\n\n` +
+                    `📝 *Como usar:*\n` +
+                    `${config.prefix}chance [pergunta]\n\n` +
+                    `💡 *Exemplos:*\n` +
+                    `• ${config.prefix}chance de eu ficar rico\n` +
+                    `• ${config.prefix}chance de chover hoje\n` +
+                    `• ${config.prefix}chance do Brasil ganhar a copa\n\n` +
+                    `🎲 O bot vai calcular a chance de acontecer!`
+                );
+                break;
+            }
+
+            console.log(`🎲 Calculando chance: "${pergunta}"`);
+            await reagirMensagem(sock, message, "🎲");
+
+            // Gera uma porcentagem aleatória
+            const chanceAcontecer = Math.floor(Math.random() * 101); // 0-100
+            const chanceNaoAcontecer = 100 - chanceAcontecer;
+
+            // Determina emoji baseado na chance
+            let emoji = "🎲";
+            if (chanceAcontecer >= 80) emoji = "🔥";
+            else if (chanceAcontecer >= 60) emoji = "✅";
+            else if (chanceAcontecer >= 40) emoji = "🤔";
+            else if (chanceAcontecer >= 20) emoji = "😬";
+            else emoji = "❌";
+
+            const config = obterConfiguracoes();
+            const mensagemChance = 
+                `${emoji} *CALCULADORA DE CHANCES* ${emoji}\n\n` +
+                `❓ *Pergunta:*\n${pergunta}\n\n` +
+                `📊 *RESULTADO:*\n\n` +
+                `✅ *Chance de ACONTECER:* ${chanceAcontecer}%\n` +
+                `${chanceAcontecer > 0 ? '█'.repeat(Math.floor(chanceAcontecer / 10)) : '░'}\n\n` +
+                `❌ *Chance de NÃO ACONTECER:* ${chanceNaoAcontecer}%\n` +
+                `${chanceNaoAcontecer > 0 ? '█'.repeat(Math.floor(chanceNaoAcontecer / 10)) : '░'}\n\n` +
+                `🎯 *Conclusão:* ${chanceAcontecer >= 70 ? 'Muito provável!' : chanceAcontecer >= 50 ? 'Chances médias!' : chanceAcontecer >= 30 ? 'Pouco provável!' : 'Quase impossível!'}\n\n` +
+                `© ${config.nomeDoBot}`;
+
+            await sock.sendMessage(from, {
+                text: mensagemChance,
+                contextInfo: {
+                    forwardingScore: 100000,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: "120363289739581116@newsletter",
+                        newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                    },
+                    externalAdReply: {
+                        title: `${emoji} CHANCE: ${chanceAcontecer}%`,
+                        body: "© NEEXT LTDA • Calculadora de Chances",
+                        thumbnailUrl: "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                        mediaType: 1,
+                        sourceUrl: "https://www.neext.online"
+                    }
+                }
+            }, { quoted: selinho });
+
+            await reagirMensagem(sock, message, emoji);
+            console.log(`✅ Chance calculada: ${chanceAcontecer}% para "${pergunta}"`);
+            break;
+        }
+
         case 'correio': {
             const textoCompleto = args.join(' ').trim();
             
