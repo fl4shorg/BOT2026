@@ -7000,21 +7000,21 @@ function setupListeners(sock) {
                             // Verifica se é um dos jogadores
                             if (sender !== jogo.jogador1 && sender !== jogo.jogador2) {
                                 await reply(sock, from, "❌ Você não está participando deste jogo!");
-                                return;
+                                continue;
                             }
                             
                             // Verifica se é a vez do jogador
                             if (sender !== jogo.vezDe) {
                                 const vezDe = jogo.vezDe === jogo.jogador1 ? jogo.jogador1 : jogo.jogador2;
                                 await reply(sock, from, `⏳ Aguarde! É a vez de @${vezDe.split('@')[0]}`, [vezDe]);
-                                return;
+                                continue;
                             }
                             
                             // Verifica se a posição está livre
                             const posicao = jogada - 1;
                             if (jogo.tabuleiro[posicao] !== `${jogada}️⃣`) {
                                 await reply(sock, from, "❌ Esta posição já está ocupada! Escolha outra.");
-                                return;
+                                continue;
                             }
                             
                             // Faz a jogada
