@@ -34,13 +34,13 @@ function salvarHistorico(historico) {
     }
 }
 
-// Gera URL da imagem do tabuleiro usando API do Chess.com (melhor qualidade)
+// Gera URL da imagem do tabuleiro usando API do Lichess (sem marca d'água)
 function gerarImagemTabuleiro(fen, ultimaJogada = null) {
     // Remove a parte extra do FEN (só precisamos da posição das peças)
     const fenSimples = fen.split(' ')[0];
     
-    // Usa API do fen2image que tem coordenadas bem visíveis
-    let url = `https://fen2image.chessvision.ai/${encodeURIComponent(fenSimples)}`;
+    // Usa API do Lichess com coordenadas visíveis e sem marca d'água
+    let url = `https://lichess1.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown&coordinates=1&lastMove=${ultimaJogada || ''}`;
     
     return url;
 }
