@@ -5361,12 +5361,13 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 }
             } else {
                 const status = config.modogamer ? "✅ ATIVO" : "❌ DESATIVO";
+                const botConfig = obterConfiguracoes();
                 await reply(sock, from,
                     `🎮 *STATUS DO MODO GAMER*\n\n` +
                     `${status}\n\n` +
                     `📝 **Uso:**\n` +
-                    `• ${config.prefix}modogamer on - Ativar\n` +
-                    `• ${config.prefix}modogamer off - Desativar\n\n` +
+                    `• ${botConfig.prefix}modogamer on - Ativar\n` +
+                    `• ${botConfig.prefix}modogamer off - Desativar\n\n` +
                     `⚠️ Apenas administradores podem alterar`
                 );
             }
