@@ -199,37 +199,41 @@ function obterMenuDono() {
 // ========================
 function obterMenuDownload() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
-    return `
-📥 *DOWNLOADS E MÍDIA*
+    return `╭─━─━⋆｡°✩📥✩°｡⋆ ━─━─╮
+│      𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃𝐒
+╰─━─━⋆｡°✩📥✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮  
 
-🎵 *SPOTIFY:*
-• \`${prefix}playspotify [nome]\` - Busca e baixa música do Spotify
-• \`${prefix}spotifysearch [nome]\` - Pesquisa música no Spotify
-• \`${prefix}spotify [link]\` - Download direto do Spotify
+│╭─━─⋆｡°✩🏮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}playspotify [nome]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}spotifysearch [nome]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}spotify [link]
+│╰─━─⋆｡°✩🏮✩°｡⋆ ━─━╯
 
-🎬 *YOUTUBE:*
-• \`${prefix}play [nome]\` - Busca e baixa música do YouTube
+│╭─━─⋆｡°✩🏮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}play [nome]
+│╰─━─⋆｡°✩🏮✩°｡⋆ ━─━╯
 
-📷 *IMAGENS:*
-• \`${prefix}pinterest [busca]\` - Imagens do Pinterest
-• \`${prefix}brat [texto]\` - Gera imagem BRAT
+│╭─━─⋆｡°✩🏮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}pinterest [busca]
+│╰─━─⋆｡°✩🏮✩°｡⋆ ━─━╯
 
-📱 *REDES SOCIAIS:*
-• \`${prefix}ig [link]\` - Download Instagram
-• \`${prefix}instagram [link]\` - Download Instagram
-• \`${prefix}tiktok [link]\` - Download TikTok sem marca d'água
-• \`${prefix}tt [link]\` - Download TikTok (atalho)
-• \`${prefix}twitter [link]\` - Download Twitter/X
-• \`${prefix}facebook [link]\` - Download Facebook
-• \`${prefix}fb [link]\` - Download Facebook (atalho)
+│╭─━─⋆｡°✩🏮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}ig [link]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}instagram [link]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}tiktok [link]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}tt [link]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}twitter [link]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}facebook [link]
+│┊𖥨ํ∘̥⃟💿￫ ${prefix}fb [link]
+│╰─━─⋆｡°✩🏮✩°｡⋆ ━─━╯
 
-🏷️ *STICKERS:*
-• \`${prefix}s\` - Criar sticker de mídia
-• \`${prefix}rename [pack|author]\` - Editar sticker
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
 
-━━━━━━━━━━━━━━━
-© NEEXT LTDA - ${nickDoDono}
-`;
+╭─━─━⋆｡°✩🧩✩°｡⋆ ━─━─╮
+│     © ɴᴇᴇxᴛ ʟᴛᴅᴀ - ɴᴇᴇxᴛ
+╰─━─━⋆｡°✩🧩✩°｡⋆ ━─━─╯`;
 }
 
 // ========================
