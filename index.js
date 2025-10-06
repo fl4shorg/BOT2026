@@ -377,14 +377,38 @@ async function removerMensagem(sock, messageKey) {
 async function botEhAdmin(sock, groupId) {
     try {
         const groupMetadata = await sock.groupMetadata(groupId);
-        // Normaliza o ID do bot - remove tudo depois do primeiro : se existir
-        let botId = sock.user?.id || '';
-        if (botId.includes(':')) {
-            botId = botId.split(':')[0] + '@s.whatsapp.net';
+        
+        // Pega o ID original do bot
+        let botIdOriginal = sock.user?.id || '';
+        
+        // Tenta várias formas de normalizar o ID
+        let possibleBotIds = [botIdOriginal];
+        
+        // Se tiver ':', remove tudo depois
+        if (botIdOriginal.includes(':')) {
+            const baseId = botIdOriginal.split(':')[0];
+            possibleBotIds.push(baseId + '@s.whatsapp.net');
+            possibleBotIds.push(baseId);
         }
         
-        console.log(`🔍 Verificando se bot é admin - Bot ID: ${botId}`);
-        const botParticipant = groupMetadata.participants.find(p => p.id === botId);
+        // Se não terminar com @s.whatsapp.net, adiciona
+        if (!botIdOriginal.endsWith('@s.whatsapp.net')) {
+            possibleBotIds.push(botIdOriginal + '@s.whatsapp.net');
+        }
+        
+        console.log(`🔍 Verificando se bot é admin - IDs possíveis:`, possibleBotIds);
+        console.log(`🔍 Participantes do grupo:`, groupMetadata.participants.map(p => ({ id: p.id, admin: p.admin })));
+        
+        // Procura o bot usando qualquer uma das variações de ID
+        const botParticipant = groupMetadata.participants.find(p => 
+            possibleBotIds.some(botId => {
+                // Comparação exata
+                if (p.id === botId) return true;
+                // Comparação sem sufixo
+                if (p.id.split('@')[0] === botId.split('@')[0]) return true;
+                return false;
+            })
+        );
         
         if (!botParticipant) {
             console.log(`⚠️ Bot não encontrado na lista de participantes do grupo ${groupId}`);
@@ -392,7 +416,7 @@ async function botEhAdmin(sock, groupId) {
         }
         
         const isAdmin = botParticipant.admin === 'admin' || botParticipant.admin === 'superadmin';
-        console.log(`🔍 Bot é admin: ${isAdmin} (status: ${botParticipant.admin || 'member'})`);
+        console.log(`🔍 Bot encontrado! ID: ${botParticipant.id}, Admin: ${isAdmin} (status: ${botParticipant.admin || 'member'})`);
         return isAdmin;
     } catch (err) {
         console.error("❌ Erro ao verificar se bot é admin:", err);
