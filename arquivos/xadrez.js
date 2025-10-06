@@ -111,8 +111,7 @@ function iniciarPartida(chatId, jogador1, jogador2) {
                  `🤍 Brancas: @${jogador1.split('@')[0]}\n` +
                  `🖤 Pretas: @${jogador2.split('@')[0]}\n\n` +
                  `♟️ Vez das *BRANCAS* jogarem!\n\n` +
-                 gerarGuiaCoordenadas() + 
-                 `\n\n💡 Use: \`.xadrez jogada e2e4\` para jogar`,
+                 `💡 Use: \`.xadrez jogada e2e4\` para jogar`,
         mentions: [jogador1, jogador2],
         imagem: gerarImagemTabuleiro(chess.fen())
     };
@@ -389,13 +388,12 @@ function mostrarAjuda(prefix) {
                  `🌐 *Chess.com:*\n` +
                  `${prefix}xadrez player [username]\n\n` +
                  `💡 *Exemplos de jogadas:*\n` +
-                 `• e2e4 (peão para e4)\n` +
+                 `• e2e4 (peão da coluna E, linha 2 para linha 4)\n` +
                  `• Nf3 (cavalo para f3)\n` +
                  `• Bb5 (bispo para b5)\n` +
                  `• O-O (roque pequeno)\n` +
                  `• O-O-O (roque grande)\n\n` +
-                 gerarGuiaCoordenadas() +
-                 `\n\n© NEEXT LTDA`
+                 `© NEEXT LTDA`
     };
 }
 
