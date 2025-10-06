@@ -239,6 +239,15 @@ function obterMenuGamer() {
 • \`${prefix}resetjogodavelha\` - Reset jogo da velha
 • \`${prefix}resetroleta\` - Reset roleta russa
 
+♟️ *XADREZ:*
+• \`${prefix}xadrez @jogador1 @jogador2\` - Iniciar partida
+• \`${prefix}xadrez jogada e2e4\` - Fazer jogada
+• \`${prefix}xadrez status\` - Ver tabuleiro
+• \`${prefix}xadrez desistir\` - Desistir da partida
+• \`${prefix}xadrez ranking\` - Ver ranking
+• \`${prefix}xadrez player [nome]\` - Buscar jogador Chess.com
+• \`${prefix}xadrez ajuda\` - Ajuda completa
+
 🎲 *DIVERSÃO:*
 • \`${prefix}eununca\` - Eu nunca poll
 • \`${prefix}impostor\` - Escolhe impostor aleatório

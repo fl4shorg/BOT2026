@@ -40,6 +40,9 @@ const welcomeSystem = require("./arquivos/welcome.js");
 // Sistema de Registros
 const registros = require("./arquivos/registros.js");
 
+// Sistema de Xadrez
+const xadrez = require("./arquivos/xadrez.js");
+
 // importa banner + logger centralizados
 const { mostrarBanner, logMensagem } = require("./export");
 
@@ -3450,6 +3453,79 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 await reagirMensagem(sock, message, "💰");
             } else {
                 await reagirMensagem(sock, message, "🚨");
+            }
+        }
+        break;
+
+        case "xadrez": {
+            const sender = message.key.participant || from;
+            const config = obterConfiguracoes();
+            
+            if (!args[0]) {
+                const ajuda = xadrez.mostrarAjuda(config.prefix);
+                await reply(sock, from, ajuda.mensagem);
+                break;
+            }
+            
+            const subcomando = args[0].toLowerCase();
+            
+            if (subcomando === "ajuda" || subcomando === "help") {
+                const ajuda = xadrez.mostrarAjuda(config.prefix);
+                await reply(sock, from, ajuda.mensagem);
+            } else if (subcomando === "jogada" || subcomando === "move") {
+                const movimento = args.slice(1).join(" ");
+                if (!movimento) {
+                    await reply(sock, from, `❌ Digite a jogada!\n\n💡 Exemplo: \`${config.prefix}xadrez jogada e2e4\``);
+                    break;
+                }
+                
+                const resultado = xadrez.fazerJogada(from, sender, movimento);
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+                
+                if (resultado.sucesso) {
+                    await reagirMensagem(sock, message, "♟️");
+                }
+            } else if (subcomando === "status" || subcomando === "tabuleiro") {
+                const resultado = xadrez.mostrarStatus(from);
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+            } else if (subcomando === "desistir" || subcomando === "quit") {
+                const resultado = xadrez.desistir(from, sender);
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+                
+                if (resultado.sucesso) {
+                    await reagirMensagem(sock, message, "🏳️");
+                }
+            } else if (subcomando === "ranking" || subcomando === "rank") {
+                const resultado = xadrez.mostrarRanking();
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+            } else if (subcomando === "player" || subcomando === "perfil") {
+                const username = args[1];
+                if (!username) {
+                    await reply(sock, from, `❌ Digite o nome do jogador!\n\n💡 Exemplo: \`${config.prefix}xadrez player hikaru\``);
+                    break;
+                }
+                
+                await reply(sock, from, "🔍 Buscando jogador no Chess.com...");
+                const resultado = await xadrez.buscarJogadorChessCom(username);
+                await reply(sock, from, resultado.mensagem);
+            } else {
+                const mentionedJid = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
+                if (!mentionedJid || mentionedJid.length === 0) {
+                    await reply(sock, from, `❌ Marque o oponente para iniciar!\n\n💡 Exemplo: \`${config.prefix}xadrez @jogador1 @jogador2\``);
+                    break;
+                }
+                
+                if (mentionedJid.length < 2) {
+                    await reply(sock, from, `❌ Você precisa marcar 2 jogadores!\n\n💡 Exemplo: \`${config.prefix}xadrez @jogador1 @jogador2\``);
+                    break;
+                }
+                
+                const resultado = xadrez.iniciarPartida(from, mentionedJid[0], mentionedJid[1]);
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+                
+                if (resultado.sucesso) {
+                    await reagirMensagem(sock, message, "♟️");
+                }
             }
         }
         break;
