@@ -2826,33 +2826,31 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                     await reply(sock, from, `🎵 Encontrado: *${firstResult.name}* - ${firstResult.artists}\n📥 Baixando...`);
 
-                    const downloadUrl = `https://api.nekolabs.my.id/downloader/spotify/v1?url=${encodeURIComponent(spotifyLink)}`;
-                    const downloadResponse = await axios.get(downloadUrl, {
+                    const apiUrl = `https://api.nekolabs.my.id/downloader/spotify/v1?url=${encodeURIComponent(spotifyLink)}`;
+                    const response = await axios.get(apiUrl, {
                         timeout: 30000,
                         headers: {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                         }
                     });
 
-                    if (!downloadResponse.data || !downloadResponse.data.status || !downloadResponse.data.result) {
+                    if (!response.data || !response.data.status || !response.data.result) {
                         await reagirMensagem(sock, message, "❌");
-                        await reply(sock, from, "❌ Erro ao baixar a música. Tente novamente.");
+                        await reply(sock, from, "❌ Não foi possível baixar esta música do Spotify. Verifique o link.");
                         break;
                     }
 
-                    const result = downloadResponse.data.result;
-                    const audioUrl = result.downloadUrl;
-                    const thumbnail = result.cover;
-
-                    if (!audioUrl) {
+                    const result = response.data.result;
+                    
+                    if (!result.downloadUrl) {
                         await reagirMensagem(sock, message, "❌");
-                        await reply(sock, from, "❌ Link de download não encontrado.");
+                        await reply(sock, from, "❌ Link de download não encontrado para esta música.");
                         break;
                     }
 
                     const audioResponse = await axios({
                         method: 'GET',
-                        url: audioUrl,
+                        url: result.downloadUrl,
                         responseType: 'arraybuffer',
                         timeout: 60000
                     });
@@ -2860,29 +2858,37 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     const audioBuffer = Buffer.from(audioResponse.data);
 
                     let thumbnailBuffer = null;
-                    if (thumbnail) {
+                    if (result.cover) {
                         try {
                             const thumbnailResponse = await axios({
                                 method: 'GET',
-                                url: thumbnail,
-                                responseType: 'arraybuffer'
+                                url: result.cover,
+                                responseType: 'arraybuffer',
+                                timeout: 10000
                             });
                             thumbnailBuffer = Buffer.from(thumbnailResponse.data);
                         } catch (err) {
-                            console.log("❌ Erro ao baixar thumbnail:", err.message);
+                            console.log("❌ Erro ao baixar capa do Spotify:", err.message);
                         }
                     }
 
                     await sock.sendMessage(from, {
                         audio: audioBuffer,
-                        mimetype: 'audio/mpeg',
-                        ptt: false,
+                        mimetype: 'audio/mp4',
+                        fileName: `${result.title} - ${result.artist}.mp3`,
+                        jpegThumbnail: thumbnailBuffer,
                         contextInfo: {
+                            forwardingScore: 100000,
+                            isForwarded: true,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: "120363289739581116@newsletter",
+                                newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                            },
                             externalAdReply: {
-                                title: result.title || firstResult.name,
-                                body: `Artista: ${result.artist || firstResult.artists}`,
-                                thumbnailUrl: thumbnail || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
-                                mediaType: 1,
+                                title: `🎵 ${result.title}`,
+                                body: `🎤 ${result.artist} • ⏱️ ${result.duration}`,
+                                thumbnailUrl: result.cover || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                                mediaType: 2,
                                 sourceUrl: spotifyLink,
                                 showAdAttribution: true
                             }
