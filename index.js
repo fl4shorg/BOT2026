@@ -4935,12 +4935,6 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 break;
             }
 
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para executar agendamentos.");
-                break;
-            }
-
             const timeArg = args[0];
             if (!timeArg) {
                 await reply(sock, from, `❌ Use: ${configBot.prefix}opengp HH:MM\n\nExemplo: ${configBot.prefix}opengp 09:07`);
@@ -4957,7 +4951,7 @@ Seu ID foi salvo com segurança em nosso sistema!`;
 
             groupSchedule.setSchedule(from, 'open', parsedTime.formatted);
             await reagirMensagem(sock, message, "🔓");
-            await reply(sock, from, `✅ *AGENDAMENTO CONFIGURADO!*\n\n🔓 Abertura automática: ${parsedTime.formatted}\n⏰ O grupo abrirá automaticamente todos os dias neste horário.`);
+            await reply(sock, from, `✅ *AGENDAMENTO CONFIGURADO!*\n\n🔓 Abertura automática: ${parsedTime.formatted}\n⏰ O grupo abrirá automaticamente todos os dias neste horário.\n\n⚠️ *Importante:* O bot precisa ser admin para executar a abertura automática!`);
             console.log(`⏰ Agendamento de abertura configurado para ${from} às ${parsedTime.formatted}`);
         }
         break;
@@ -4977,12 +4971,6 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 break;
             }
 
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para executar agendamentos.");
-                break;
-            }
-
             const timeArg = args[0];
             if (!timeArg) {
                 await reply(sock, from, `❌ Use: ${configBot.prefix}closegp HH:MM\n\nExemplo: ${configBot.prefix}closegp 21:50`);
@@ -4999,7 +4987,7 @@ Seu ID foi salvo com segurança em nosso sistema!`;
 
             groupSchedule.setSchedule(from, 'close', parsedTime.formatted);
             await reagirMensagem(sock, message, "🔒");
-            await reply(sock, from, `✅ *AGENDAMENTO CONFIGURADO!*\n\n🔒 Fechamento automático: ${parsedTime.formatted}\n⏰ O grupo fechará automaticamente todos os dias neste horário.`);
+            await reply(sock, from, `✅ *AGENDAMENTO CONFIGURADO!*\n\n🔒 Fechamento automático: ${parsedTime.formatted}\n⏰ O grupo fechará automaticamente todos os dias neste horário.\n\n⚠️ *Importante:* O bot precisa ser admin para executar o fechamento automático!`);
             console.log(`⏰ Agendamento de fechamento configurado para ${from} às ${parsedTime.formatted}`);
         }
         break;
