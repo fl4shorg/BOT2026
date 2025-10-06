@@ -34,13 +34,15 @@ function salvarHistorico(historico) {
     }
 }
 
-// Gera URL da imagem do tabuleiro usando Chess.com DynBoard API (com coordenadas)
+// Gera URL da imagem do tabuleiro usando ChessVision API (com coordenadas bem visíveis)
 function gerarImagemTabuleiro(fen, ultimaJogada = null) {
-    // Remove a parte extra do FEN (só precisamos da posição das peças)
-    const fenSimples = fen.split(' ')[0];
+    // Remove a parte extra do FEN (só precisamos da posição das peças + quem joga)
+    const fenParts = fen.split(' ');
+    const fenSimples = fenParts[0];
+    const turn = fenParts[1] || 'w'; // 'w' para brancas, 'b' para pretas
     
-    // Usa Chess.com DynBoard API - gera PNG com coordenadas
-    let url = `https://www.chess.com/dynboard?fen=${encodeURIComponent(fenSimples)}&board=brown&piece=neo&size=3&coordinates=true`;
+    // Usa ChessVision FEN2Image API - gera PNG com coordenadas claras e visíveis
+    let url = `https://fen2image.chessvision.ai/${encodeURIComponent(fenSimples)}?turn=${turn === 'w' ? 'white' : 'black'}`;
     
     return url;
 }
