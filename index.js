@@ -1867,7 +1867,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                 console.log(`📥 Resposta API Frases Anime:`, response.data);
 
-                if (!response.data || !response.data.frase) {
+                if (!response.data || !response.data.text) {
                     await reagirMensagem(sock, message, "❌");
                     await sock.sendMessage(from, {
                         text: '❌ Erro ao buscar frase de anime. Tente novamente!'
@@ -1878,9 +1878,8 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 await reagirMensagem(sock, message, "✅");
 
                 const mensagem = `🎌 *FRASE DE ANIME*\n\n` +
-                               `📝 "${response.data.frase}"\n\n` +
-                               `✍️ *Personagem:* ${response.data.personagem || 'Desconhecido'}\n` +
-                               `📺 *Anime:* ${response.data.anime || 'Desconhecido'}\n\n` +
+                               `📝 "${response.data.text}"\n\n` +
+                               `📺 *Anime:* ${response.data.author}\n\n` +
                                `© NEEXT LTDA`;
 
                 await sock.sendMessage(from, {
