@@ -367,6 +367,9 @@ function processarMensagem(message, groupId, userId) {
     const config = carregarConfigGrupo(groupId);
     if (!config) return { violacao: false };
     
+    // Verifica se message existe
+    if (!message) return { violacao: false };
+    
     const violations = [];
     
     // Extrai texto da mensagem
