@@ -676,10 +676,55 @@ async function handleCommand(sock, message, command, args, from, quoted) {
     await reply(sock, from, "🛡️ Esse é o dono do bot!", [sender]);
     break;
 
+        case "lid":
         case "getlid": {
-            const sender = message.key.participant || from;
-            const userLid = sender.split('@')[0].split(':')[0];
-            await reply(sock, from, `🔑 Seu LID é: \`${userLid}\`\n\n💡 Use este LID para ser adicionado como dono do bot.`);
+            const numero = args[0];
+            
+            if (!numero) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Use: ${config.prefix}lid [número]\n\n💡 Exemplo: ${config.prefix}lid 5521999999999`);
+                break;
+            }
+
+            // Limpa o número (remove caracteres especiais)
+            const numeroLimpo = numero.replace(/[^0-9]/g, '');
+            
+            if (numeroLimpo.length < 10) {
+                await reply(sock, from, "❌ Número inválido! Use o número completo com DDD e DDI.\n\n💡 Exemplo: 5521999999999");
+                break;
+            }
+
+            try {
+                // Busca o LID real procurando nos grupos
+                let lidEncontrado = null;
+                const grupos = await sock.groupFetchAllParticipating();
+                
+                for (const groupId in grupos) {
+                    const group = grupos[groupId];
+                    const participants = group.participants || [];
+                    
+                    for (const participant of participants) {
+                        const participantId = participant.id;
+                        const participantNumber = participantId.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
+                        
+                        if (participantNumber === numeroLimpo) {
+                            lidEncontrado = participantId.split('@')[0].split(':')[0];
+                            break;
+                        }
+                    }
+                    
+                    if (lidEncontrado) break;
+                }
+
+                if (lidEncontrado) {
+                    await reply(sock, from, `✅ *LID Encontrado!*\n\n📱 Número: ${numeroLimpo}\n🔑 LID: \`${lidEncontrado}\`\n\n💡 Use este LID para adicionar como dono do bot.`);
+                } else {
+                    await reply(sock, from, `⚠️ *LID não encontrado!*\n\n📱 Número: ${numeroLimpo}\n\n❌ Este número não está em nenhum grupo comum com o bot.\n\n💡 O bot precisa estar no mesmo grupo que a pessoa para encontrar o LID.`);
+                }
+            } catch (err) {
+                console.error("❌ Erro ao buscar LID:", err);
+                await reply(sock, from, "❌ Erro ao buscar LID. Tente novamente.");
+            }
             break;
         }
 
