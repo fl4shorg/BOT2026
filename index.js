@@ -18,7 +18,6 @@ const Jimp = require("jimp");
 const { igdl } = require('./Instagram.js');
 const settings = require('./settings/settings.json');
 const envConfig = require('./config/environment.js');
-const { Aki } = require('aki-api');
 const cloudscraper = require('cloudscraper');
 const UserAgent = require('user-agents');
 const moment = require('moment-timezone');
@@ -142,9 +141,6 @@ const contextAnuncio = {
 // Mensagens já processadas (evita duplicadas)
 const processedMessages = new Set();
 setInterval(() => processedMessages.clear(), 5 * 60 * 1000);
-
-// Sistema Akinator - Jogo de adivinhação
-const akinatorGames = new Map();
 
 // Sistema de Xadrez - Chess Games
 const chessGames = new Map();
@@ -2088,120 +2084,6 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
             break;
         }
-
-        case 'akinator': {
-            // Só funciona em grupos
-            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
-                await reply(sock, from, "❌ Este comando só funciona em grupos.");
-                break;
-            }
-
-            const sender = message.key.participant || from;
-            const pushname = sock.user?.verifiedName || sock.user?.name || "Usuário";
-
-            // Verifica se já existe um jogo ativo neste grupo
-            if (akinatorGames.has(from)) {
-                const game = akinatorGames.get(from);
-                const jogadorAtual = game.player.split('@')[0];
-                await reply(sock, from, `🎮 *PARTIDA EM ANDAMENTO*\n\n@${jogadorAtual} já está jogando!\n\n⏰ Aguarde finalizar ou use \`.resetakinator\` (admin/jogador).`, [game.player]);
-                break;
-            }
-
-            await reply(sock, from, `🧞‍♂️ *BEM-VINDO AO AKINATOR!*\n\n👤 Jogador: ${pushname}\n\n📝 *COMO JOGAR:*\nPense em um personagem (real ou fictício) e responda:\n\n✅ *sim* | ❌ *não* | 🤷 *não sei*\n👍 *provavelmente* | 👎 *provavelmente não*\n⬅️ *voltar* (pergunta anterior)\n\n🎮 Iniciando jogo...`);
-            await reagirMensagem(sock, message, "⏳");
-
-            try {
-                let aki = null;
-                let region = 'pt';
-                let attempts = 0;
-                const maxAttempts = 2;
-                
-                // Tenta conectar com retry
-                while (attempts < maxAttempts && !aki) {
-                    try {
-                        console.log(`🧞‍♂️ Tentativa ${attempts + 1}/${maxAttempts} - Região: ${region}`);
-                        
-                        const tempAki = new Aki({ 
-                            region: region, 
-                            childMode: false
-                        });
-                        
-                        await tempAki.start();
-                        aki = tempAki;
-                        console.log(`✅ Conectado ao Akinator - Região: ${region}`);
-                        
-                    } catch (err) {
-                        console.error(`❌ Falha na tentativa ${attempts + 1}:`, err.message);
-                        attempts++;
-                        
-                        // Tenta com região diferente
-                        if (attempts === 1) {
-                            region = 'en';
-                            await new Promise(resolve => setTimeout(resolve, 2000));
-                        }
-                    }
-                }
-                
-                if (!aki) {
-                    throw new Error('Não foi possível conectar após múltiplas tentativas');
-                }
-                
-                akinatorGames.set(from, {
-                    aki: aki,
-                    player: sender,
-                    question: 0
-                });
-
-                const progressBar = '▓' + '░'.repeat(9);
-                await reply(sock, from, `🧞‍♂️ *QUESTÃO 1*\n\n📊 [${progressBar}] ${Math.round(aki.progress)}%\n\n❓ *${aki.question}*\n\n💬 Responda agora!`);
-                await reagirMensagem(sock, message, "🧞‍♂️");
-                
-                console.log(`🧞‍♂️ Akinator iniciado no grupo ${from.split('@')[0]} por ${sender.split('@')[0]}`);
-
-            } catch (err) {
-                console.error("❌ Erro ao iniciar Akinator:", err.message);
-                await reagirMensagem(sock, message, "❌");
-                
-                if (err.response && err.response.status === 403) {
-                    await reply(sock, from, "❌ *BLOQUEADO PELO CLOUDFLARE*\n\nO Akinator está protegido contra bots.\n\n💡 Tente novamente mais tarde ou use outro horário.");
-                } else {
-                    await reply(sock, from, "❌ *ERRO DE CONEXÃO*\n\nNão foi possível conectar ao Akinator.\n\n💡 O serviço pode estar temporariamente indisponível.");
-                }
-                
-                akinatorGames.delete(from);
-            }
-        }
-        break;
-
-        case 'resetaki':
-        case 'resetakinator': {
-            // Só funciona em grupos
-            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
-                await reply(sock, from, "❌ Este comando só funciona em grupos.");
-                break;
-            }
-
-            const sender = message.key.participant || from;
-
-            if (!akinatorGames.has(from)) {
-                await reply(sock, from, "❌ Não há nenhum jogo do Akinator em andamento.");
-                break;
-            }
-
-            const game = akinatorGames.get(from);
-            const ehAdmin = await isAdmin(sock, from, sender);
-            const ehDono = isDono(sender);
-
-            if (game.player === sender || ehAdmin || ehDono) {
-                akinatorGames.delete(from);
-                await reply(sock, from, `🧞‍♂️ *JOGO RESETADO*\n\n✅ Sessão deletada!\n\n💡 Use \`.akinator\` para jogar novamente.`);
-                await reagirMensagem(sock, message, "✅");
-                console.log(`🔄 Akinator resetado no grupo ${from.split('@')[0]}`);
-            } else {
-                await reply(sock, from, "⛔ Apenas admin ou o jogador podem resetar.");
-            }
-        }
-        break;
 
         case "instagram":
         case "ig": {
