@@ -34,18 +34,13 @@ function salvarHistorico(historico) {
     }
 }
 
-// Gera URL da imagem do tabuleiro usando web-boardimage (sem marca d'água)
+// Gera URL da imagem do tabuleiro usando Chess.com DynBoard API (com coordenadas)
 function gerarImagemTabuleiro(fen, ultimaJogada = null) {
     // Remove a parte extra do FEN (só precisamos da posição das peças)
     const fenSimples = fen.split(' ')[0];
     
-    // Usa web-boardimage API - serviço mantido por desenvolvedor do Lichess
-    let url = `https://backscattering.de/web-boardimage/board.svg?fen=${encodeURIComponent(fenSimples)}&size=600&colors=lichess-brown&coordinates=true`;
-    
-    // Adiciona destaque da última jogada se existir
-    if (ultimaJogada) {
-        url += `&lastMove=${ultimaJogada}`;
-    }
+    // Usa Chess.com DynBoard API - gera PNG com coordenadas
+    let url = `https://www.chess.com/dynboard?fen=${encodeURIComponent(fenSimples)}&board=brown&piece=neo&size=3&coordinates=true`;
     
     return url;
 }
