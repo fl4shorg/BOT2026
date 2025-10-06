@@ -213,6 +213,8 @@ function obterMenuDownload() {
 📱 *REDES SOCIAIS:*
 • \`${prefix}ig [link]\` - Download Instagram
 • \`${prefix}instagram [link]\` - Download Instagram
+• \`${prefix}tiktok [link]\` - Download TikTok sem marca d'água
+• \`${prefix}tt [link]\` - Download TikTok (atalho)
 
 🏷️ *STICKERS:*
 • \`${prefix}s\` - Criar sticker de mídia

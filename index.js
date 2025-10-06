@@ -4626,39 +4626,86 @@ Seu ID foi salvo com segurança em nosso sistema!`;
 
         case "tiktok":
         case "tt": {
-            // Só funciona em grupos com RPG ativo
-            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
-                await reply(sock, from, "❌ O sistema RPG só funciona em grupos.");
+            // Download de vídeos do TikTok
+            if (!args[0]) {
+                await reply(sock, from, "❌ Por favor, forneça um link do TikTok.\n\nExemplo: `.tiktok https://vm.tiktok.com/xxxxx`");
                 break;
             }
 
-            if (!rpg.isRPGAtivo(from)) {
-                await reply(sock, from, "❌ O RPG não está ativo neste grupo.");
+            const url = args[0];
+
+            if (!url.includes('tiktok.com')) {
+                await reply(sock, from, "❌ Link inválido! Use um link do TikTok.");
                 break;
             }
 
-            const sender = message.key.participant || from;
-            const userId = sender.split('@')[0];
+            try {
+                await reagirMensagem(sock, message, "⏳");
+                await reply(sock, from, "📱 Baixando vídeo do TikTok, aguarde...");
 
-            if (!rpg.isUsuarioRegistrado(userId)) {
-                const config = obterConfiguracoes();
-                await reply(sock, from, "❌ Você precisa se registrar primeiro! Use `" + config.prefix + "registrar`");
-                break;
-            }
+                const apiUrl = `https://api.siputzx.my.id/api/d/tiktok?url=${encodeURIComponent(url)}`;
+                const response = await axios.get(apiUrl, {
+                    timeout: 30000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
 
-            const resultado = await rpg.criarConteudo(userId, 'tiktok');
-
-            if (resultado.erro) {
-                if (resultado.erro === 'Cooldown') {
-                    await reply(sock, from, resultado.mensagem);
-                } else {
-                    await reply(sock, from, `❌ ${resultado.erro}`);
+                if (!response.data || !response.data.status || !response.data.data) {
+                    await reagirMensagem(sock, message, "❌");
+                    await reply(sock, from, "❌ Não foi possível baixar este vídeo do TikTok. Verifique o link.");
+                    break;
                 }
-                break;
-            }
 
-            await reply(sock, from, resultado.mensagem);
-            await reagirMensagem(sock, message, "📱");
+                const result = response.data.data;
+
+                if (!result.video || !result.video.noWatermark) {
+                    await reagirMensagem(sock, message, "❌");
+                    await reply(sock, from, "❌ Vídeo não encontrado ou não disponível.");
+                    break;
+                }
+
+                const videoResponse = await axios({
+                    method: 'GET',
+                    url: result.video.noWatermark,
+                    responseType: 'arraybuffer',
+                    timeout: 60000
+                });
+
+                const videoBuffer = Buffer.from(videoResponse.data);
+
+                const caption = `📱 *Vídeo do TikTok baixado!*
+
+📝 **Título:** ${result.title || 'Sem título'}
+👤 **Autor:** ${result.author?.nickname || result.author?.uniqueId || 'Desconhecido'}
+❤️ **Likes:** ${result.statistics?.likeCount || 0}
+💬 **Comentários:** ${result.statistics?.commentCount || 0}
+🔗 **Link:** ${url}
+
+© NEEXT LTDA`;
+
+                await sock.sendMessage(from, {
+                    video: videoBuffer,
+                    caption: caption,
+                    mimetype: 'video/mp4',
+                    contextInfo: {
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        }
+                    }
+                }, { quoted: message });
+
+                await reagirMensagem(sock, message, "✅");
+                console.log(`✅ Vídeo do TikTok baixado com sucesso`);
+
+            } catch (error) {
+                console.error("❌ Erro ao baixar TikTok:", error);
+                await reagirMensagem(sock, message, "❌");
+                await reply(sock, from, "❌ Erro ao baixar o vídeo do TikTok. Tente novamente mais tarde.");
+            }
         }
         break;
 
