@@ -7908,7 +7908,7 @@ function setupListeners(sock) {
                 const sender = isGroup ? message.key.participant : from;
                 const messageText = getMessageText(message.message);
                 
-                logMensagem(from, sender, messageText, isGroup);
+                logMensagem(message, messageText, false, sock);
                 
                 // Normaliza a mensagem
                 const { normalized, quoted } = normalizeMessage(message);
@@ -7974,7 +7974,7 @@ function setupListeners(sock) {
                     const args = text.slice(prefix.length).trim().split(/ +/);
                     const command = args.shift().toLowerCase();
                     
-                    console.log(`🤖 Comando recebido: ${command} de ${sender.split('@')[0]}`);
+                    logMensagem(message, text, true, sock);
                     
                     // Executa o comando
                     await handleCommand(sock, normalized, command, args, from, quoted);
