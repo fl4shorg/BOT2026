@@ -2793,11 +2793,10 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         }
         break;
 
-        case "playspotify":
-        case "play": {
+        case "playspotify": {
             try {
                 if (!args[0]) {
-                    await reply(sock, from, "❌ Por favor, forneça o nome da música.\n\nExemplo: `.play Kamaitachi`");
+                    await reply(sock, from, "❌ Por favor, forneça o nome da música.\n\nExemplo: `.playspotify Kamaitachi`");
                     break;
                 }
 

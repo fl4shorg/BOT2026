@@ -204,12 +204,11 @@ function obterMenuDownload() {
 
 🎵 *SPOTIFY:*
 • \`${prefix}playspotify [nome]\` - Busca e baixa música do Spotify
-• \`${prefix}play [nome]\` - Busca e baixa música do Spotify
 • \`${prefix}spotifysearch [nome]\` - Pesquisa música no Spotify
 • \`${prefix}spotify [link]\` - Download direto do Spotify
 
-🎬 *VÍDEOS:*
-• \`${prefix}play [nome]\` - Busca música no YouTube
+🎬 *YOUTUBE:*
+• \`${prefix}play [nome]\` - Busca e baixa música do YouTube
 
 📷 *IMAGENS:*
 • \`${prefix}pinterest [busca]\` - Imagens do Pinterest
