@@ -82,18 +82,20 @@ const HENTAI_COMMANDS = {
 
 async function fetchHentaiImage(url) {
     try {
-        const response = await axios.get(url);
+        const response = await axios.get(url, {
+            responseType: 'arraybuffer'
+        });
         
-        if (response.data && response.data.url) {
+        if (response.data) {
             return {
                 success: true,
-                imageUrl: response.data.url
+                imageBuffer: Buffer.from(response.data)
             };
         }
         
         return {
             success: false,
-            error: 'URL não encontrada na resposta'
+            error: 'Imagem não encontrada na resposta'
         };
     } catch (error) {
         console.error('Erro ao buscar imagem hentai:', error);
@@ -125,7 +127,7 @@ async function handleHentaiCommand(sock, command, from, sender, message) {
         
         if (result.success) {
             await sock.sendMessage(targetJid, {
-                image: { url: result.imageUrl },
+                image: result.imageBuffer,
                 caption: `🔞 *${command.toUpperCase()}*\n\n📸 Imagem aleatória da API Neext\n🌐 api.neext.online\n\n⚠️ Conteúdo +18`
             });
             console.log(`🔞 Imagem ${command} enviada no PV de ${sender.split('@')[0]}`);
@@ -139,7 +141,7 @@ async function handleHentaiCommand(sock, command, from, sender, message) {
         
         if (result.success) {
             await sock.sendMessage(from, {
-                image: { url: result.imageUrl },
+                image: result.imageBuffer,
                 caption: `🔞 *${command.toUpperCase()}*\n\n📸 Imagem aleatória da API Neext\n🌐 api.neext.online\n\n⚠️ Conteúdo +18`
             }, { quoted: message });
             console.log(`🔞 Imagem ${command} enviada no PV de ${sender.split('@')[0]}`);
