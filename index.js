@@ -45,6 +45,9 @@ const xadrez = require("./arquivos/xadrez.js");
 // Sistema de Akinator
 const akinator = require("./arquivos/akinator.js");
 
+// Sistema de Damas
+const damas = require("./arquivos/damas.js");
+
 // importa banner + logger centralizados
 const { mostrarBanner, logMensagem } = require("./export");
 
@@ -3531,6 +3534,127 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             if (resultado.success) {
                 await reagirMensagem(sock, message, "🛑");
             }
+        }
+        break;
+
+        case "damas": {
+            await reagirMensagem(sock, message, "🎲");
+            const sender = message.key.participant || from;
+            
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "⚠️ O jogo de damas só funciona em grupos!");
+                break;
+            }
+            
+            const mentionedJid = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
+            if (!mentionedJid || mentionedJid.length === 0) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `⚠️ Marque o oponente para iniciar!\n\n💡 Exemplo: \`${config.prefix}damas @oponente\``);
+                break;
+            }
+            
+            const resultado = await damas.iniciarPartida(from, sender, mentionedJid[0]);
+            
+            if (resultado.sucesso && resultado.imagem) {
+                try {
+                    await sock.sendMessage(from, {
+                        image: { url: resultado.imagem },
+                        caption: resultado.mensagem,
+                        mentions: resultado.mentions
+                    });
+                    await reagirMensagem(sock, message, "🎲");
+                } catch (err) {
+                    console.log("⚠️ Erro ao enviar imagem do tabuleiro:", err.message);
+                    await reply(sock, from, resultado.mensagem, resultado.mentions);
+                }
+            } else {
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+            }
+        }
+        break;
+
+        case "damasjogada": {
+            const sender = message.key.participant || from;
+            
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "⚠️ O jogo de damas só funciona em grupos!");
+                break;
+            }
+            
+            if (!args[0] || !args[1]) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Digite a origem e destino!\n\n💡 Exemplo: \`${config.prefix}damasjogada c3 d4\``);
+                break;
+            }
+            
+            await reagirMensagem(sock, message, "⏳");
+            
+            const resultado = await damas.fazerJogada(from, sender, args[0], args[1]);
+            
+            if (resultado.sucesso && resultado.imagem) {
+                try {
+                    await sock.sendMessage(from, {
+                        image: { url: resultado.imagem },
+                        caption: resultado.mensagem,
+                        mentions: resultado.mentions
+                    });
+                    await reagirMensagem(sock, message, "✅");
+                } catch (err) {
+                    console.log("⚠️ Erro ao enviar imagem do tabuleiro:", err.message);
+                    await reply(sock, from, resultado.mensagem, resultado.mentions);
+                }
+            } else {
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+            }
+        }
+        break;
+
+        case "damastabuleiro": {
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "⚠️ O jogo de damas só funciona em grupos!");
+                break;
+            }
+            
+            await reagirMensagem(sock, message, "📊");
+            
+            const resultado = await damas.mostrarTabuleiro(from);
+            
+            if (resultado.sucesso && resultado.imagem) {
+                try {
+                    await sock.sendMessage(from, {
+                        image: { url: resultado.imagem },
+                        caption: resultado.mensagem,
+                        mentions: resultado.mentions
+                    });
+                } catch (err) {
+                    console.log("⚠️ Erro ao enviar imagem do tabuleiro:", err.message);
+                    await reply(sock, from, resultado.mensagem, resultado.mentions);
+                }
+            } else {
+                await reply(sock, from, resultado.mensagem, resultado.mentions);
+            }
+        }
+        break;
+
+        case "damasparar": {
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "⚠️ O jogo de damas só funciona em grupos!");
+                break;
+            }
+            
+            const resultado = damas.pararPartida(from);
+            await reply(sock, from, resultado.mensagem);
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "🛑");
+            }
+        }
+        break;
+
+        case "damasajuda": {
+            const config = obterConfiguracoes();
+            const resultado = damas.mostrarAjuda(config.prefix);
+            await reply(sock, from, resultado.mensagem);
         }
         break;
 
