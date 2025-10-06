@@ -515,41 +515,26 @@ function obterMenuSticker() {
 // ========================
 function obterMenuFigurinhas() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
-    return `
-🖼️ *MENU FIGURINHAS - PACOTES PRONTOS*
+    return `╭─━─━⋆｡°✩🎨✩°｡⋆ ━─━─╮
+│        𝐅𝐈𝐆𝐔𝐑𝐈𝐍𝐇𝐀𝐒    
+╰─━─━⋆｡°✩🎨✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮  
+│╭─━─⋆｡°✩🏮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhasanime - Figurinhas aleatórias
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhasmeme - Figurinhas aleatórias
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhasengracadas - Figurinhas aleatórias
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhasemoji - Figurinhas aleatórias
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhascoreana - Figurinhas aleatórias
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhasdesenho - Figurinhas aleatórias
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhasraiva - Figurinhas aleatórias
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}figurinhasroblox - Figurinhas aleatórias
+│╰─━─⋆｡°✩🏮✩°｡⋆ ━─━╯
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
 
-✨ *PACOTES DISPONÍVEIS (5 figurinhas aleatórias):*
-
-🎌 *ANIME:*
-• \`${prefix}figurinhasanime\` - Figurinhas de anime
-
-😂 *HUMOR:*
-• \`${prefix}figurinhasmeme\` - Figurinhas de meme
-• \`${prefix}figurinhasengracadas\` - Figurinhas engraçadas
-
-😊 *EMOJI:*
-• \`${prefix}figurinhasemoji\` - Figurinhas de emoji
-
-🌸 *ESTILO K-POP:*
-• \`${prefix}figurinhascoreana\` - Figurinhas coreanas
-
-🎨 *DESENHOS:*
-• \`${prefix}figurinhasdesenho\` - Figurinhas de desenho
-
-😡 *REAÇÕES:*
-• \`${prefix}figurinhasraiva\` - Figurinhas de raiva
-
-🎮 *ROBLOX:*
-• \`${prefix}figurinhasroblox\` - Figurinhas do Roblox
-
-💡 *COMO USAR:*
-• Digite o comando e receba 5 figurinhas aleatórias
-• Figurinhas em formato WebP otimizado
-• Novos pacotes adicionados regularmente
-
-━━━━━━━━━━━━━━━
-© NEEXT LTDA - ${nickDoDono}
-`;
+╭─━─━⋆｡°✩🧩✩°｡⋆ ━─━─╮
+│     © ɴᴇᴇxᴛ ʟᴛᴅᴀ - ɴᴇᴇxᴛ
+╰─━─━⋆｡°✩🧩✩°｡⋆ ━─━─╯`;
 }
 
 // ========================
