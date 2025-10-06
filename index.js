@@ -714,10 +714,21 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                             lidEncontrado = jidCompleto.split('@')[0];
                             metodoEncontrado = "API WhatsApp";
                         } else {
-                            // Se retornou número tradicional, busca o LID no mapeamento
-                            const numeroExtraido = jidCompleto.split('@')[0];
-                            lidEncontrado = numeroExtraido;
-                            metodoEncontrado = "Número tradicional";
+                            // Se retornou número tradicional, tenta converter para LID
+                            // Busca no mapeamento widToLid
+                            if (sock.authState?.creds?.lidJidMapping?.widToLid) {
+                                const mapping = sock.authState.creds.lidJidMapping.widToLid;
+                                const lidMapeado = mapping[jidCompleto];
+                                
+                                if (lidMapeado) {
+                                    lidEncontrado = lidMapeado.split('@')[0];
+                                    metodoEncontrado = "Mapeamento WID→LID";
+                                    console.log(`✅ LID encontrado via mapeamento: ${lidEncontrado}`);
+                                } else {
+                                    // Número tradicional sem LID - não salva ainda, vai tentar outros métodos
+                                    console.log(`⚠️ Número tradicional sem LID no mapeamento`);
+                                }
+                            }
                         }
                     }
                 } catch (apiErr) {
