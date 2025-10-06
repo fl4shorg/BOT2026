@@ -216,11 +216,18 @@ async function startBot() {
             console.log("🔧 Listeners de mensagens configurados!");
         } else if(connection==="close"){
             const statusCode = lastDisconnect?.error?.output?.statusCode;
-            const shouldReconnect = statusCode !== 401 && statusCode !== 403;
+            const reason = lastDisconnect?.error?.output?.payload?.message;
+            
+            // Só limpa sessão se for erro de autenticação PERMANENTE, não temporário
+            const isPermanentAuthError = (statusCode === 401 || statusCode === 403) && 
+                                         reason && (reason.includes('logged out') || reason.includes('invalid'));
+            
+            const shouldReconnect = !isPermanentAuthError;
             console.log(`❌ Conexão fechada (${statusCode || 'desconhecido'}). Reconectando... (${shouldReconnect?"sim":"não"})`);
             
-            if(!shouldReconnect && (statusCode === 401 || statusCode === 403)){
-                console.log("🔄 Sessão inválida detectada! Limpando credenciais antigas...");
+            if(isPermanentAuthError){
+                console.log("🔄 Sessão PERMANENTEMENTE inválida! Limpando credenciais...");
+                console.log(`📋 Motivo: ${reason}`);
                 try {
                     await sock.logout().catch(()=>{});
                     const path = require('path');
