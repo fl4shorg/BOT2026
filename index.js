@@ -2826,7 +2826,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                     await reply(sock, from, `🎵 Encontrado: *${firstResult.name}* - ${firstResult.artists}\n📥 Baixando...`);
 
-                    const downloadUrl = `https://www.api.neext.online/spotify?url=${encodeURIComponent(spotifyLink)}`;
+                    const downloadUrl = `https://api.nekolabs.my.id/downloader/spotify/v1?url=${encodeURIComponent(spotifyLink)}`;
                     const downloadResponse = await axios.get(downloadUrl, {
                         timeout: 30000,
                         headers: {
@@ -2834,15 +2834,15 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         }
                     });
 
-                    if (!downloadResponse.data || !downloadResponse.data.result) {
+                    if (!downloadResponse.data || !downloadResponse.data.status || !downloadResponse.data.result) {
                         await reagirMensagem(sock, message, "❌");
                         await reply(sock, from, "❌ Erro ao baixar a música. Tente novamente.");
                         break;
                     }
 
                     const result = downloadResponse.data.result;
-                    const audioUrl = result.url;
-                    const thumbnail = result.image;
+                    const audioUrl = result.downloadUrl;
+                    const thumbnail = result.cover;
 
                     if (!audioUrl) {
                         await reagirMensagem(sock, message, "❌");
