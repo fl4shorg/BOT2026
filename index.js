@@ -6182,136 +6182,15 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 `${global.jogoDaVelha[from].tabuleiro[3]} ${global.jogoDaVelha[from].tabuleiro[4]} ${global.jogoDaVelha[from].tabuleiro[5]}\n` +
                 `${global.jogoDaVelha[from].tabuleiro[6]} ${global.jogoDaVelha[from].tabuleiro[7]} ${global.jogoDaVelha[from].tabuleiro[8]}`;
 
-            const botConfig = obterConfiguracoes();
             await reply(sock, from,
                 `⭕ *JOGO DA VELHA INICIADO!*\n\n` +
                 `👤 **Jogador 1:** @${sender.split('@')[0]} (❌)\n` +
                 `👤 **Jogador 2:** @${oponente.split('@')[0]} (⭕)\n\n` +
                 `🎲 **Tabuleiro:**\n${tabuleiro}\n\n` +
                 `🎯 **Vez de:** @${sender.split('@')[0]}\n\n` +
-                `💡 **Como jogar:** Digite \`${botConfig.prefix}jv [1-9]\` para fazer sua jogada\n` +
-                `📌 Exemplo: \`${botConfig.prefix}jv 5\` para jogar no centro`,
+                `💡 **Como jogar:** Digite o número de 1 a 9 para marcar sua posição`,
                 [sender, oponente]
             );
-        }
-        break;
-
-        case "jv":
-        case "jogarvelha": {
-            // Verifica se modo gamer está ativo
-            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
-                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
-                break;
-            }
-
-            const config = antiSpam.carregarConfigGrupo(from);
-            if (!config || !config.modogamer) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Modo Gamer está desativado neste grupo! Use \`${botConfig.prefix}modogamer on\` para ativar.`);
-                break;
-            }
-
-            const sender = message.key.participant || from;
-
-            if (!global.jogoDaVelha || !global.jogoDaVelha[from] || !global.jogoDaVelha[from].ativo) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Não há jogo da velha ativo! Use \`${botConfig.prefix}jogodavelha @usuario\` para iniciar.`);
-                break;
-            }
-
-            const jogo = global.jogoDaVelha[from];
-            const jogada = parseInt(args[0]);
-
-            // Verifica se forneceu um número
-            if (!args[0] || isNaN(jogada) || jogada < 1 || jogada > 9) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Digite um número de 1 a 9!\n\nExemplo: \`${botConfig.prefix}jv 5\``);
-                break;
-            }
-
-            // Verifica se é um dos jogadores
-            if (sender !== jogo.jogador1 && sender !== jogo.jogador2) {
-                await reply(sock, from, "❌ Você não está participando deste jogo!");
-                break;
-            }
-
-            // Verifica se é a vez do jogador
-            if (sender !== jogo.vezDe) {
-                const vezDe = jogo.vezDe === jogo.jogador1 ? jogo.jogador1 : jogo.jogador2;
-                await reply(sock, from, `⏳ Aguarde! É a vez de @${vezDe.split('@')[0]}`, [vezDe]);
-                break;
-            }
-
-            // Verifica se a posição está livre
-            const posicao = jogada - 1;
-            if (jogo.tabuleiro[posicao] !== `${jogada}️⃣`) {
-                await reply(sock, from, "❌ Esta posição já está ocupada! Escolha outra.");
-                break;
-            }
-
-            // Faz a jogada
-            const simbolo = sender === jogo.jogador1 ? "❌" : "⭕";
-            jogo.tabuleiro[posicao] = simbolo;
-
-            // Verifica vitória
-            const combinacoesVitoria = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
-                [0, 4, 8], [2, 4, 6]             // Diagonais
-            ];
-
-            let vencedor = null;
-            for (const combo of combinacoesVitoria) {
-                if (jogo.tabuleiro[combo[0]] === simbolo && 
-                    jogo.tabuleiro[combo[1]] === simbolo && 
-                    jogo.tabuleiro[combo[2]] === simbolo) {
-                    vencedor = sender;
-                    break;
-                }
-            }
-
-            // Verifica empate
-            const empate = !vencedor && jogo.tabuleiro.every(pos => pos === "❌" || pos === "⭕");
-
-            const tabuleiro =
-                `${jogo.tabuleiro[0]} ${jogo.tabuleiro[1]} ${jogo.tabuleiro[2]}\n` +
-                `${jogo.tabuleiro[3]} ${jogo.tabuleiro[4]} ${jogo.tabuleiro[5]}\n` +
-                `${jogo.tabuleiro[6]} ${jogo.tabuleiro[7]} ${jogo.tabuleiro[8]}`;
-
-            if (vencedor) {
-                await reagirMensagem(sock, message, "🎉");
-                await reply(sock, from,
-                    `🎉 *JOGO DA VELHA - VITÓRIA!*\n\n` +
-                    `🎲 **Tabuleiro Final:**\n${tabuleiro}\n\n` +
-                    `🏆 **VENCEDOR:** @${vencedor.split('@')[0]}\n\n` +
-                    `🎮 Parabéns pela vitória!`,
-                    [vencedor, jogo.jogador1, jogo.jogador2]
-                );
-                delete global.jogoDaVelha[from];
-            } else if (empate) {
-                await reagirMensagem(sock, message, "🤝");
-                await reply(sock, from,
-                    `🤝 *JOGO DA VELHA - EMPATE!*\n\n` +
-                    `🎲 **Tabuleiro Final:**\n${tabuleiro}\n\n` +
-                    `⚖️ Deu velha! Ninguém venceu.\n\n` +
-                    `🎮 Jogo finalizado!`,
-                    [jogo.jogador1, jogo.jogador2]
-                );
-                delete global.jogoDaVelha[from];
-            } else {
-                // Alterna a vez
-                jogo.vezDe = jogo.vezDe === jogo.jogador1 ? jogo.jogador2 : jogo.jogador1;
-                const botConfig = obterConfiguracoes();
-                
-                await reagirMensagem(sock, message, simbolo);
-                await reply(sock, from,
-                    `⭕ *JOGO DA VELHA*\n\n` +
-                    `🎲 **Tabuleiro:**\n${tabuleiro}\n\n` +
-                    `🎯 **Vez de:** @${jogo.vezDe.split('@')[0]}\n\n` +
-                    `💡 Digite \`${botConfig.prefix}jv [1-9]\` para jogar`,
-                    [jogo.vezDe]
-                );
-            }
         }
         break;
 
@@ -7107,6 +6986,93 @@ function setupListeners(sock) {
                             } else {
                                 await reply(sock, from, resultado.message);
                                 await reagirMensagem(sock, normalized, "❌");
+                            }
+                        }
+                    }
+                    
+                    // Sistema de jogadas do Jogo da Velha
+                    if (global.jogoDaVelha && global.jogoDaVelha[from] && global.jogoDaVelha[from].ativo) {
+                        const jogo = global.jogoDaVelha[from];
+                        const jogada = parseInt(text.trim());
+                        
+                        // Verifica se é um número válido (1-9)
+                        if (!isNaN(jogada) && jogada >= 1 && jogada <= 9) {
+                            // Verifica se é um dos jogadores
+                            if (sender !== jogo.jogador1 && sender !== jogo.jogador2) {
+                                await reply(sock, from, "❌ Você não está participando deste jogo!");
+                            } else if (sender !== jogo.vezDe) {
+                                // Verifica se é a vez do jogador
+                                const vezDe = jogo.vezDe === jogo.jogador1 ? jogo.jogador1 : jogo.jogador2;
+                                await reply(sock, from, `⏳ Aguarde! É a vez de @${vezDe.split('@')[0]}`, [vezDe]);
+                            } else {
+                                // Verifica se a posição está livre
+                                const posicao = jogada - 1;
+                                if (jogo.tabuleiro[posicao] !== `${jogada}️⃣`) {
+                                    await reply(sock, from, "❌ Esta posição já está ocupada! Escolha outra.");
+                                } else {
+                                    // Faz a jogada
+                                    const simbolo = sender === jogo.jogador1 ? "❌" : "⭕";
+                                    jogo.tabuleiro[posicao] = simbolo;
+                                    
+                                    // Verifica vitória
+                                    const combinacoesVitoria = [
+                                        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
+                                        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
+                                        [0, 4, 8], [2, 4, 6]             // Diagonais
+                                    ];
+                                    
+                                    let vencedor = null;
+                                    for (const combo of combinacoesVitoria) {
+                                        if (jogo.tabuleiro[combo[0]] === simbolo && 
+                                            jogo.tabuleiro[combo[1]] === simbolo && 
+                                            jogo.tabuleiro[combo[2]] === simbolo) {
+                                            vencedor = sender;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    // Verifica empate
+                                    const empate = !vencedor && jogo.tabuleiro.every(pos => pos === "❌" || pos === "⭕");
+                                    
+                                    const tabuleiro =
+                                        `${jogo.tabuleiro[0]} ${jogo.tabuleiro[1]} ${jogo.tabuleiro[2]}\n` +
+                                        `${jogo.tabuleiro[3]} ${jogo.tabuleiro[4]} ${jogo.tabuleiro[5]}\n` +
+                                        `${jogo.tabuleiro[6]} ${jogo.tabuleiro[7]} ${jogo.tabuleiro[8]}`;
+                                    
+                                    if (vencedor) {
+                                        await reagirMensagem(sock, normalized, "🎉");
+                                        await reply(sock, from,
+                                            `🎉 *JOGO DA VELHA - VITÓRIA!*\n\n` +
+                                            `🎲 **Tabuleiro Final:**\n${tabuleiro}\n\n` +
+                                            `🏆 **VENCEDOR:** @${vencedor.split('@')[0]}\n\n` +
+                                            `🎮 Parabéns pela vitória!`,
+                                            [vencedor, jogo.jogador1, jogo.jogador2]
+                                        );
+                                        delete global.jogoDaVelha[from];
+                                    } else if (empate) {
+                                        await reagirMensagem(sock, normalized, "🤝");
+                                        await reply(sock, from,
+                                            `🤝 *JOGO DA VELHA - EMPATE!*\n\n` +
+                                            `🎲 **Tabuleiro Final:**\n${tabuleiro}\n\n` +
+                                            `⚖️ Deu velha! Ninguém venceu.\n\n` +
+                                            `🎮 Jogo finalizado!`,
+                                            [jogo.jogador1, jogo.jogador2]
+                                        );
+                                        delete global.jogoDaVelha[from];
+                                    } else {
+                                        // Alterna a vez
+                                        jogo.vezDe = jogo.vezDe === jogo.jogador1 ? jogo.jogador2 : jogo.jogador1;
+                                        
+                                        await reagirMensagem(sock, normalized, simbolo);
+                                        await reply(sock, from,
+                                            `⭕ *JOGO DA VELHA*\n\n` +
+                                            `🎲 **Tabuleiro:**\n${tabuleiro}\n\n` +
+                                            `🎯 **Vez de:** @${jogo.vezDe.split('@')[0]}\n\n` +
+                                            `💡 Digite um número de 1 a 9 para jogar`,
+                                            [jogo.vezDe]
+                                        );
+                                    }
+                                }
                             }
                         }
                     }
