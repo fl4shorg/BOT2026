@@ -42,6 +42,9 @@ const registros = require("./arquivos/registros.js");
 // Sistema de Xadrez
 const xadrez = require("./arquivos/xadrez.js");
 
+// Sistema de Akinator
+const akinator = require("./arquivos/akinator.js");
+
 // importa banner + logger centralizados
 const { mostrarBanner, logMensagem } = require("./export");
 
@@ -3494,6 +3497,43 @@ Seu ID foi salvo com segurança em nosso sistema!`;
         }
         break;
 
+        case "akinator": {
+            await reagirMensagem(sock, message, "🔮");
+            const sender = message.key.participant || from;
+            const resultado = await akinator.iniciarAkinator(sender);
+            
+            await reply(sock, from, resultado.message);
+            
+            if (resultado.success) {
+                await reagirMensagem(sock, message, "✨");
+            }
+        }
+        break;
+
+        case "akinatorvoltar": {
+            const sender = message.key.participant || from;
+            const resultado = await akinator.voltarAkinator(sender);
+            
+            await reply(sock, from, resultado.message);
+            
+            if (resultado.success) {
+                await reagirMensagem(sock, message, "⬅️");
+            }
+        }
+        break;
+
+        case "akinatorparar": {
+            const sender = message.key.participant || from;
+            const resultado = akinator.pararAkinator(sender);
+            
+            await reply(sock, from, resultado.message);
+            
+            if (resultado.success) {
+                await reagirMensagem(sock, message, "🛑");
+            }
+        }
+        break;
+
         case "estudar": {
             // Só funciona em grupos com RPG ativo
             if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
@@ -6491,98 +6531,35 @@ function setupListeners(sock) {
                         await reply(sock, from, `🤖 *Prefixo atual:* \`${prefix}\`\n\n💡 Use ${prefix}menu para ver os comandos disponíveis.`);
                     }
                     
-                    // Sistema de respostas do Akinator
-                    if (akinatorGames.has(from)) {
-                        const game = akinatorGames.get(from);
+                    // Sistema de respostas do Akinator (novo sistema)
+                    if (akinator.jogosAtivos.has(sender)) {
+                        const respostaNum = parseInt(text.trim());
                         
-                        // Apenas o jogador que iniciou pode responder
-                        if (game.player === sender) {
-                            const resposta = text.toLowerCase().trim();
-                            const respostasValidas = {
-                                'sim': 0,
-                                's': 0,
-                                'yes': 0,
-                                'y': 0,
-                                'não': 1,
-                                'nao': 1,
-                                'n': 1,
-                                'no': 1,
-                                'não sei': 2,
-                                'nao sei': 2,
-                                'ns': 2,
-                                'idk': 2,
-                                'provavelmente sim': 3,
-                                'provavelmente': 3,
-                                'probably': 3,
-                                'p': 3,
-                                'provavelmente não': 4,
-                                'provavelmente nao': 4,
-                                'probably not': 4,
-                                'pn': 4,
-                                'voltar': 'back',
-                                'back': 'back',
-                                'v': 'back'
-                            };
-
-                            if (respostasValidas.hasOwnProperty(resposta)) {
-                                const answerNum = respostasValidas[resposta];
-                                
-                                try {
-                                    await reagirMensagem(sock, normalized, "⏳");
-                                    
-                                    if (answerNum === 'back') {
-                                        if (game.question > 0) {
-                                            await game.aki.back();
-                                            game.question--;
-                                            
-                                            const progress = Math.round(game.aki.progress);
-                                            const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
-                                            
-                                            await reply(sock, from, `🧞‍♂️ *QUESTÃO ${game.question + 1}*\n\n📊 [${progressBar}] ${progress}%\n\n❓ *${game.aki.question}*\n\n💬 Responda!`);
-                                            await reagirMensagem(sock, normalized, "⬅️");
-                                        } else {
-                                            await reply(sock, from, "⚠️ Já está na primeira questão!");
-                                        }
-                                    } else {
-                                        await game.aki.answer(answerNum);
-                                        game.question++;
-                                        
-                                        const progress = Math.round(game.aki.progress);
-                                        
-                                        // Verifica se o Akinator quer adivinhar
-                                        if (progress >= 85 || game.question >= 75) {
-                                            await game.aki.win();
-                                            const firstGuess = game.aki.answers[0];
-                                            
-                                            if (firstGuess) {
-                                                const photoUrl = firstGuess.absolute_picture_path || 'https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg';
-                                                
-                                                await sock.sendMessage(from, {
-                                                    image: { url: photoUrl },
-                                                    caption: `🧞‍♂️ *RESULTADO!*\n\n✨ Você pensou em...\n\n👤 *${firstGuess.name}*\n📝 ${firstGuess.description || 'Sem descrição'}\n\n🎯 Certeza: ${progress}%\n❓ Perguntas: ${game.question}\n\n🎮 Acertei? 🎮\n\n© NEEXT LTDA`
-                                                });
-                                                
-                                                await reagirMensagem(sock, normalized, "🎉");
-                                                console.log(`🎯 Akinator adivinhou: ${firstGuess.name}`);
-                                            } else {
-                                                await reply(sock, from, "❌ Não consegui adivinhar! Você venceu! 🏆");
-                                                await reagirMensagem(sock, normalized, "🏆");
-                                            }
-                                            
-                                            akinatorGames.delete(from);
-                                        } else {
-                                            const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
-                                            
-                                            await reply(sock, from, `🧞‍♂️ *QUESTÃO ${game.question + 1}*\n\n📊 [${progressBar}] ${progress}%\n\n❓ *${game.aki.question}*\n\n💬 Responda!`);
-                                            await reagirMensagem(sock, normalized, "🧞‍♂️");
-                                        }
+                        if (!isNaN(respostaNum) && respostaNum >= 1 && respostaNum <= 5) {
+                            await reagirMensagem(sock, normalized, "⏳");
+                            const resultado = await akinator.responderAkinator(sender, text.trim());
+                            
+                            if (resultado.success) {
+                                if (resultado.isWin && resultado.photo) {
+                                    try {
+                                        await sock.sendMessage(from, {
+                                            image: { url: resultado.photo },
+                                            caption: resultado.message
+                                        });
+                                        await reagirMensagem(sock, normalized, "🎉");
+                                    } catch (err) {
+                                        console.log("⚠️ Erro ao enviar imagem do Akinator, enviando texto:", err.message);
+                                        await reply(sock, from, resultado.message);
                                     }
-                                } catch (err) {
-                                    console.error("❌ Erro no Akinator:", err);
-                                    await reagirMensagem(sock, normalized, "❌");
-                                    await reply(sock, from, "❌ Erro ao processar. Use `.resetakinator` para recomeçar.");
-                                    akinatorGames.delete(from);
+                                } else {
+                                    await reply(sock, from, resultado.message);
+                                    if (!resultado.isWin) {
+                                        await reagirMensagem(sock, normalized, "🔮");
+                                    }
                                 }
+                            } else {
+                                await reply(sock, from, resultado.message);
+                                await reagirMensagem(sock, normalized, "❌");
                             }
                         }
                     }
