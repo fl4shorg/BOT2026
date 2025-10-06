@@ -850,6 +850,15 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             const configBot = obterConfiguracoes();
             const prefixAtual = configBot.prefix;
 
+            // Verifica status de welcome e rpg
+            const welcomeAtivo = welcomeSystem.isWelcomeAtivo(from);
+            const rpgAtivo = rpg.isRPGAtivo(from);
+            
+            // Verifica antipv (configuração global do dono)
+            const settingsGlobal = require('./settings/settings.json');
+            const antipvAtivo = settingsGlobal.antipv || false;
+            const anticallAtivo = settingsGlobal.anticall || false;
+
             const getStatusIcon = (feature) => config[feature] ? "✅" : "❌";
             const getStatusText = (feature) => config[feature] ? "ATIVO" : "INATIVO";
 
@@ -857,7 +866,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             const featuresAtivas = [
                 'antilink', 'anticontato', 'antidocumento',
                 'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 
-                'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'modogamer'
+                'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'modogamer', 'rankativo'
             ].filter(feature => config[feature]).length;
 
             // Mensagem de status real do grupo
@@ -876,10 +885,18 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 `${getStatusIcon('antiporno')} **Antiporno:** ${getStatusText('antiporno')}\n` +
                 `${getStatusIcon('antipalavrao')} **Antipalavrao:** ${getStatusText('antipalavrao')}\n` +
                 `${getStatusIcon('x9')} **X9:** ${getStatusText('x9')}\n\n` +
+                `🎮 **SISTEMAS DO GRUPO**\n\n` +
+                `${welcomeAtivo ? "✅" : "❌"} **Welcome:** ${welcomeAtivo ? "ATIVO" : "INATIVO"}\n` +
+                `${rpgAtivo ? "✅" : "❌"} **RPG:** ${rpgAtivo ? "ATIVO" : "INATIVO"}\n` +
+                `${getStatusIcon('modogamer')} **Modo Gamer:** ${getStatusText('modogamer')}\n` +
+                `${getStatusIcon('rankativo')} **Rank Ativo:** ${getStatusText('rankativo')}\n\n` +
+                `🤖 **CONFIGURAÇÕES GLOBAIS (DONO)**\n\n` +
+                `${antipvAtivo ? "✅" : "❌"} **AntiPV:** ${antipvAtivo ? "ATIVO" : "INATIVO"}\n` +
+                `${anticallAtivo ? "✅" : "❌"} **AntiCall:** ${anticallAtivo ? "ATIVO" : "INATIVO"}\n\n` +
                 `📊 **ESTATÍSTICAS**\n\n` +
                 `📋 **Lista Negra:** ${config.listanegra ? config.listanegra.length : 0} usuários\n` +
-                `📊 **Proteções Ativas:** ${featuresAtivas}/13\n` +
-                `🔒 **Nível de Segurança:** ${featuresAtivas >= 9 ? "🟢 ALTO" : featuresAtivas >= 5 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
+                `📊 **Proteções Ativas:** ${featuresAtivas}/14\n` +
+                `🔒 **Nível de Segurança:** ${featuresAtivas >= 10 ? "🟢 ALTO" : featuresAtivas >= 6 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
                 `⚙️ **COMANDOS**\n\n` +
                 `💡 **Use:** \`${prefixAtual}[comando] on/off\` para alterar\n` +
                 `🛡️ **Powered by:** NEEXT SECURITY\n` +
