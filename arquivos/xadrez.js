@@ -34,13 +34,18 @@ function salvarHistorico(historico) {
     }
 }
 
-// Gera URL da imagem do tabuleiro usando API do Lichess (sem marca d'água)
+// Gera URL da imagem do tabuleiro usando web-boardimage (sem marca d'água)
 function gerarImagemTabuleiro(fen, ultimaJogada = null) {
     // Remove a parte extra do FEN (só precisamos da posição das peças)
     const fenSimples = fen.split(' ')[0];
     
-    // Usa API do Lichess com coordenadas visíveis e sem marca d'água
-    let url = `https://lichess.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown&coordinates=1&lastMove=${ultimaJogada || ''}`;
+    // Usa web-boardimage API - serviço mantido por desenvolvedor do Lichess
+    let url = `https://backscattering.de/web-boardimage/board.svg?fen=${encodeURIComponent(fenSimples)}&size=600&colors=lichess-brown&coordinates=true`;
+    
+    // Adiciona destaque da última jogada se existir
+    if (ultimaJogada) {
+        url += `&lastMove=${ultimaJogada}`;
+    }
     
     return url;
 }
@@ -113,7 +118,8 @@ function iniciarPartida(chatId, jogador1, jogador2) {
                  `♟️ Vez das *BRANCAS* jogarem!\n\n` +
                  `💡 Use: \`.xadrez jogada e2e4\` para jogar`,
         mentions: [jogador1, jogador2],
-        imagem: gerarImagemTabuleiro(chess.fen())
+        imagem: gerarImagemTabuleiro(chess.fen()),
+        tabuleiroTexto: tabuleiroPraEmoji(chess.fen())
     };
 }
 
@@ -191,7 +197,8 @@ function fazerJogada(chatId, jogador, movimento) {
                      statusJogo +
                      (fimDeJogo ? '' : `\n\n♟️ Vez ${proximoTurno === 'w' ? 'das *BRANCAS*' : 'das *PRETAS*'} jogarem!`),
             mentions: [partida.jogador1, partida.jogador2],
-            imagem: gerarImagemTabuleiro(partida.chess.fen(), jogada.from + jogada.to)
+            imagem: gerarImagemTabuleiro(partida.chess.fen(), jogada.from + jogada.to),
+            tabuleiroTexto: tabuleiroPraEmoji(partida.chess.fen())
         };
         
     } catch (err) {
@@ -229,7 +236,8 @@ function mostrarStatus(chatId) {
                  `📊 Total de jogadas: ${partida.jogadas.length}\n\n` +
                  (ultimasJogadas ? `📜 Últimas jogadas:\n${ultimasJogadas}` : ''),
         mentions: [partida.jogador1, partida.jogador2],
-        imagem: gerarImagemTabuleiro(partida.chess.fen(), lastMove)
+        imagem: gerarImagemTabuleiro(partida.chess.fen(), lastMove),
+        tabuleiroTexto: tabuleiroPraEmoji(partida.chess.fen())
     };
 }
 

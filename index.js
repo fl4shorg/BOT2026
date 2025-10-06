@@ -3482,28 +3482,33 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 const resultado = xadrez.fazerJogada(from, sender, movimento);
                 
                 if (resultado.sucesso && resultado.imagem) {
-                    await sock.sendMessage(from, {
-                        image: { url: resultado.imagem },
-                        caption: resultado.mensagem,
-                        mentions: resultado.mentions,
-                        contextInfo: {
-                            mentionedJid: resultado.mentions,
-                            isForwarded: true,
-                            forwardingScore: 100000,
-                            forwardedNewsletterMessageInfo: {
-                                newsletterJid: config.idDoCanal,
-                                newsletterName: "© NEEXT LTDA"
-                            },
-                            externalAdReply: {
-                                title: "♟️ Xadrez NEEXT",
-                                body: "Jogo de Xadrez no WhatsApp",
-                                thumbnailUrl: config.fotoDoBot,
-                                mediaType: 1,
-                                sourceUrl: "www.neext.online"
+                    try {
+                        await sock.sendMessage(from, {
+                            image: { url: resultado.imagem },
+                            caption: resultado.mensagem,
+                            mentions: resultado.mentions,
+                            contextInfo: {
+                                mentionedJid: resultado.mentions,
+                                isForwarded: true,
+                                forwardingScore: 100000,
+                                forwardedNewsletterMessageInfo: {
+                                    newsletterJid: config.idDoCanal,
+                                    newsletterName: "© NEEXT LTDA"
+                                },
+                                externalAdReply: {
+                                    title: "♟️ Xadrez NEEXT",
+                                    body: "Jogo de Xadrez no WhatsApp",
+                                    thumbnailUrl: config.fotoDoBot,
+                                    mediaType: 1,
+                                    sourceUrl: "www.neext.online"
+                                }
                             }
-                        }
-                    });
-                    await reagirMensagem(sock, message, "♟️");
+                        });
+                        await reagirMensagem(sock, message, "♟️");
+                    } catch (imgErr) {
+                        console.log("⚠️ Erro ao carregar imagem do tabuleiro, enviando texto:", imgErr.message);
+                        await reply(sock, from, resultado.mensagem + (resultado.tabuleiroTexto ? "\n\n" + resultado.tabuleiroTexto : ""), resultado.mentions);
+                    }
                 } else {
                     await reply(sock, from, resultado.mensagem, resultado.mentions);
                 }
@@ -3511,27 +3516,32 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 const resultado = xadrez.mostrarStatus(from);
                 
                 if (resultado.sucesso && resultado.imagem) {
-                    await sock.sendMessage(from, {
-                        image: { url: resultado.imagem },
-                        caption: resultado.mensagem,
-                        mentions: resultado.mentions,
-                        contextInfo: {
-                            mentionedJid: resultado.mentions,
-                            isForwarded: true,
-                            forwardingScore: 100000,
-                            forwardedNewsletterMessageInfo: {
-                                newsletterJid: config.idDoCanal,
-                                newsletterName: "© NEEXT LTDA"
-                            },
-                            externalAdReply: {
-                                title: "♟️ Xadrez NEEXT",
-                                body: "Status da Partida",
-                                thumbnailUrl: config.fotoDoBot,
-                                mediaType: 1,
-                                sourceUrl: "www.neext.online"
+                    try {
+                        await sock.sendMessage(from, {
+                            image: { url: resultado.imagem },
+                            caption: resultado.mensagem,
+                            mentions: resultado.mentions,
+                            contextInfo: {
+                                mentionedJid: resultado.mentions,
+                                isForwarded: true,
+                                forwardingScore: 100000,
+                                forwardedNewsletterMessageInfo: {
+                                    newsletterJid: config.idDoCanal,
+                                    newsletterName: "© NEEXT LTDA"
+                                },
+                                externalAdReply: {
+                                    title: "♟️ Xadrez NEEXT",
+                                    body: "Status da Partida",
+                                    thumbnailUrl: config.fotoDoBot,
+                                    mediaType: 1,
+                                    sourceUrl: "www.neext.online"
+                                }
                             }
-                        }
-                    });
+                        });
+                    } catch (imgErr) {
+                        console.log("⚠️ Erro ao carregar imagem do tabuleiro, enviando texto:", imgErr.message);
+                        await reply(sock, from, resultado.mensagem + (resultado.tabuleiroTexto ? "\n\n" + resultado.tabuleiroTexto : ""), resultado.mentions);
+                    }
                 } else {
                     await reply(sock, from, resultado.mensagem, resultado.mentions);
                 }
@@ -3568,28 +3578,33 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 const resultado = xadrez.iniciarPartida(from, sender, mentionedJid[0]);
                 
                 if (resultado.sucesso && resultado.imagem) {
-                    await sock.sendMessage(from, {
-                        image: { url: resultado.imagem },
-                        caption: resultado.mensagem,
-                        mentions: resultado.mentions,
-                        contextInfo: {
-                            mentionedJid: resultado.mentions,
-                            isForwarded: true,
-                            forwardingScore: 100000,
-                            forwardedNewsletterMessageInfo: {
-                                newsletterJid: config.idDoCanal,
-                                newsletterName: "© NEEXT LTDA"
-                            },
-                            externalAdReply: {
-                                title: "♟️ Xadrez NEEXT",
-                                body: "Nova Partida Iniciada",
-                                thumbnailUrl: config.fotoDoBot,
-                                mediaType: 1,
-                                sourceUrl: "www.neext.online"
+                    try {
+                        await sock.sendMessage(from, {
+                            image: { url: resultado.imagem },
+                            caption: resultado.mensagem,
+                            mentions: resultado.mentions,
+                            contextInfo: {
+                                mentionedJid: resultado.mentions,
+                                isForwarded: true,
+                                forwardingScore: 100000,
+                                forwardedNewsletterMessageInfo: {
+                                    newsletterJid: config.idDoCanal,
+                                    newsletterName: "© NEEXT LTDA"
+                                },
+                                externalAdReply: {
+                                    title: "♟️ Xadrez NEEXT",
+                                    body: "Nova Partida Iniciada",
+                                    thumbnailUrl: config.fotoDoBot,
+                                    mediaType: 1,
+                                    sourceUrl: "www.neext.online"
+                                }
                             }
-                        }
-                    });
-                    await reagirMensagem(sock, message, "♟️");
+                        });
+                        await reagirMensagem(sock, message, "♟️");
+                    } catch (imgErr) {
+                        console.log("⚠️ Erro ao carregar imagem do tabuleiro, enviando texto:", imgErr.message);
+                        await reply(sock, from, resultado.mensagem + (resultado.tabuleiroTexto ? "\n\n" + resultado.tabuleiroTexto : ""), resultado.mentions);
+                    }
                 } else {
                     await reply(sock, from, resultado.mensagem, resultado.mentions);
                 }
