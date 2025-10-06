@@ -202,9 +202,14 @@ function obterMenuDownload() {
     return `
 📥 *DOWNLOADS E MÍDIA*
 
-🎵 *MÚSICA:*
+🎵 *SPOTIFY:*
+• \`${prefix}playspotify [nome]\` - Busca e baixa música do Spotify
+• \`${prefix}play [nome]\` - Busca e baixa música do Spotify
+• \`${prefix}spotifysearch [nome]\` - Pesquisa música no Spotify
+• \`${prefix}spotify [link]\` - Download direto do Spotify
+
+🎬 *VÍDEOS:*
 • \`${prefix}play [nome]\` - Busca música no YouTube
-• \`${prefix}spotify [link]\` - Download do Spotify
 
 📷 *IMAGENS:*
 • \`${prefix}pinterest [busca]\` - Imagens do Pinterest
@@ -215,6 +220,9 @@ function obterMenuDownload() {
 • \`${prefix}instagram [link]\` - Download Instagram
 • \`${prefix}tiktok [link]\` - Download TikTok sem marca d'água
 • \`${prefix}tt [link]\` - Download TikTok (atalho)
+• \`${prefix}twitter [link]\` - Download Twitter/X
+• \`${prefix}facebook [link]\` - Download Facebook
+• \`${prefix}fb [link]\` - Download Facebook (atalho)
 
 🏷️ *STICKERS:*
 • \`${prefix}s\` - Criar sticker de mídia
