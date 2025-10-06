@@ -34,20 +34,34 @@ function salvarHistorico(historico) {
     }
 }
 
-// Gera URL da imagem do tabuleiro usando API do Lichess
+// Gera URL da imagem do tabuleiro usando API do Chess.com (melhor qualidade)
 function gerarImagemTabuleiro(fen, ultimaJogada = null) {
     // Remove a parte extra do FEN (só precisamos da posição das peças)
     const fenSimples = fen.split(' ')[0];
     
-    // Monta URL da API do Lichess com coordenadas visíveis
-    let url = `https://lichess1.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown&coordinates=1`;
-    
-    // Adiciona última jogada se existir (destacar movimento)
-    if (ultimaJogada) {
-        url += `&lastMove=${ultimaJogada}`;
-    }
+    // Usa API do fen2image que tem coordenadas bem visíveis
+    let url = `https://fen2image.chessvision.ai/${encodeURIComponent(fenSimples)}`;
     
     return url;
+}
+
+// Gera descrição das coordenadas para ajudar o jogador
+function gerarGuiaCoordenadas() {
+    return `
+📍 *COORDENADAS DO TABULEIRO:*
+
+   a  b  c  d  e  f  g  h
+8  ⬛⬜⬛⬜⬛⬜⬛⬜  8
+7  ⬜⬛⬜⬛⬜⬛⬜⬛  7
+6  ⬛⬜⬛⬜⬛⬜⬛⬜  6
+5  ⬜⬛⬜⬛⬜⬛⬜⬛  5
+4  ⬛⬜⬛⬜⬛⬜⬛⬜  4
+3  ⬜⬛⬜⬛⬜⬛⬜⬛  3
+2  ⬛⬜⬛⬜⬛⬜⬛⬜  2
+1  ⬜⬛⬜⬛⬜⬛⬜⬛  1
+   a  b  c  d  e  f  g  h
+
+💡 Exemplo: e2e4 = peão da coluna E, linha 2 para linha 4`;
 }
 
 // Converte tabuleiro em emoji (fallback para texto se imagem falhar)
@@ -97,8 +111,8 @@ function iniciarPartida(chatId, jogador1, jogador2) {
                  `🤍 Brancas: @${jogador1.split('@')[0]}\n` +
                  `🖤 Pretas: @${jogador2.split('@')[0]}\n\n` +
                  `♟️ Vez das *BRANCAS* jogarem!\n\n` +
-                 `💡 Use: \`.xadrez jogada e2e4\` para jogar\n` +
-                 `💡 Use: \`.xadrez status\` para ver o tabuleiro`,
+                 gerarGuiaCoordenadas() + 
+                 `\n\n💡 Use: \`.xadrez jogada e2e4\` para jogar`,
         mentions: [jogador1, jogador2],
         imagem: gerarImagemTabuleiro(chess.fen())
     };
@@ -366,6 +380,8 @@ function mostrarAjuda(prefix) {
                  `${prefix}xadrez jogada Nf3\n\n` +
                  `📊 *Ver Tabuleiro:*\n` +
                  `${prefix}xadrez status\n\n` +
+                 `📍 *Ver Coordenadas:*\n` +
+                 `${prefix}xadrez coordenadas\n\n` +
                  `🏳️ *Desistir:*\n` +
                  `${prefix}xadrez desistir\n\n` +
                  `🏆 *Ranking:*\n` +
@@ -378,7 +394,8 @@ function mostrarAjuda(prefix) {
                  `• Bb5 (bispo para b5)\n` +
                  `• O-O (roque pequeno)\n` +
                  `• O-O-O (roque grande)\n\n` +
-                 `© NEEXT LTDA`
+                 gerarGuiaCoordenadas() +
+                 `\n\n© NEEXT LTDA`
     };
 }
 
@@ -390,5 +407,6 @@ module.exports = {
     mostrarRanking,
     buscarJogadorChessCom,
     mostrarAjuda,
-    partidasAtivas
+    partidasAtivas,
+    gerarGuiaCoordenadas
 };

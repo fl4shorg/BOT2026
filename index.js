@@ -3542,6 +3542,9 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 if (resultado.sucesso) {
                     await reagirMensagem(sock, message, "🏳️");
                 }
+            } else if (subcomando === "coordenadas" || subcomando === "coord") {
+                const guia = xadrez.gerarGuiaCoordenadas();
+                await reply(sock, from, `♟️ *GUIA DE COORDENADAS*${guia}\n\n💡 Use essas coordenadas para fazer suas jogadas!`);
             } else if (subcomando === "ranking" || subcomando === "rank") {
                 const resultado = xadrez.mostrarRanking();
                 await reply(sock, from, resultado.mensagem, resultado.mentions);
