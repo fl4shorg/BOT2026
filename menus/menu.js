@@ -588,95 +588,109 @@ function obterMenuBrincadeira() {
 // ========================
 function obterMenuHentai() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
-    return `🔞 *MENU HENTAI - DANBOORU API*
+    return `╭─━─━⋆｡°✩🔞✩°｡⋆ ━─━─╮
+│        𝐌𝐄𝐍𝐔 𝐇𝐄𝐍𝐓𝐀𝐈
+╰─━─━⋆｡°✩🔞✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮  
 
-⚠️ *AVISO IMPORTANTE:*
-• Comandos em GRUPO: Imagem enviada no seu PV
-• Comandos no PV: Imagem enviada diretamente
-• Conteúdo +18 - Uso responsável
-• API: api.neext.online
-
-╭──────────────────⪩
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 🎌 *CATEGORIAS GERAIS*
-│ • ${prefix}hentai - Hentai aleatório
-│ • ${prefix}yaoi - Yaoi aleatório
-│ • ${prefix}yuri - Yuri aleatório
-│ • ${prefix}nude - Nude aleatório
-│ • ${prefix}sex - Sex aleatório
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}hentai - Hentai aleatório
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}yaoi - Yaoi aleatório
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}yuri - Yuri aleatório
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}nude - Nude aleatório
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}sex - Sex aleatório
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 🔗 *BONDAGE & BDSM*
-│ • ${prefix}bondage - Bondage
-│ • ${prefix}bdsm - BDSM
-│ • ${prefix}bondage_solo - Bondage solo
-│ • ${prefix}bondage_group - Bondage group
-│ • ${prefix}gag - Mordaça
-│ • ${prefix}whip - Chicote
-│ • ${prefix}handcuffs - Algemas
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}bondage - Bondage
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}bdsm - BDSM
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}bondage_solo - Bondage solo
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}bondage_group - Bondage group
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}gag - Mordaça
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}whip - Chicote
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}handcuffs - Algemas
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 💋 *ATOS SEXUAIS*
-│ • ${prefix}anal - Anal
-│ • ${prefix}oral - Oral
-│ • ${prefix}blowjob - Blowjob
-│ • ${prefix}handjob - Handjob
-│ • ${prefix}footjob - Footjob
-│ • ${prefix}vaginal - Vaginal
-│ • ${prefix}oral_sex - Oral sex
-│ • ${prefix}masturbation - Masturbação
-│ • ${prefix}cumshot - Cumshot
-│ • ${prefix}creampie - Creampie
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}anal - Anal
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}oral - Oral
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}blowjob - Boquete
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}handjob - Punheta
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}footjob - Pézão
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}vaginal - Vaginal
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}oral_sex - Sexo oral
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}masturbation - Masturbação
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}cumshot - Ejaculação
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}creampie - Gozo interno
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 👗 *ROUPAS & ACESSÓRIOS*
-│ • ${prefix}panties - Calcinha
-│ • ${prefix}bra - Sutiã
-│ • ${prefix}lingerie - Lingerie
-│ • ${prefix}swimsuit - Maiô
-│ • ${prefix}bikini - Biquíni
-│ • ${prefix}stockings - Meias
-│ • ${prefix}corset - Espartilho
-│ • ${prefix}dress - Vestido
-│ • ${prefix}skirt - Saia
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}panties - Calcinha
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}bra - Sutiã
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}lingerie - Lingerie
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}swimsuit - Maiô
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}bikini - Biquíni
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}stockings - Meias
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}corset - Espartilho
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}dress - Vestido
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}skirt - Saia
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 🎭 *DOMINAÇÃO*
-│ • ${prefix}futa - Futanari
-│ • ${prefix}femdom - Femdom
-│ • ${prefix}dominant - Dominante
-│ • ${prefix}submissive - Submissa
-│ • ${prefix}face_sitting - Face sitting
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}futa - Futanari
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}femdom - Dominação feminina
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}dominant - Dominante
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}submissive - Submissa
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}face_sitting - Sentada na cara
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 👥 *GRUPO & MÚLTIPLOS*
-│ • ${prefix}group_sex - Sexo em grupo
-│ • ${prefix}threesome - Ménage à trois
-│ • ${prefix}foursome - Quateto
-│ • ${prefix}orgy - Orgia
-│ • ${prefix}double_penetration - Dupla penetração
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}group_sex - Sexo em grupo
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}threesome - Ménage à trois
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}foursome - Quateto
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}orgy - Orgia
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}double_penetration - Dupla penetração
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 🎯 *ESPECÍFICOS*
-│ • ${prefix}tentacle - Tentáculos
-│ • ${prefix}lactation - Lactação
-│ • ${prefix}sex_toy - Sex toys
-│ • ${prefix}massage - Massagem
-│ • ${prefix}teacher_student - Professor/Aluno
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}tentacle - Tentáculos
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}lactation - Lactação
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}sex_toy - Brinquedo sexual
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}massage - Massagem
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}teacher_student - Professor/Aluno
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 🔞 *PARTES DO CORPO*
-│ • ${prefix}breasts - Seios
-│ • ${prefix}nipples - Mamilos
-│ • ${prefix}ass - Bunda
-│ • ${prefix}thighs - Coxas
-│ • ${prefix}pussy - Buceta
-│
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}breasts - Seios
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}nipples - Mamilos
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}ass - Bunda
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}thighs - Coxas
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}pussy - Buceta
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🩸✩°｡⋆ ━─━╮
 │ 🎪 *VARIAÇÕES*
-│ • ${prefix}yuri_anal - Yuri anal
-│ • ${prefix}yaoi_anal - Yaoi anal
-│ • ${prefix}futa_anal - Futa anal
-│ • ${prefix}maid_nsfw - Empregada NSFW
-│ • ${prefix}school_uniform_nsfw - Uniforme NSFW
-╰──────────────────⪨
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}yuri_anal - Yuri anal
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}yaoi_anal - Yaoi anal
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}futa_anal - Futa anal
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}maid_nsfw - Empregada NSFW
+│┊𖥨ํ∘̥⃟🩸￫ ${prefix}school_uniform_nsfw - Uniforme NSFW
+│╰─━─⋆｡°✩🩸✩°｡⋆ ━─━╯
 
-💡 *Total: 70+ comandos disponíveis*
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
 
-━━━━━━━━━━━━━━━
-© NEEXT LTDA - ${nickDoDono}
-`;
+╭─━─━⋆｡°✩🧩✩°｡⋆ ━─━─╮
+│     © ɴᴇᴇxᴛ ʟᴛᴅᴀ - ɴᴇᴇxᴛ
+╰─━─━⋆｡°✩🧩✩°｡⋆ ━─━─╯`;
 }
 
 // ========================
