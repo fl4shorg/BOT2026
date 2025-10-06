@@ -2508,6 +2508,105 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         }
         break;
 
+        case "facebook":
+        case "fb": {
+            try {
+                if (!args[0]) {
+                    await reply(sock, from, "❌ Por favor, forneça um link do Facebook.\n\nExemplo: `.fb https://www.facebook.com/share/r/xxxxx`");
+                    break;
+                }
+
+                const url = args[0];
+
+                if (!url.includes('facebook.com') && !url.includes('fb.watch')) {
+                    await reply(sock, from, "❌ Link inválido! Use um link do Facebook.");
+                    break;
+                }
+
+                await reagirMensagem(sock, message, "⏳");
+                await reply(sock, from, "📥 Baixando vídeo do Facebook, aguarde...");
+
+                try {
+                    const apiUrl = `https://www.api.neext.online/facebook?url=${encodeURIComponent(url)}`;
+                    const response = await axios.get(apiUrl, {
+                        timeout: 30000,
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+
+                    if (!response.data || !response.data.result) {
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ Não foi possível baixar este vídeo. Verifique se o link está correto e se o post é público.");
+                        break;
+                    }
+
+                    const result = response.data.result;
+                    const videoUrl = result.hd || result.sd;
+
+                    if (!videoUrl) {
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ Vídeo não encontrado neste post.");
+                        break;
+                    }
+
+                    const videoResponse = await axios({
+                        method: 'GET',
+                        url: videoUrl,
+                        responseType: 'arraybuffer',
+                        timeout: 60000
+                    });
+
+                    const videoBuffer = Buffer.from(videoResponse.data);
+
+                    const caption = "📹 *Vídeo do Facebook baixado com sucesso!*\n\n© NEEXT LTDA";
+
+                    await sock.sendMessage(from, {
+                        video: videoBuffer,
+                        caption: caption,
+                        contextInfo: {
+                            isForwarded: true,
+                            forwardingScore: 100000,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: "120363289739581116@newsletter",
+                                newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                            },
+                            externalAdReply: {
+                                title: "© NEEXT LTDA - Facebook Downloader",
+                                body: "📱 Instagram: @neet.tk",
+                                thumbnailUrl: "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                                mediaType: 1,
+                                sourceUrl: "https://www.neext.online",
+                                showAdAttribution: true
+                            }
+                        }
+                    }, { quoted: selinho2 });
+
+                    await reagirMensagem(sock, message, "✅");
+
+                } catch (apiError) {
+                    await reagirMensagem(sock, message, "❌");
+                    
+                    if (apiError.code === 'ECONNABORTED' || apiError.code === 'ETIMEDOUT') {
+                        await reply(sock, from, "⏱️ Timeout ao processar vídeo. O vídeo pode ser muito grande, tente novamente.");
+                    } else if (apiError.response?.status === 429) {
+                        await reply(sock, from, "🚫 Muitas tentativas na API. Aguarde alguns minutos antes de tentar novamente.");
+                    } else if (apiError.response?.status >= 500) {
+                        await reply(sock, from, "🔧 API do Facebook temporariamente indisponível. Tente novamente mais tarde.");
+                    } else {
+                        await reply(sock, from, "❌ Erro ao conectar com a API do Facebook. Verifique o link e tente novamente.");
+                    }
+                    break;
+                }
+
+            } catch (error) {
+                console.error("❌ Erro no comando Facebook:", error);
+                await reagirMensagem(sock, message, "❌");
+                await reply(sock, from, "❌ Erro ao baixar vídeo do Facebook. Tente novamente mais tarde.");
+            }
+        }
+        break;
+
         case "hermitwhite": {
             try {
                 // Verifica se foram passados argumentos suficientes (mínimo 5: nome pode ter espaços + 4 outros campos)
