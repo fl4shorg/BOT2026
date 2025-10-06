@@ -27,8 +27,6 @@ const moment = require('moment-timezone');
 const rpg = require('./arquivos/rpg.js');
 
 const antilinkFile = path.join(__dirname, "antilink.json");
-const akinatorFile = path.join(__dirname, "database/grupos/games/akinator.json");
-
 // Sistema Anti-Spam Completo
 const antiSpam = require("./arquivos/antispam.js");
 
@@ -141,106 +139,8 @@ const contextAnuncio = {
 const processedMessages = new Set();
 setInterval(() => processedMessages.clear(), 5 * 60 * 1000);
 
-// Variáveis do jogo Akinator
-let akinator = [];
-let jogo = { now: true, jogador: "" };
-
-// Classe para bypass do Cloudflare no Akinator
-class AkinatorCloudflareBypass {
-    constructor() {
-        this.userAgents = [
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0'
-        ];
-    }
-
-    getRandomUserAgent() {
-        return this.userAgents[Math.floor(Math.random() * this.userAgents.length)];
-    }
-
-    async createAkinator(region = 'en', retries = 3) {
-        for (let attempt = 1; attempt <= retries; attempt++) {
-            try {
-                console.log(`🧞‍♂️ Tentando conectar ao Akinator (tentativa ${attempt}/${retries})...`);
-
-                // Configura cloudscraper para contornar Cloudflare
-                const userAgent = this.getRandomUserAgent();
-
-                // Cria instância do Akinator
-                const aki = new Aki({
-                    region: region,
-                    childMode: false,
-                    // Configurações para bypass
-                    requestOptions: {
-                        headers: {
-                            'User-Agent': userAgent,
-                            'Accept': 'application/json, text/plain, */*',
-                            'Accept-Language': 'en-US,en;q=0.9',
-                            'Accept-Encoding': 'gzip, deflate, br',
-                            'Connection': 'keep-alive',
-                            'Upgrade-Insecure-Requests': '1',
-                            'Sec-Fetch-Dest': 'document',
-                            'Sec-Fetch-Mode': 'navigate',
-                            'Sec-Fetch-Site': 'none',
-                            'Cache-Control': 'max-age=0'
-                        },
-                        timeout: 30000
-                    }
-                });
-
-                // Aguarda um pouco antes de tentar
-                await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
-
-                await aki.start();
-                console.log(`✅ Conectado ao Akinator com sucesso! Região: ${region}`);
-                return aki;
-
-            } catch (error) {
-                console.error(`❌ Tentativa ${attempt} falhou:`, error.message);
-
-                if (attempt === retries) {
-                    throw new Error(`Falha após ${retries} tentativas. Akinator temporariamente indisponível.`);
-                }
-
-                // Aguarda mais tempo a cada tentativa
-                await new Promise(resolve => setTimeout(resolve, 5000 * attempt));
-            }
-        }
-    }
-}
-
-// Carrega dados do Akinator
-function carregarAkinator() {
-    try {
-        if (!fs.existsSync(akinatorFile)) {
-            const dir = path.dirname(akinatorFile);
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-            fs.writeFileSync(akinatorFile, "[]");
-        }
-        const data = fs.readFileSync(akinatorFile, "utf-8");
-        akinator = JSON.parse(data);
-        return akinator;
-    } catch (err) {
-        console.error("❌ Erro ao carregar akinator.json:", err);
-        akinator = [];
-        return [];
-    }
-}
-
-// Salva dados do Akinator
-function salvarAkinator() {
-    try {
-        fs.writeFileSync(akinatorFile, JSON.stringify(akinator, null, 2));
-    } catch (err) {
-        console.error("❌ Erro ao salvar akinator.json:", err);
-    }
-}
-
-// Inicializa dados do Akinator
-carregarAkinator();
+// Sistema Akinator - Jogo de adivinhação
+const akinatorGames = new Map();
 
 
 
@@ -2134,73 +2034,83 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         case 'akinator': {
             // Só funciona em grupos
             if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
-                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                await reply(sock, from, "❌ Este comando só funciona em grupos.");
                 break;
             }
 
             const sender = message.key.participant || from;
             const pushname = sock.user?.verifiedName || sock.user?.name || "Usuário";
 
-            // Verifica se o jogador já iniciou o jogo e se a data é a mesma
-            if (!akinator.some(game => game.id === from) && akinator.length > 0 && Number(akinator[0].dia) === Number(moment.tz('America/Sao_Paulo').format('DD'))) {
-                await reply(sock, from, "⏰ *LIMITE DIÁRIO ATINGIDO*\n\nJá houve uma partida hoje neste grupo.\n\n💡 Volte amanhã para jogar novamente!");
+            // Verifica se já existe um jogo ativo neste grupo
+            if (akinatorGames.has(from)) {
+                const game = akinatorGames.get(from);
+                const jogadorAtual = game.player.split('@')[0];
+                await reply(sock, from, `🎮 *PARTIDA EM ANDAMENTO*\n\n@${jogadorAtual} já está jogando!\n\n⏰ Aguarde finalizar ou use \`.resetakinator\` (admin/jogador).`, [game.player]);
                 break;
             }
 
-            // Se o dia mudou, reinicia o jogo
-            if (!akinator.some(game => game.id === from) && akinator.length > 0 && Number(akinator[0].dia) !== Number(moment.tz('America/Sao_Paulo').format('DD'))) {
-                jogo.now = true;
-                akinator.splice(0, 1); // Limpa os jogos antigos
-                salvarAkinator();
-            }
+            await reply(sock, from, `🧞‍♂️ *BEM-VINDO AO AKINATOR!*\n\n👤 Jogador: ${pushname}\n\n📝 *COMO JOGAR:*\nPense em um personagem (real ou fictício) e responda:\n\n✅ *sim* | ❌ *não* | 🤷 *não sei*\n👍 *provavelmente* | 👎 *provavelmente não*\n⬅️ *voltar* (pergunta anterior)\n\n🎮 Iniciando jogo...`);
+            await reagirMensagem(sock, message, "⏳");
 
-            // Se o jogador não estiver participando de um jogo
-            if (!akinator.some(game => game.id === from)) {
-                await reply(sock, from, `🧞‍♂️ *BEM-VINDO AO AKINATOR!*\n\n👤 Jogador: ${pushname}\n\n📝 *INSTRUÇÕES:*\nPense em um personagem (real ou fictício) e responda as perguntas com:\n\n• ✅ *Sim*\n• ❌ *Não*\n• 🤷 *Não sei*\n• 👍 *Provavelmente sim*\n• 👎 *Provavelmente não*\n• ⬅️ *Voltar* (volta para pergunta anterior)\n\n🎮 O Akinator tentará adivinhar seu personagem!\n\n⏳ Conectando ao Akinator...`);
-                await reagirMensagem(sock, message, "⏳");
-
-                const dateAKI = moment.tz('America/Sao_Paulo').format('DD');
-
-                try {
-                    const bypass = new AkinatorCloudflareBypass();
-                    let aki;
-
-                    // Tenta primeiro com português, depois inglês
+            try {
+                let aki = null;
+                let region = 'pt';
+                let attempts = 0;
+                const maxAttempts = 2;
+                
+                // Tenta conectar com retry
+                while (attempts < maxAttempts && !aki) {
                     try {
-                        aki = await bypass.createAkinator('pt');
-                    } catch (e) {
-                        console.log("Região 'pt' falhou. Tentando com 'en'...");
-                        aki = await bypass.createAkinator('en');
+                        console.log(`🧞‍♂️ Tentativa ${attempts + 1}/${maxAttempts} - Região: ${region}`);
+                        
+                        const tempAki = new Aki({ 
+                            region: region, 
+                            childMode: false
+                        });
+                        
+                        await tempAki.start();
+                        aki = tempAki;
+                        console.log(`✅ Conectado ao Akinator - Região: ${region}`);
+                        
+                    } catch (err) {
+                        console.error(`❌ Falha na tentativa ${attempts + 1}:`, err.message);
+                        attempts++;
+                        
+                        // Tenta com região diferente
+                        if (attempts === 1) {
+                            region = 'en';
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                        }
                     }
-
-                    jogo.now = false;
-                    jogo.jogador = sender;
-
-                    // Adiciona o jogador à lista de jogadores ativos
-                    akinator.push({
-                        id: from,
-                        jogador: sender,
-                        finish: 0,
-                        dia: dateAKI,
-                        aki: aki, // Salva a instância real do Akinator
-                        step: 0
-                    });
-
-                    salvarAkinator();
-
-                    const progressBar = '▓'.repeat(1) + '░'.repeat(9);
-                    await reply(sock, from, `🧞‍♂️ *AKINATOR - QUESTÃO 1*\n\n📊 Progresso: [${progressBar}] 10%\n\n❓ *${aki.question}*\n\n💬 Responda: Sim | Não | Não sei | Provavelmente sim | Provavelmente não`);
-                    await reagirMensagem(sock, message, "🧞‍♂️");
-
-                } catch (err) {
-                    console.error("❌ Erro ao iniciar Akinator:", err);
-                    await reagirMensagem(sock, message, "❌");
-                    await reply(sock, from, "❌ *ERRO DE CONEXÃO*\n\nNão foi possível conectar ao Akinator.\n\n💡 O serviço pode estar temporariamente indisponível.\n🔄 Tente novamente em alguns minutos.");
                 }
-            } else {
-                // Informa se alguém já está jogando
-                const jogadorAtual = akinator.find(game => game.id === from).jogador.split('@')[0];
-                await reply(sock, from, `🎮 *PARTIDA EM ANDAMENTO*\n\n@${jogadorAtual} já iniciou uma partida!\n\n⏰ Aguarde ele(a) finalizar ou use \`.resetakinator\` (apenas admin/jogador).`, [akinator.find(game => game.id === from).jogador]);
+                
+                if (!aki) {
+                    throw new Error('Não foi possível conectar após múltiplas tentativas');
+                }
+                
+                akinatorGames.set(from, {
+                    aki: aki,
+                    player: sender,
+                    question: 0
+                });
+
+                const progressBar = '▓' + '░'.repeat(9);
+                await reply(sock, from, `🧞‍♂️ *QUESTÃO 1*\n\n📊 [${progressBar}] ${Math.round(aki.progress)}%\n\n❓ *${aki.question}*\n\n💬 Responda agora!`);
+                await reagirMensagem(sock, message, "🧞‍♂️");
+                
+                console.log(`🧞‍♂️ Akinator iniciado no grupo ${from.split('@')[0]} por ${sender.split('@')[0]}`);
+
+            } catch (err) {
+                console.error("❌ Erro ao iniciar Akinator:", err.message);
+                await reagirMensagem(sock, message, "❌");
+                
+                if (err.response && err.response.status === 403) {
+                    await reply(sock, from, "❌ *BLOQUEADO PELO CLOUDFLARE*\n\nO Akinator está protegido contra bots.\n\n💡 Tente novamente mais tarde ou use outro horário.");
+                } else {
+                    await reply(sock, from, "❌ *ERRO DE CONEXÃO*\n\nNão foi possível conectar ao Akinator.\n\n💡 O serviço pode estar temporariamente indisponível.");
+                }
+                
+                akinatorGames.delete(from);
             }
         }
         break;
@@ -2209,37 +2119,28 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         case 'resetakinator': {
             // Só funciona em grupos
             if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
-                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                await reply(sock, from, "❌ Este comando só funciona em grupos.");
                 break;
             }
 
             const sender = message.key.participant || from;
 
-            if (!JSON.stringify(akinator).includes(from) && !isDono(sender)) {
-                await reply(sock, from, "❌ Não existe nenhuma sessão do Akinator em andamento no grupo.");
+            if (!akinatorGames.has(from)) {
+                await reply(sock, from, "❌ Não há nenhum jogo do Akinator em andamento.");
                 break;
             }
 
-            const gameIndex = isDono(sender) ? 0 : akinator.map(i => i.id).indexOf(from);
-            const gameData = akinator[gameIndex];
-
-            if (!gameData) {
-                await reply(sock, from, "❌ Não existe nenhuma sessão do Akinator em andamento no grupo.");
-                break;
-            }
-
-            // Verifica se é admin ou dono
+            const game = akinatorGames.get(from);
             const ehAdmin = await isAdmin(sock, from, sender);
             const ehDono = isDono(sender);
 
-            if (gameData.jogador === sender || ehAdmin || ehDono) {
-                jogo.now = true;
-                akinator.splice(gameIndex, 1);
-                salvarAkinator();
-                await reply(sock, from, `🧞‍♂️ *AKINATOR RESETADO*\n\n✅ A sessão foi deletada com sucesso!\n\n💡 Use \`.akinator\` para começar um novo jogo!`);
+            if (game.player === sender || ehAdmin || ehDono) {
+                akinatorGames.delete(from);
+                await reply(sock, from, `🧞‍♂️ *JOGO RESETADO*\n\n✅ Sessão deletada!\n\n💡 Use \`.akinator\` para jogar novamente.`);
                 await reagirMensagem(sock, message, "✅");
+                console.log(`🔄 Akinator resetado no grupo ${from.split('@')[0]}`);
             } else {
-                await reply(sock, from, "⛔ Somente o(s) admin(s) ou a pessoa que iniciou o jogo podem resetar.");
+                await reply(sock, from, "⛔ Apenas admin ou o jogador podem resetar.");
             }
         }
         break;
@@ -6496,110 +6397,97 @@ function setupListeners(sock) {
                     }
                     
                     // Sistema de respostas do Akinator
-                    const gameData = akinator.find(game => game.id === from);
-                    if (gameData && gameData.finish === 0 && gameData.jogador === sender) {
-                        const resposta = text.toLowerCase().trim();
-                        const respostasValidas = {
-                            'sim': 0,
-                            's': 0,
-                            'yes': 0,
-                            'y': 0,
-                            'não': 1,
-                            'nao': 1,
-                            'n': 1,
-                            'no': 1,
-                            'não sei': 2,
-                            'nao sei': 2,
-                            'ns': 2,
-                            'idk': 2,
-                            'provavelmente sim': 3,
-                            'provavelmente': 3,
-                            'probably yes': 3,
-                            'probably': 3,
-                            'p sim': 3,
-                            'provavelmente não': 4,
-                            'provavelmente nao': 4,
-                            'probably not': 4,
-                            'p não': 4,
-                            'p nao': 4,
-                            'voltar': 'back',
-                            'back': 'back',
-                            'b': 'back'
-                        };
+                    if (akinatorGames.has(from)) {
+                        const game = akinatorGames.get(from);
+                        
+                        // Apenas o jogador que iniciou pode responder
+                        if (game.player === sender) {
+                            const resposta = text.toLowerCase().trim();
+                            const respostasValidas = {
+                                'sim': 0,
+                                's': 0,
+                                'yes': 0,
+                                'y': 0,
+                                'não': 1,
+                                'nao': 1,
+                                'n': 1,
+                                'no': 1,
+                                'não sei': 2,
+                                'nao sei': 2,
+                                'ns': 2,
+                                'idk': 2,
+                                'provavelmente sim': 3,
+                                'provavelmente': 3,
+                                'probably': 3,
+                                'p': 3,
+                                'provavelmente não': 4,
+                                'provavelmente nao': 4,
+                                'probably not': 4,
+                                'pn': 4,
+                                'voltar': 'back',
+                                'back': 'back',
+                                'v': 'back'
+                            };
 
-                        if (respostasValidas.hasOwnProperty(resposta)) {
-                            const answerNum = respostasValidas[resposta];
-                            
-                            try {
-                                await reagirMensagem(sock, normalized, "⏳");
+                            if (respostasValidas.hasOwnProperty(resposta)) {
+                                const answerNum = respostasValidas[resposta];
                                 
-                                if (answerNum === 'back') {
-                                    if (gameData.step > 0) {
-                                        await gameData.aki.back();
-                                        gameData.step--;
-                                        
-                                        const progress = Math.min(Math.round((gameData.step / 80) * 100), 100);
-                                        const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
-                                        
-                                        await reply(sock, from, `🧞‍♂️ *AKINATOR - QUESTÃO ${gameData.step + 1}*\n\n📊 Progresso: [${progressBar}] ${progress}%\n\n❓ *${gameData.aki.question}*\n\n💬 Responda: Sim | Não | Não sei | Provavelmente sim | Provavelmente não | Voltar`);
-                                        await reagirMensagem(sock, normalized, "⬅️");
-                                    } else {
-                                        await reply(sock, from, "⚠️ Você já está na primeira questão!");
-                                        await reagirMensagem(sock, normalized, "⚠️");
-                                    }
-                                } else {
-                                    await gameData.aki.answer(answerNum);
-                                    gameData.step++;
+                                try {
+                                    await reagirMensagem(sock, normalized, "⏳");
                                     
-                                    if (gameData.aki.progress >= 80 || gameData.step >= 78) {
-                                        await gameData.aki.win();
-                                        const firstGuess = gameData.aki.answers[0];
-                                        
-                                        if (firstGuess) {
-                                            gameData.finish = 1;
-                                            jogo.now = true;
+                                    if (answerNum === 'back') {
+                                        if (game.question > 0) {
+                                            await game.aki.back();
+                                            game.question--;
                                             
-                                            const photoUrl = firstGuess.absolute_picture_path || 'https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg';
+                                            const progress = Math.round(game.aki.progress);
+                                            const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
                                             
-                                            await sock.sendMessage(from, {
-                                                image: { url: photoUrl },
-                                                caption: `🧞‍♂️ *AKINATOR - RESULTADO!*\n\n✨ Eu acho que você está pensando em...\n\n👤 *${firstGuess.name}*\n📝 ${firstGuess.description || 'Sem descrição'}\n\n🎯 *Progresso:* ${gameData.aki.progress}%\n❓ *Questões:* ${gameData.step}\n\n🎮 É essa pessoa? 🎮\n\n© NEEXT LTDA`
-                                            });
-                                            
-                                            await reagirMensagem(sock, normalized, "🎉");
-                                            
-                                            akinator.splice(akinator.indexOf(gameData), 1);
-                                            salvarAkinator();
-                                            
-                                            console.log(`🎯 Akinator finalizou - Palpite: ${firstGuess.name}`);
+                                            await reply(sock, from, `🧞‍♂️ *QUESTÃO ${game.question + 1}*\n\n📊 [${progressBar}] ${progress}%\n\n❓ *${game.aki.question}*\n\n💬 Responda!`);
+                                            await reagirMensagem(sock, normalized, "⬅️");
                                         } else {
-                                            await reply(sock, from, "❌ Desculpe, não consegui adivinhar! Você venceu! 🏆");
-                                            await reagirMensagem(sock, normalized, "🏆");
-                                            
-                                            gameData.finish = 1;
-                                            jogo.now = true;
-                                            akinator.splice(akinator.indexOf(gameData), 1);
-                                            salvarAkinator();
+                                            await reply(sock, from, "⚠️ Já está na primeira questão!");
                                         }
                                     } else {
-                                        const progress = Math.min(Math.round((gameData.step / 80) * 100), 100);
-                                        const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
+                                        await game.aki.answer(answerNum);
+                                        game.question++;
                                         
-                                        await reply(sock, from, `🧞‍♂️ *AKINATOR - QUESTÃO ${gameData.step + 1}*\n\n📊 Progresso: [${progressBar}] ${progress}%\n🎯 Certeza: ${gameData.aki.progress}%\n\n❓ *${gameData.aki.question}*\n\n💬 Responda: Sim | Não | Não sei | Provavelmente sim | Provavelmente não | Voltar`);
-                                        await reagirMensagem(sock, normalized, "🧞‍♂️");
+                                        const progress = Math.round(game.aki.progress);
+                                        
+                                        // Verifica se o Akinator quer adivinhar
+                                        if (progress >= 85 || game.question >= 75) {
+                                            await game.aki.win();
+                                            const firstGuess = game.aki.answers[0];
+                                            
+                                            if (firstGuess) {
+                                                const photoUrl = firstGuess.absolute_picture_path || 'https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg';
+                                                
+                                                await sock.sendMessage(from, {
+                                                    image: { url: photoUrl },
+                                                    caption: `🧞‍♂️ *RESULTADO!*\n\n✨ Você pensou em...\n\n👤 *${firstGuess.name}*\n📝 ${firstGuess.description || 'Sem descrição'}\n\n🎯 Certeza: ${progress}%\n❓ Perguntas: ${game.question}\n\n🎮 Acertei? 🎮\n\n© NEEXT LTDA`
+                                                });
+                                                
+                                                await reagirMensagem(sock, normalized, "🎉");
+                                                console.log(`🎯 Akinator adivinhou: ${firstGuess.name}`);
+                                            } else {
+                                                await reply(sock, from, "❌ Não consegui adivinhar! Você venceu! 🏆");
+                                                await reagirMensagem(sock, normalized, "🏆");
+                                            }
+                                            
+                                            akinatorGames.delete(from);
+                                        } else {
+                                            const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
+                                            
+                                            await reply(sock, from, `🧞‍♂️ *QUESTÃO ${game.question + 1}*\n\n📊 [${progressBar}] ${progress}%\n\n❓ *${game.aki.question}*\n\n💬 Responda!`);
+                                            await reagirMensagem(sock, normalized, "🧞‍♂️");
+                                        }
                                     }
+                                } catch (err) {
+                                    console.error("❌ Erro no Akinator:", err);
+                                    await reagirMensagem(sock, normalized, "❌");
+                                    await reply(sock, from, "❌ Erro ao processar. Use `.resetakinator` para recomeçar.");
+                                    akinatorGames.delete(from);
                                 }
-                                
-                                salvarAkinator();
-                            } catch (err) {
-                                console.error("❌ Erro ao processar resposta do Akinator:", err);
-                                await reagirMensagem(sock, normalized, "❌");
-                                await reply(sock, from, "❌ Erro ao processar sua resposta. Use `.resetakinator` para recomeçar.");
-                                
-                                gameData.finish = 1;
-                                jogo.now = true;
-                                akinator.splice(akinator.indexOf(gameData), 1);
-                                salvarAkinator();
                             }
                         }
                     }
