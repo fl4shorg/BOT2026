@@ -3446,7 +3446,8 @@ Seu ID foi salvo com segurança em nosso sistema!`;
 
             const acao = args[0]?.toLowerCase();
 
-            // Carrega configuração atual global
+            // Limpa o cache e carrega configuração atual global
+            delete require.cache[require.resolve('./settings/settings.json')];
             const config = require('./settings/settings.json');
             const estadoAtual = config.antipv || false;
 
@@ -3462,6 +3463,9 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                         const settingsPath = path.join(__dirname, 'settings/settings.json');
                         config.antipv = true;
                         fs.writeFileSync(settingsPath, JSON.stringify(config, null, 2));
+                        
+                        // Limpa o cache para próxima leitura
+                        delete require.cache[require.resolve('./settings/settings.json')];
                         
                         await reagirMensagem(sock, message, "✅");
                         await reply(sock, from, `✅ *🚫 ANTIPV ATIVADO*\n\n🛡️ Apenas você pode falar comigo no privado\n🚫 PVs de outros usuários serão ignorados\n⚔️ Proteção máxima ativada!`);
@@ -3482,6 +3486,9 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                         const settingsPath = path.join(__dirname, 'settings/settings.json');
                         config.antipv = false;
                         fs.writeFileSync(settingsPath, JSON.stringify(config, null, 2));
+                        
+                        // Limpa o cache para próxima leitura
+                        delete require.cache[require.resolve('./settings/settings.json')];
                         
                         await reagirMensagem(sock, message, "✅");
                         await reply(sock, from, `✅ *💬 ANTIPV DESATIVADO*\n\n💬 Qualquer pessoa pode falar comigo no privado\n🔓 PVs liberados para todos os usuários\n📱 Conversas privadas habilitadas!`);
@@ -7911,6 +7918,63 @@ function setupListeners(sock) {
             
             // Processa lista negra e antifake PRIMEIRO
             await processarListaNegra(sock, participants, id, action);
+            
+            // Processa X9 (monitor de ações de admin)
+            const config = antiSpam.carregarConfigGrupo(id);
+            if (config && config.x9) {
+                console.log(`🕵️ [X9] Monitorando ação: ${action}`);
+                
+                try {
+                    // Pega metadados do grupo
+                    const groupMetadata = await sock.groupMetadata(id);
+                    const groupName = groupMetadata.subject || 'Grupo';
+                    
+                    for (const participant of participants) {
+                        const participantNumber = participant.split('@')[0];
+                        let mensagemX9 = '';
+                        
+                        switch (action) {
+                            case 'promote':
+                                mensagemX9 = `🕵️ *X9 MONITOR - PROMOÇÃO*\n\n` +
+                                    `👤 *Usuário:* @${participantNumber}\n` +
+                                    `⬆️ *Ação:* Promovido a Admin\n` +
+                                    `📱 *Grupo:* ${groupName}\n` +
+                                    `⏰ *Horário:* ${new Date().toLocaleString('pt-BR')}\n\n` +
+                                    `🔍 Sistema X9 ativo`;
+                                break;
+                                
+                            case 'demote':
+                                mensagemX9 = `🕵️ *X9 MONITOR - REBAIXAMENTO*\n\n` +
+                                    `👤 *Usuário:* @${participantNumber}\n` +
+                                    `⬇️ *Ação:* Removido de Admin\n` +
+                                    `📱 *Grupo:* ${groupName}\n` +
+                                    `⏰ *Horário:* ${new Date().toLocaleString('pt-BR')}\n\n` +
+                                    `🔍 Sistema X9 ativo`;
+                                break;
+                                
+                            case 'remove':
+                                mensagemX9 = `🕵️ *X9 MONITOR - REMOÇÃO*\n\n` +
+                                    `👤 *Usuário:* @${participantNumber}\n` +
+                                    `🚫 *Ação:* Removido do grupo\n` +
+                                    `📱 *Grupo:* ${groupName}\n` +
+                                    `⏰ *Horário:* ${new Date().toLocaleString('pt-BR')}\n\n` +
+                                    `🔍 Sistema X9 ativo`;
+                                break;
+                        }
+                        
+                        // Envia notificação se houver mensagem
+                        if (mensagemX9) {
+                            await sock.sendMessage(id, {
+                                text: mensagemX9,
+                                mentions: [participant]
+                            });
+                            console.log(`✅ [X9] Notificação enviada: ${action} - ${participantNumber}`);
+                        }
+                    }
+                } catch (x9Error) {
+                    console.error(`❌ [X9] Erro ao processar:`, x9Error);
+                }
+            }
             
             // Processa welcome para novos membros (após verificar lista negra)
             if (action === 'add') {
