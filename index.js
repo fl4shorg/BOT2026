@@ -7912,22 +7912,26 @@ function setupListeners(sock) {
     });
 
     // Listener para atualizações de grupo
-    sock.ev.on('group-participants.update', async ({ id, participants, action }) => {
+    sock.ev.on('group-participants.update', async ({ id, participants, action, author }) => {
         try {
-            console.log(`👥 [GROUP-UPDATE] Evento recebido: ${action} - ${participants.length} participante(s) no grupo ${id}`);
+            console.log(`👥 [GROUP-UPDATE] Evento recebido: ${action} - ${participants.length} participante(s) no grupo ${id} por ${author || 'desconhecido'}`);
             
             // Processa lista negra e antifake PRIMEIRO
             await processarListaNegra(sock, participants, id, action);
             
             // Processa X9 (monitor de ações de admin)
             const config = antiSpam.carregarConfigGrupo(id);
-            if (config && config.x9) {
-                console.log(`🕵️ [X9] Monitorando ação: ${action}`);
+            if (config && config.x9 && (action === 'promote' || action === 'demote' || action === 'remove')) {
+                console.log(`🕵️ [X9] Monitorando ação: ${action} por ${author}`);
                 
                 try {
                     // Pega metadados do grupo
                     const groupMetadata = await sock.groupMetadata(id);
                     const groupName = groupMetadata.subject || 'Grupo';
+                    
+                    // Prepara as menções (inclui autor e participantes)
+                    const mentions = author ? [author, ...participants] : participants;
+                    const authorNumber = author ? author.split('@')[0] : 'Sistema';
                     
                     for (const participant of participants) {
                         const participantNumber = participant.split('@')[0];
@@ -7936,29 +7940,32 @@ function setupListeners(sock) {
                         switch (action) {
                             case 'promote':
                                 mensagemX9 = `🕵️ *X9 MONITOR - PROMOÇÃO*\n\n` +
-                                    `👤 *Usuário:* @${participantNumber}\n` +
+                                    `👑 *Admin responsável:* @${authorNumber}\n` +
+                                    `👤 *Usuário promovido:* @${participantNumber}\n` +
                                     `⬆️ *Ação:* Promovido a Admin\n` +
                                     `📱 *Grupo:* ${groupName}\n` +
                                     `⏰ *Horário:* ${new Date().toLocaleString('pt-BR')}\n\n` +
-                                    `🔍 Sistema X9 ativo`;
+                                    `🔍 Sistema X9 ativo - Monitorando alterações de poder`;
                                 break;
                                 
                             case 'demote':
                                 mensagemX9 = `🕵️ *X9 MONITOR - REBAIXAMENTO*\n\n` +
-                                    `👤 *Usuário:* @${participantNumber}\n` +
+                                    `👑 *Admin responsável:* @${authorNumber}\n` +
+                                    `👤 *Usuário rebaixado:* @${participantNumber}\n` +
                                     `⬇️ *Ação:* Removido de Admin\n` +
                                     `📱 *Grupo:* ${groupName}\n` +
                                     `⏰ *Horário:* ${new Date().toLocaleString('pt-BR')}\n\n` +
-                                    `🔍 Sistema X9 ativo`;
+                                    `🔍 Sistema X9 ativo - Monitorando alterações de poder`;
                                 break;
                                 
                             case 'remove':
                                 mensagemX9 = `🕵️ *X9 MONITOR - REMOÇÃO*\n\n` +
-                                    `👤 *Usuário:* @${participantNumber}\n` +
+                                    `👑 *Admin responsável:* @${authorNumber}\n` +
+                                    `👤 *Usuário removido:* @${participantNumber}\n` +
                                     `🚫 *Ação:* Removido do grupo\n` +
                                     `📱 *Grupo:* ${groupName}\n` +
                                     `⏰ *Horário:* ${new Date().toLocaleString('pt-BR')}\n\n` +
-                                    `🔍 Sistema X9 ativo`;
+                                    `🔍 Sistema X9 ativo - Monitorando ações administrativas`;
                                 break;
                         }
                         
@@ -7966,13 +7973,13 @@ function setupListeners(sock) {
                         if (mensagemX9) {
                             await sock.sendMessage(id, {
                                 text: mensagemX9,
-                                mentions: [participant]
+                                mentions: mentions
                             });
-                            console.log(`✅ [X9] Notificação enviada: ${action} - ${participantNumber}`);
+                            console.log(`✅ [X9] Notificação enviada: ${action} por @${authorNumber} - alvo: ${participantNumber}`);
                         }
                     }
                 } catch (x9Error) {
-                    console.error(`❌ [X9] Erro ao processar:`, x9Error);
+                    console.error(`❌ [X9] Erro ao processar X9:`, x9Error);
                 }
             }
             
