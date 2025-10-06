@@ -471,42 +471,68 @@ function gerarTabuleiroTexto(tabuleiro, ultimoMovimento = null) {
     return texto;
 }
 
-function converterTabuleiroParaFEN(tabuleiro) {
-    let fen = '';
-    
-    for (let linha = 0; linha < 8; linha++) {
-        let vazios = 0;
-        for (let coluna = 0; coluna < 8; coluna++) {
-            const peca = tabuleiro[linha][coluna];
-            
-            if (peca === VAZIO) {
-                vazios++;
-            } else {
-                if (vazios > 0) {
-                    fen += vazios;
-                    vazios = 0;
-                }
+async function gerarImagemTabuleiro(tabuleiro, turno) {
+    try {
+        const boardSize = 400;
+        const squareSize = 50;
+        
+        let svg = `<svg width="${boardSize}" height="${boardSize + 60}" xmlns="http://www.w3.org/2000/svg">`;
+        
+        svg += `<rect width="${boardSize}" height="${boardSize + 60}" fill="#2c2c2c"/>`;
+        
+        svg += `<text x="${boardSize/2}" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">JOGO DE DAMAS</text>`;
+        svg += `<text x="${boardSize/2}" y="50" font-family="Arial, sans-serif" font-size="14" fill="#FFD700" text-anchor="middle">Vez: ${turno === 'branco' ? '⚪ Brancas' : '⚫ Pretas'}</text>`;
+        
+        const colunas = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        for (let i = 0; i < 8; i++) {
+            svg += `<text x="${i * squareSize + squareSize/2}" y="${boardSize + 75}" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">${colunas[i]}</text>`;
+            svg += `<text x="-5" y="${i * squareSize + squareSize/2 + 65}" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="end">${8-i}</text>`;
+        }
+        
+        for (let linha = 0; linha < 8; linha++) {
+            for (let coluna = 0; coluna < 8; coluna++) {
+                const x = coluna * squareSize;
+                const y = linha * squareSize + 60;
+                const casaEscura = (linha + coluna) % 2 === 1;
+                const cor = casaEscura ? '#8B4513' : '#F5DEB3';
                 
-                if (peca === PECA_BRANCA) fen += 'w';
-                else if (peca === PECA_PRETA) fen += 'b';
-                else if (peca === DAMA_BRANCA) fen += 'W';
-                else if (peca === DAMA_PRETA) fen += 'B';
+                svg += `<rect x="${x}" y="${y}" width="${squareSize}" height="${squareSize}" fill="${cor}" stroke="#000" stroke-width="1"/>`;
+                
+                const peca = tabuleiro[linha][coluna];
+                if (peca && casaEscura) {
+                    const cx = x + squareSize/2;
+                    const cy = y + squareSize/2;
+                    const r = 18;
+                    
+                    if (peca === PECA_BRANCA) {
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="white" stroke="#333" stroke-width="2"/>`;
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r-3}" fill="none" stroke="#ccc" stroke-width="1"/>`;
+                    }
+                    else if (peca === PECA_PRETA) {
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#1a1a1a" stroke="#666" stroke-width="2"/>`;
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r-3}" fill="none" stroke="#333" stroke-width="1"/>`;
+                    }
+                    else if (peca === DAMA_BRANCA) {
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="white" stroke="#333" stroke-width="2"/>`;
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r-3}" fill="none" stroke="#FFD700" stroke-width="2"/>`;
+                        svg += `<text x="${cx}" y="${cy+5}" font-family="Arial, sans-serif" font-size="20" fill="#FFD700" text-anchor="middle" font-weight="bold">♔</text>`;
+                    }
+                    else if (peca === DAMA_PRETA) {
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#1a1a1a" stroke="#666" stroke-width="2"/>`;
+                        svg += `<circle cx="${cx}" cy="${cy}" r="${r-3}" fill="none" stroke="#FFD700" stroke-width="2"/>`;
+                        svg += `<text x="${cx}" y="${cy+5}" font-family="Arial, sans-serif" font-size="20" fill="#FFD700" text-anchor="middle" font-weight="bold">♚</text>`;
+                    }
+                }
             }
         }
         
-        if (vazios > 0) fen += vazios;
-        if (linha < 7) fen += '/';
-    }
-    
-    return fen;
-}
-
-async function gerarImagemTabuleiro(tabuleiro, turno) {
-    try {
-        const fen = converterTabuleiroParaFEN(tabuleiro);
-        const url = `https://api.checklyhq.com/v1/snippets/render-image?url=${encodeURIComponent('https://checkerboard-api.herokuapp.com/board?fen=' + fen)}`;
+        svg += '</svg>';
+        
+        const encodedSvg = encodeURIComponent(svg).replace(/'/g, '%27').replace(/"/g, '%22');
+        const url = `https://quickchart.io/chart?bkg=white&c=${encodedSvg}`;
         
         return url;
+        
     } catch (error) {
         console.error("Erro ao gerar imagem:", error);
         return null;
