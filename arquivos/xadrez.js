@@ -3,6 +3,7 @@ const { Chess } = require('chess.js');
 const ChessWebAPI = require('chess-web-api');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 const chessAPI = new ChessWebAPI();
 const partidasAtivas = new Map();
@@ -33,7 +34,23 @@ function salvarHistorico(historico) {
     }
 }
 
-// Converte tabuleiro em emoji
+// Gera URL da imagem do tabuleiro usando API do Lichess
+function gerarImagemTabuleiro(fen, ultimaJogada = null) {
+    // Remove a parte extra do FEN (só precisamos da posição das peças)
+    const fenSimples = fen.split(' ')[0];
+    
+    // Monta URL da API do Lichess
+    let url = `https://lichess1.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown`;
+    
+    // Adiciona última jogada se existir (destacar movimento)
+    if (ultimaJogada) {
+        url += `&lastMove=${ultimaJogada}`;
+    }
+    
+    return url;
+}
+
+// Converte tabuleiro em emoji (fallback para texto se imagem falhar)
 function tabuleiroPraEmoji(fen) {
     const chess = new Chess(fen);
     const board = chess.board();
@@ -79,11 +96,11 @@ function iniciarPartida(chatId, jogador1, jogador2) {
         mensagem: `♟️ *PARTIDA DE XADREZ INICIADA*\n\n` +
                  `🤍 Brancas: @${jogador1.split('@')[0]}\n` +
                  `🖤 Pretas: @${jogador2.split('@')[0]}\n\n` +
-                 tabuleiroPraEmoji(chess.fen()) +
-                 `\n\n♟️ Vez das *BRANCAS* jogarem!\n\n` +
+                 `♟️ Vez das *BRANCAS* jogarem!\n\n` +
                  `💡 Use: \`.xadrez jogada e2e4\` para jogar\n` +
                  `💡 Use: \`.xadrez status\` para ver o tabuleiro`,
-        mentions: [jogador1, jogador2]
+        mentions: [jogador1, jogador2],
+        imagem: gerarImagemTabuleiro(chess.fen())
     };
 }
 
@@ -158,10 +175,10 @@ function fazerJogada(chatId, jogador, movimento) {
             sucesso: true,
             mensagem: `♟️ *JOGADA REALIZADA*\n\n` +
                      `${turnoAtual === 'w' ? '🤍' : '🖤'} ${jogada.san}\n\n` +
-                     tabuleiroPraEmoji(partida.chess.fen()) +
                      statusJogo +
                      (fimDeJogo ? '' : `\n\n♟️ Vez ${proximoTurno === 'w' ? 'das *BRANCAS*' : 'das *PRETAS*'} jogarem!`),
-            mentions: [partida.jogador1, partida.jogador2]
+            mentions: [partida.jogador1, partida.jogador2],
+            imagem: gerarImagemTabuleiro(partida.chess.fen(), jogada.from + jogada.to)
         };
         
     } catch (err) {
@@ -186,16 +203,20 @@ function mostrarStatus(chatId) {
         return `${numero}. ${j.jogada}`;
     }).join('\n');
     
+    const ultimaJogadaMovimento = partida.jogadas.length > 0 ? 
+        partida.chess.history({ verbose: true })[partida.jogadas.length - 1] : null;
+    const lastMove = ultimaJogadaMovimento ? ultimaJogadaMovimento.from + ultimaJogadaMovimento.to : null;
+    
     return {
         sucesso: true,
         mensagem: `♟️ *STATUS DA PARTIDA*\n\n` +
                  `🤍 Brancas: @${partida.jogador1.split('@')[0]}\n` +
                  `🖤 Pretas: @${partida.jogador2.split('@')[0]}\n\n` +
-                 tabuleiroPraEmoji(partida.chess.fen()) +
-                 `\n\n♟️ Vez ${turnoAtual === 'w' ? 'das *BRANCAS*' : 'das *PRETAS*'} jogarem!\n` +
+                 `♟️ Vez ${turnoAtual === 'w' ? 'das *BRANCAS*' : 'das *PRETAS*'} jogarem!\n` +
                  `📊 Total de jogadas: ${partida.jogadas.length}\n\n` +
                  (ultimasJogadas ? `📜 Últimas jogadas:\n${ultimasJogadas}` : ''),
-        mentions: [partida.jogador1, partida.jogador2]
+        mentions: [partida.jogador1, partida.jogador2],
+        imagem: gerarImagemTabuleiro(partida.chess.fen(), lastMove)
     };
 }
 

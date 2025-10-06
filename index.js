@@ -3480,14 +3480,29 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 }
                 
                 const resultado = xadrez.fazerJogada(from, sender, movimento);
-                await reply(sock, from, resultado.mensagem, resultado.mentions);
                 
-                if (resultado.sucesso) {
+                if (resultado.sucesso && resultado.imagem) {
+                    await sock.sendMessage(from, {
+                        image: { url: resultado.imagem },
+                        caption: resultado.mensagem,
+                        mentions: resultado.mentions
+                    });
                     await reagirMensagem(sock, message, "♟️");
+                } else {
+                    await reply(sock, from, resultado.mensagem, resultado.mentions);
                 }
             } else if (subcomando === "status" || subcomando === "tabuleiro") {
                 const resultado = xadrez.mostrarStatus(from);
-                await reply(sock, from, resultado.mensagem, resultado.mentions);
+                
+                if (resultado.sucesso && resultado.imagem) {
+                    await sock.sendMessage(from, {
+                        image: { url: resultado.imagem },
+                        caption: resultado.mensagem,
+                        mentions: resultado.mentions
+                    });
+                } else {
+                    await reply(sock, from, resultado.mensagem, resultado.mentions);
+                }
             } else if (subcomando === "desistir" || subcomando === "quit") {
                 const resultado = xadrez.desistir(from, sender);
                 await reply(sock, from, resultado.mensagem, resultado.mentions);
@@ -3516,10 +3531,16 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 }
                 
                 const resultado = xadrez.iniciarPartida(from, sender, mentionedJid[0]);
-                await reply(sock, from, resultado.mensagem, resultado.mentions);
                 
-                if (resultado.sucesso) {
+                if (resultado.sucesso && resultado.imagem) {
+                    await sock.sendMessage(from, {
+                        image: { url: resultado.imagem },
+                        caption: resultado.mensagem,
+                        mentions: resultado.mentions
+                    });
                     await reagirMensagem(sock, message, "♟️");
+                } else {
+                    await reply(sock, from, resultado.mensagem, resultado.mentions);
                 }
             }
         }
