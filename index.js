@@ -68,6 +68,7 @@ function obterConfiguracoes() {
             prefix: settingsFile.prefix || envConfig.botOwner.prefix || ".",
             nomeDoBot: settingsFile.nomeDoBot || envConfig.botOwner.name || "WhatsApp Bot",
             nickDoDono: settingsFile.nickDoDono || envConfig.botOwner.nickname || "Owner",
+            numeroDono: settingsFile.numeroDono || "",
             lidDono: settingsFile.lidDono || "",
             fotoDoBot: settingsFile.fotoDoBot || envConfig.media.botPhotoUrl || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
             idDoCanal: settingsFile.idDoCanal || "120363399209756764@g.us"
@@ -695,35 +696,71 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
 
             try {
-                // Busca o LID real procurando nos grupos
                 let lidEncontrado = null;
-                const grupos = await sock.groupFetchAllParticipating();
-                
-                for (const groupId in grupos) {
-                    const group = grupos[groupId];
-                    const participants = group.participants || [];
+                let metodoEncontrado = "";
+
+                // MÉTODO 1: Busca direta no mapeamento LID do WhatsApp
+                try {
+                    const jidFormatado = `${numeroLimpo}@s.whatsapp.net`;
                     
-                    for (const participant of participants) {
-                        const participantId = participant.id;
-                        const participantNumber = participantId.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
+                    // Tenta usar a API onWhatsApp para verificar se o número existe
+                    const [result] = await sock.onWhatsApp(jidFormatado);
+                    
+                    if (result && result.exists) {
+                        const jidCompleto = result.jid;
                         
-                        if (participantNumber === numeroLimpo) {
-                            lidEncontrado = participantId.split('@')[0].split(':')[0];
-                            break;
+                        // Se retornou um LID, extrai ele
+                        if (jidCompleto.includes('@lid')) {
+                            lidEncontrado = jidCompleto.split('@')[0];
+                            metodoEncontrado = "API WhatsApp";
+                        } else {
+                            // Se retornou número tradicional, busca o LID no mapeamento
+                            const numeroExtraido = jidCompleto.split('@')[0];
+                            lidEncontrado = numeroExtraido;
+                            metodoEncontrado = "Número tradicional";
                         }
                     }
+                } catch (apiErr) {
+                    console.log("⚠️ Método API falhou, tentando método de grupos:", apiErr.message);
+                }
+
+                // MÉTODO 2: Se não encontrou pela API, busca nos grupos (fallback)
+                if (!lidEncontrado) {
+                    const grupos = await sock.groupFetchAllParticipating();
                     
-                    if (lidEncontrado) break;
+                    for (const groupId in grupos) {
+                        const group = grupos[groupId];
+                        const participants = group.participants || [];
+                        
+                        for (const participant of participants) {
+                            const participantId = participant.id;
+                            const participantNumber = participantId.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
+                            
+                            if (participantNumber === numeroLimpo) {
+                                lidEncontrado = participantId.split('@')[0];
+                                metodoEncontrado = "Busca em grupos";
+                                break;
+                            }
+                        }
+                        
+                        if (lidEncontrado) break;
+                    }
                 }
 
                 if (lidEncontrado) {
-                    await reply(sock, from, `✅ *LID Encontrado!*\n\n📱 Número: ${numeroLimpo}\n🔑 LID: \`${lidEncontrado}\`\n\n💡 Use este LID para adicionar como dono do bot.`);
+                    let mensagem = `✅ *LID ENCONTRADO!*\n\n`;
+                    mensagem += `📱 *Número:* ${numeroLimpo}\n`;
+                    mensagem += `🔑 *LID:* \`${lidEncontrado}\`\n`;
+                    mensagem += `🔍 *Método:* ${metodoEncontrado}\n\n`;
+                    mensagem += `💡 *Dica:* Use este LID para adicionar como dono do bot.`;
+                    
+                    await reply(sock, from, mensagem);
                 } else {
-                    await reply(sock, from, `⚠️ *LID não encontrado!*\n\n📱 Número: ${numeroLimpo}\n\n❌ Este número não está em nenhum grupo comum com o bot.\n\n💡 O bot precisa estar no mesmo grupo que a pessoa para encontrar o LID.`);
+                    await reply(sock, from, `⚠️ *LID NÃO ENCONTRADO!*\n\n📱 *Número:* ${numeroLimpo}\n\n❌ Não foi possível encontrar o LID deste número.\n\n💡 *Possíveis motivos:*\n• Número não existe no WhatsApp\n• Número não está em grupos com o bot\n• Erro na conexão com WhatsApp`);
                 }
             } catch (err) {
                 console.error("❌ Erro ao buscar LID:", err);
-                await reply(sock, from, "❌ Erro ao buscar LID. Tente novamente.");
+                await reply(sock, from, `❌ *ERRO AO BUSCAR LID*\n\n⚠️ ${err.message || 'Erro desconhecido'}\n\n🔄 Tente novamente em alguns segundos.`);
             }
             break;
         }
@@ -4069,7 +4106,7 @@ Seu ID foi salvo com segurança em nosso sistema!`;
         case "donos": {
             const config = obterConfiguracoes();
             const donosAdicionais = carregarDonosAdicionais();
-            const numeroDono = config.numeroDoDono;
+            const numeroDono = config.numeroDono || "não configurado";
             
             let mensagem = `╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮  
 │╭─━─━─━─━─━─━─━─
@@ -4085,7 +4122,7 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             for (let i = 1; i <= 6; i++) {
                 const dono = donosAdicionais[`dono${i}`];
                 if (dono && dono.trim() !== "") {
-                    mensagem += `│╞『${i}』- wa.me/${dono}\n│┊\n`;
+                    mensagem += `│╞『${i}』- ${dono}\n│┊\n`;
                 } else {
                     mensagem += `│╞『${i}』- Vazio\n│┊\n`;
                 }
