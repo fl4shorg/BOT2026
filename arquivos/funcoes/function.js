@@ -103,16 +103,42 @@ function logMensagem(m, text = "", isCommand = false, sock = null) {
     const tipo = isCommand || (conteudo.startsWith(prefix)) ? "[COMANDO]" : "[MENSAGEM]";
     const local = isGroup ? "GRUPO" : "PV";
     
-    // Tenta resolver o número real
-    const numero = resolverNumero(senderJid, sock);
-    const infoRemetente = numero 
-        ? `${pushName} (📞 ${numero} | LID: ${sender})${fromMe ? " [EU]" : ""}`
-        : `${pushName} (LID: ${sender})${fromMe ? " [EU]" : ""}`;
+    // Detecta se é LID ou número tradicional
+    const isLid = senderJid && senderJid.includes('@lid');
+    const isTradicional = senderJid && senderJid.includes('@s.whatsapp.net');
+    
+    let infoRemetente = pushName;
+    
+    // Se for LID, tenta resolver o número E mostra o LID
+    if (isLid) {
+        const numero = resolverNumero(senderJid, sock);
+        const lid = senderJid.split('@')[0];
+        if (numero) {
+            infoRemetente = `${pushName} (📞 ${numero} | 🆔 LID: ${lid})`;
+        } else {
+            infoRemetente = `${pushName} (🆔 LID: ${lid})`;
+        }
+    }
+    // Se for tradicional, mostra o número direto
+    else if (isTradicional) {
+        const numero = senderJid.split('@')[0];
+        infoRemetente = `${pushName} (📞 ${numero})`;
+    }
+    // Fallback genérico
+    else {
+        const id = senderJid ? senderJid.split('@')[0] : "desconhecido";
+        infoRemetente = `${pushName} (ID: ${id})`;
+    }
+    
+    if (fromMe) infoRemetente += " [EU]";
 
     const logText = `
 ───────────────────────────────
 ${tipo} ${local}
 De: ${infoRemetente}
+${isGroup ? `📍 Grupo ID: ${jid.split('@')[0]}` : ''}
+${isGroup && senderJid ? `👤 Sender: ${senderJid}` : ''}
+${!isGroup ? `👤 RemoteJid: ${jid}` : ''}
 Conteúdo: ${conteudo}
 ───────────────────────────────`;
 
