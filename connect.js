@@ -127,9 +127,9 @@ END:VCARD`,
 }
 
 async function startBot() {
-    // Usa caminho absoluto e persistente para evitar que a pasta seja apagada
+    // Usa a pasta 'conexao' do projeto
     const path = require('path');
-    const pastaConexao = process.env.BOT_STATE_DIR || path.join(process.env.HOME || __dirname, '.data', 'conexao');
+    const pastaConexao = process.env.BOT_STATE_DIR || path.join(__dirname, 'conexao');
     
     // Cria diretório e arquivo .keep para garantir persistência
     if(!fs.existsSync(pastaConexao)) {
