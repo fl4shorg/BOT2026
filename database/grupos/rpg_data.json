@@ -1,0 +1,52 @@
+{
+  "grupos": {
+    "120363420647388023@g.us": {
+      "ativo": true,
+      "jogadores": []
+    },
+    "120363400994746868@g.us": {
+      "ativo": true,
+      "jogadores": []
+    }
+  },
+  "jogadores": {
+    "5521993272080": {
+      "nome": "flash",
+      "banco": {
+        "id": "bb",
+        "nome": "🟡 Banco do Brasil",
+        "emoji": "🟡"
+      },
+      "saldo": 330,
+      "registrado": "2025-09-28T18:53:24.824Z",
+      "ultimaPesca": 0,
+      "ultimaMineracao": 1759085649087,
+      "ultimoTrabalho": 1759085613951,
+      "ultimoAssalto": 0,
+      "pescasFeitas": 0,
+      "mineracoesFeitas": 1,
+      "trabalhosFeitos": 1,
+      "assaltosFeitos": 0
+    },
+    "74982159855828": {
+      "nome": "joão",
+      "banco": {
+        "id": "neon",
+        "nome": "🔺 Neon",
+        "emoji": "🔺"
+      },
+      "saldo": 980,
+      "registrado": "2025-09-29T03:59:16.127Z",
+      "inventario": {},
+      "pescasFeitas": 1,
+      "mineracoesFeitas": 0,
+      "trabalhosFeitos": 0,
+      "assaltosFeitos": 0,
+      "ultimaPesca": 1759121256848,
+      "ultimaMineracao": 0,
+      "ultimoTrabalho": 0,
+      "ultimoAssalto": 0,
+      "totalGanho": 880
+    }
+  }
+}

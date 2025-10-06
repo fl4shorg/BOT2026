@@ -1,0 +1,24 @@
+{
+  "antilink": true,
+  "anticontato": false,
+  "antidocumento": false,
+  "antivideo": false,
+  "antiaudio": false,
+  "antisticker": false,
+  "antiflod": false,
+  "antifake": false,
+  "x9": true,
+  "modogamer": true,
+  "antiporno": false,
+  "antilinkhard": false,
+  "antipalavrao": false,
+  "antipv": false,
+  "anticall": false,
+  "rankativo": true,
+  "welcome1": false,
+  "listanegra": [],
+  "floodConfig": {
+    "maxMensagens": 5,
+    "tempoSegundos": 10
+  }
+}
