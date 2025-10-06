@@ -21,6 +21,8 @@
     "cfonts": "^3.3.1",
     "chalk": "^5.6.2",
     "cheerio": "^1.1.2",
+    "chess-web-api": "^1.2.0",
+    "chess.js": "^1.4.0",
     "cloudscraper": "^4.6.0",
     "colors": "^1.4.0",
     "dotenv": "^17.2.2",

@@ -22,6 +22,7 @@ const { Aki } = require('aki-api');
 const cloudscraper = require('cloudscraper');
 const UserAgent = require('user-agents');
 const moment = require('moment-timezone');
+const { Chess } = require('chess.js');
 
 // Sistema RPG - NeextCity
 const rpg = require('./arquivos/rpg.js');
@@ -141,6 +142,60 @@ setInterval(() => processedMessages.clear(), 5 * 60 * 1000);
 
 // Sistema Akinator - Jogo de adivinhação
 const akinatorGames = new Map();
+
+// Sistema de Xadrez - Chess Games
+const chessGames = new Map();
+
+// Função para renderizar o tabuleiro de xadrez em ASCII
+function renderChessBoard(chess, lastMove = null) {
+    const board = chess.board();
+    const pieces = {
+        'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚',
+        'P': '♙', 'N': '♘', 'B': '♗', 'R': '♖', 'Q': '♕', 'K': '♔'
+    };
+    
+    let boardStr = '```\n  a b c d e f g h\n';
+    
+    for (let i = 0; i < 8; i++) {
+        boardStr += `${8 - i} `;
+        for (let j = 0; j < 8; j++) {
+            const square = board[i][j];
+            if (square) {
+                boardStr += pieces[square.type.toUpperCase() === square.type ? square.type.toUpperCase() : square.type.toLowerCase()];
+            } else {
+                boardStr += (i + j) % 2 === 0 ? '□' : '■';
+            }
+            boardStr += ' ';
+        }
+        boardStr += `${8 - i}\n`;
+    }
+    
+    boardStr += '  a b c d e f g h\n```';
+    return boardStr;
+}
+
+// Função para obter status do jogo
+function getGameStatus(chess) {
+    if (chess.isCheckmate()) {
+        return chess.turn() === 'w' ? '♔ XEQUE-MATE! Pretas vencem! ♚' : '♚ XEQUE-MATE! Brancas vencem! ♔';
+    }
+    if (chess.isDraw()) {
+        return '🤝 EMPATE!';
+    }
+    if (chess.isStalemate()) {
+        return '🔒 EMPATE POR AFOGAMENTO!';
+    }
+    if (chess.isThreefoldRepetition()) {
+        return '🔁 EMPATE POR REPETIÇÃO TRIPLA!';
+    }
+    if (chess.isInsufficientMaterial()) {
+        return '⚖️ EMPATE POR MATERIAL INSUFICIENTE!';
+    }
+    if (chess.isCheck()) {
+        return chess.turn() === 'w' ? '⚠️ XEQUE! Brancas em xeque!' : '⚠️ XEQUE! Pretas em xeque!';
+    }
+    return chess.turn() === 'w' ? '♔ Vez das BRANCAS' : '♚ Vez das PRETAS';
+}
 
 
 
