@@ -2722,6 +2722,195 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         }
         break;
 
+        case "spotifysearch": {
+            try {
+                if (!args[0]) {
+                    await reply(sock, from, "❌ Por favor, forneça o nome da música ou artista.\n\nExemplo: `.spotifysearch Kamaitachi`");
+                    break;
+                }
+
+                const query = args.join(' ');
+
+                await reagirMensagem(sock, message, "🔍");
+                await reply(sock, from, "🔍 Pesquisando no Spotify, aguarde...");
+
+                try {
+                    const apiUrl = `https://nayan-video-downloader.vercel.app/spotify-search?name=${encodeURIComponent(query)}&limit=5`;
+                    const response = await axios.get(apiUrl, {
+                        timeout: 15000,
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+
+                    if (!response.data || response.data.status !== 200 || !response.data.results || response.data.results.length === 0) {
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ Nenhum resultado encontrado para esta pesquisa.");
+                        break;
+                    }
+
+                    const firstResult = response.data.results[0];
+
+                    const resultMessage = `🎵 *Resultado no Spotify*\n\n` +
+                        `📌 *Música:* ${firstResult.name}\n` +
+                        `🎤 *Artista:* ${firstResult.artists}\n` +
+                        `🔗 *Link:* ${firstResult.link}`;
+
+                    await sock.sendMessage(from, {
+                        text: resultMessage,
+                        contextInfo: {
+                            isForwarded: true,
+                            forwardingScore: 100000,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: "120363289739581116@newsletter",
+                                newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                            },
+                            externalAdReply: {
+                                title: "© NEEXT LTDA - Spotify Search",
+                                body: "📱 Instagram: @neet.tk",
+                                thumbnailUrl: "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                                mediaType: 1,
+                                sourceUrl: "https://www.neext.online",
+                                showAdAttribution: true
+                            }
+                        }
+                    }, { quoted: selinho2 });
+
+                    await reagirMensagem(sock, message, "✅");
+
+                } catch (apiError) {
+                    await reagirMensagem(sock, message, "❌");
+                    console.error("❌ Erro na API Spotify Search:", apiError);
+                    await reply(sock, from, "❌ Erro ao pesquisar no Spotify. Tente novamente mais tarde.");
+                    break;
+                }
+
+            } catch (error) {
+                console.error("❌ Erro no comando Spotify Search:", error);
+                await reagirMensagem(sock, message, "❌");
+                await reply(sock, from, "❌ Erro ao pesquisar música. Tente novamente mais tarde.");
+            }
+        }
+        break;
+
+        case "playspotify":
+        case "play": {
+            try {
+                if (!args[0]) {
+                    await reply(sock, from, "❌ Por favor, forneça o nome da música.\n\nExemplo: `.play Kamaitachi`");
+                    break;
+                }
+
+                const query = args.join(' ');
+
+                await reagirMensagem(sock, message, "🔍");
+                await reply(sock, from, "🎵 Buscando e baixando música, aguarde...");
+
+                try {
+                    const searchUrl = `https://nayan-video-downloader.vercel.app/spotify-search?name=${encodeURIComponent(query)}&limit=5`;
+                    const searchResponse = await axios.get(searchUrl, {
+                        timeout: 15000,
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+
+                    if (!searchResponse.data || searchResponse.data.status !== 200 || !searchResponse.data.results || searchResponse.data.results.length === 0) {
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ Nenhuma música encontrada com esse nome.");
+                        break;
+                    }
+
+                    const firstResult = searchResponse.data.results[0];
+                    const spotifyLink = firstResult.link;
+
+                    await reply(sock, from, `🎵 Encontrado: *${firstResult.name}* - ${firstResult.artists}\n📥 Baixando...`);
+
+                    const downloadUrl = `https://nayan-video-downloader.vercel.app/spotify?url=${encodeURIComponent(spotifyLink)}`;
+                    const downloadResponse = await axios.get(downloadUrl, {
+                        timeout: 30000,
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+
+                    if (!downloadResponse.data || downloadResponse.data.status !== 200 || !downloadResponse.data.result) {
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ Erro ao baixar a música. Tente novamente.");
+                        break;
+                    }
+
+                    const result = downloadResponse.data.result;
+                    const audioUrl = result.url;
+                    const thumbnail = result.image;
+
+                    if (!audioUrl) {
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ Link de download não encontrado.");
+                        break;
+                    }
+
+                    const audioResponse = await axios({
+                        method: 'GET',
+                        url: audioUrl,
+                        responseType: 'arraybuffer',
+                        timeout: 60000
+                    });
+
+                    const audioBuffer = Buffer.from(audioResponse.data);
+
+                    let thumbnailBuffer = null;
+                    if (thumbnail) {
+                        try {
+                            const thumbnailResponse = await axios({
+                                method: 'GET',
+                                url: thumbnail,
+                                responseType: 'arraybuffer'
+                            });
+                            thumbnailBuffer = Buffer.from(thumbnailResponse.data);
+                        } catch (err) {
+                            console.log("❌ Erro ao baixar thumbnail:", err.message);
+                        }
+                    }
+
+                    await sock.sendMessage(from, {
+                        audio: audioBuffer,
+                        mimetype: 'audio/mpeg',
+                        ptt: false,
+                        contextInfo: {
+                            externalAdReply: {
+                                title: result.title || firstResult.name,
+                                body: `Artista: ${result.artist || firstResult.artists}`,
+                                thumbnailUrl: thumbnail || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                                mediaType: 1,
+                                sourceUrl: spotifyLink,
+                                showAdAttribution: true
+                            }
+                        }
+                    }, { quoted: selinho2 });
+
+                    await reagirMensagem(sock, message, "✅");
+
+                } catch (apiError) {
+                    await reagirMensagem(sock, message, "❌");
+                    console.error("❌ Erro na API Spotify:", apiError);
+                    
+                    if (apiError.code === 'ECONNABORTED' || apiError.code === 'ETIMEDOUT') {
+                        await reply(sock, from, "⏱️ Timeout ao processar música. Tente novamente.");
+                    } else {
+                        await reply(sock, from, "❌ Erro ao baixar música do Spotify. Tente novamente mais tarde.");
+                    }
+                    break;
+                }
+
+            } catch (error) {
+                console.error("❌ Erro no comando Play Spotify:", error);
+                await reagirMensagem(sock, message, "❌");
+                await reply(sock, from, "❌ Erro ao baixar música. Tente novamente mais tarde.");
+            }
+        }
+        break;
+
         case "hermitwhite": {
             try {
                 // Verifica se foram passados argumentos suficientes (mínimo 5: nome pode ter espaços + 4 outros campos)
