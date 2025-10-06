@@ -114,6 +114,9 @@ function obterMenuMembro() {
 • \`${prefix}frasesanime\` - Frases de animes
 • \`${prefix}wikipedia [assunto]\` - Busca na Wikipedia
 
+🎲 *DIVERSÃO:*
+• \`${prefix}chance [texto]\` - Calcula chance de algo acontecer
+
 🏷️ *STICKERS:*
 • \`${prefix}s\` - Converte mídia em sticker
 • \`${prefix}rename [pack|author]\` - Renomeia sticker
