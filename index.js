@@ -1784,6 +1784,90 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
+        case 'correio': {
+            const textoCompleto = args.join(' ').trim();
+            
+            if (!textoCompleto.includes('/')) {
+                const config = obterConfiguracoes();
+                await reagirMensagem(sock, message, "❌");
+                await reply(sock, from, 
+                    `❌ *FORMATO INCORRETO!*\n\n` +
+                    `📝 *Como usar:*\n` +
+                    `${config.prefix}correio [número]/[mensagem]\n\n` +
+                    `💡 *Exemplo:*\n` +
+                    `${config.prefix}correio 5591912345678/Oi amor, saudades de você! ❤️\n\n` +
+                    `⚠️ *Importante:*\n` +
+                    `• Use o número completo com código do país (55 para Brasil)\n` +
+                    `• Não use espaços no número\n` +
+                    `• Use / para separar número da mensagem`
+                );
+                break;
+            }
+
+            const [numeroDestino, mensagemAnonima] = textoCompleto.split('/');
+            
+            if (!numeroDestino || !mensagemAnonima || numeroDestino.trim() === '' || mensagemAnonima.trim() === '') {
+                await reagirMensagem(sock, message, "❌");
+                await reply(sock, from, '❌ Número ou mensagem inválidos! Verifique o formato.');
+                break;
+            }
+
+            console.log(`💌 Enviando correio anônimo para: ${numeroDestino}`);
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                const config = obterConfiguracoes();
+                const numeroLimpo = numeroDestino.trim().replace(/[^0-9]/g, '');
+                
+                const mensagemCorreio = 
+                    `⸙. ͎۪۫𝚅𝙾𝙲𝙴 𝙰𝙲𝙰𝙱𝙰 𝙳𝙴 𝚁𝙴𝙲𝙴𝙱𝙴𝚁 𝚄𝙼𝙰 𝙼𝙴𝙽𝚂𝙰𝙶𝙴𝙼 𝙰𝙽𝙾𝙽𝙸𝙼𝙰 💗 ː͡₊ꞋꞌꞋꞌ*\n\n` +
+                    `*🌟 𝙰 𝙼𝙴𝙽𝚂𝙰𝙶𝙴𝙼:*\n\n` +
+                    `- ${mensagemAnonima.trim()}\n\n` +
+                    `⸙. ͎۪۫𝙰𝚂𝚂: 𝙰𝙽𝙾𝙽𝙸𝙼𝙾💗 ː͡₊ꞋꞌꞋꞌ\n\n` +
+                    `© ${config.nomeDoBot}`;
+
+                await sock.sendMessage(`${numeroLimpo}@s.whatsapp.net`, {
+                    text: mensagemCorreio,
+                    contextInfo: {
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        },
+                        externalAdReply: {
+                            title: "💌 CORREIO ANÔNIMO",
+                            body: "© NEEXT LTDA • Mensagem Secreta",
+                            thumbnailUrl: "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                            mediaType: 1,
+                            sourceUrl: "https://www.neext.online"
+                        }
+                    }
+                });
+
+                await reagirMensagem(sock, message, "✅");
+                await reply(sock, from, `✅ *✰ MENSAGEM ENVIADA COM SUCESSO! ★*\n\n📬 Destinatário: ${numeroDestino}\n💌 Sua mensagem anônima foi entregue!`);
+                
+                console.log(`✅ Correio anônimo enviado para ${numeroLimpo}`);
+
+            } catch (error) {
+                console.error('❌ Erro ao enviar correio anônimo:', error);
+                await reagirMensagem(sock, message, "❌");
+                
+                let errorMsg = '❌ Erro ao enviar mensagem anônima.';
+                if (error.message?.includes('not-authorized')) {
+                    errorMsg += ' O bot não tem permissão para enviar mensagens para este número.';
+                } else if (error.message?.includes('forbidden')) {
+                    errorMsg += ' Número bloqueou o bot ou não está no WhatsApp.';
+                } else {
+                    errorMsg += ' Verifique se o número está correto e tente novamente.';
+                }
+                
+                await reply(sock, from, errorMsg);
+            }
+            break;
+        }
+
         // Comandos de Figurinhas (Pacotes)
         case 'figurinhasanime':
         case 'figurinhasmeme':
