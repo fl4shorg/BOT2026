@@ -2846,11 +2846,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         }
                     });
 
-                    console.log(`📥 [PLAY] Resposta da API de download:`, {
-                        status: response.data?.status,
-                        hasResult: !!response.data?.result,
-                        hasDownloadUrl: !!response.data?.result?.downloadUrl
-                    });
+                    console.log(`📥 [PLAY] Resposta COMPLETA da API:`, JSON.stringify(response.data, null, 2));
 
                     if (!response.data || !response.data.status || !response.data.result) {
                         console.error("❌ [PLAY] API retornou dados inválidos:", response.data);
@@ -2860,18 +2856,28 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     }
 
                     const result = response.data.result;
+                    console.log(`📥 [PLAY] Objeto result:`, JSON.stringify(result, null, 2));
                     
-                    if (!result.downloadUrl) {
-                        console.error("❌ [PLAY] Link de download não encontrado no resultado:", result);
+                    let downloadUrl = result.downloadUrl || result.download || result.url || result.link || result.audio;
+                    
+                    if (!downloadUrl) {
+                        console.error("❌ [PLAY] Link de download não encontrado. Campos disponíveis:", Object.keys(result));
                         await reagirMensagem(sock, message, "❌");
                         await reply(sock, from, "❌ Link de download não encontrado para esta música.");
                         break;
                     }
 
-                    console.log(`📥 [PLAY] Baixando áudio de: ${result.downloadUrl}`);
+                    if (downloadUrl.includes('undefined')) {
+                        console.error("❌ [PLAY] URL malformada detectada:", downloadUrl);
+                        await reagirMensagem(sock, message, "❌");
+                        await reply(sock, from, "❌ A API retornou um link inválido. Tente outra música.");
+                        break;
+                    }
+
+                    console.log(`📥 [PLAY] Baixando áudio de: ${downloadUrl}`);
                     const audioResponse = await axios({
                         method: 'GET',
-                        url: result.downloadUrl,
+                        url: downloadUrl,
                         responseType: 'arraybuffer',
                         timeout: 90000,
                         maxContentLength: 50 * 1024 * 1024,
