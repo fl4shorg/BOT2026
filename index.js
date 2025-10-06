@@ -433,20 +433,13 @@ async function botEhAdmin(sock, groupId) {
 // Bane usuário do grupo
 async function banirUsuario(sock, groupId, userId) {
     try {
-        // Verifica se bot tem permissão de admin
-        const botAdmin = await botEhAdmin(sock, groupId);
-        if (!botAdmin) {
-            console.log(`⚠️ Bot não é admin no grupo ${groupId} - não pode banir`);
-            return { success: false, reason: "bot_nao_admin" };
-        }
-
         console.log(`⚔️ Tentando banir usuário ${userId} do grupo ${groupId}`);
         await sock.groupParticipantsUpdate(groupId, [userId], "remove");
         console.log(`✅ Usuário ${userId} banido com sucesso!`);
         return { success: true, reason: "banido" };
     } catch (err) {
         console.error(`❌ Erro ao banir usuário ${userId}:`, err);
-        if (err.message?.includes('forbidden')) {
+        if (err.message?.includes('forbidden') || err.message?.includes('not-authorized')) {
             return { success: false, reason: "sem_permissao" };
         }
         return { success: false, reason: "erro_tecnico" };
@@ -5949,13 +5942,6 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
             if (!ehAdmin && !ehDono) {
                 await reply(sock, from, "❌ Apenas admins podem usar este comando.");
-                break;
-            }
-
-            // Verifica se bot é admin
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para banir usuários.");
                 break;
             }
 
