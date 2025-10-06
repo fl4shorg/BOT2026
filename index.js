@@ -57,19 +57,19 @@ const { mostrarBanner, logMensagem } = require("./export");
 // importa funções auxiliares do menu
 const { obterSaudacao, contarGrupos, contarComandos } = require("./arquivos/funcoes/function.js");
 
-// Config do Bot - prioriza environment vars sobre settings.json
+// Config do Bot - PRIORIZA settings.json sobre environment vars
 function obterConfiguracoes() {
     try {
         delete require.cache[require.resolve('./settings/settings.json')];
         const settingsFile = require('./settings/settings.json');
 
-        // Merge environment config with settings.json (env vars take priority)
+        // SETTINGS.JSON TEM PRIORIDADE TOTAL (para o dono poder configurar facilmente)
         return {
-            prefix: envConfig.botOwner.prefix || settingsFile.prefix || ".",
-            nomeDoBot: envConfig.botOwner.name || settingsFile.nomeDoBot || "WhatsApp Bot",
-            nickDoDono: envConfig.botOwner.nickname || settingsFile.nickDoDono || "Owner",
-            numeroDoDono: envConfig.botOwner.number || settingsFile.numeroDoDono || "PLACEHOLDER_NUMBER",
-            fotoDoBot: envConfig.media.botPhotoUrl || settingsFile.fotoDoBot || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+            prefix: settingsFile.prefix || envConfig.botOwner.prefix || ".",
+            nomeDoBot: settingsFile.nomeDoBot || envConfig.botOwner.name || "WhatsApp Bot",
+            nickDoDono: settingsFile.nickDoDono || envConfig.botOwner.nickname || "Owner",
+            numeroDoDono: settingsFile.numeroDoDono || envConfig.botOwner.number || "PLACEHOLDER_NUMBER",
+            fotoDoBot: settingsFile.fotoDoBot || envConfig.media.botPhotoUrl || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
             idDoCanal: settingsFile.idDoCanal || "120363399209756764@g.us"
         };
     } catch (err) {
@@ -349,25 +349,34 @@ function salvarDonosAdicionais(donos) {
 
 // Verifica se usuário é o dono oficial do bot
 function isDonoOficial(userId) {
+    if (!userId) return false;
+    
     const config = obterConfiguracoes();
     
-    // Normaliza o userId (remove sufixos e formata)
-    const userNumber = userId.split('@')[0].replace(/[^0-9]/g, '');
+    // Extrai apenas os números do userId (funciona com @s.whatsapp.net, @lid, :XX, etc)
+    const userNumber = userId.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
     const donoNumber = config.numeroDoDono.replace(/[^0-9]/g, '');
+    
+    console.log(`🔍 [isDono] Verificando: userId=${userId}, userNumber=${userNumber}, donoNumber=${donoNumber}`);
     
     return userNumber === donoNumber;
 }
 
 // Verifica se usuário é o dono do bot (oficial ou adicional)
 function isDono(userId) {
-    // Normaliza o userId (remove sufixos e formata)
-    const userNumber = userId.split('@')[0].replace(/[^0-9]/g, '');
+    if (!userId) return false;
+    
+    // Extrai apenas os números do userId (funciona com @s.whatsapp.net, @lid, :XX, etc)
+    const userNumber = userId.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
     
     // Verifica dono oficial
     const config = obterConfiguracoes();
     const donoNumber = config.numeroDoDono.replace(/[^0-9]/g, '');
     
+    console.log(`🔍 [isDono] Comparando: userNumber=${userNumber} com donoNumber=${donoNumber}`);
+    
     if (userNumber === donoNumber) {
+        console.log(`✅ [isDono] Dono oficial confirmado!`);
         return true;
     }
     
@@ -377,10 +386,12 @@ function isDono(userId) {
     for (const key in donosAdicionais) {
         const donoAdicionalNumber = donosAdicionais[key].replace(/[^0-9]/g, '');
         if (userNumber === donoAdicionalNumber) {
+            console.log(`✅ [isDono] Dono adicional confirmado: ${key}`);
             return true;
         }
     }
     
+    console.log(`❌ [isDono] Não é dono`);
     return false;
 }
 
@@ -5769,13 +5780,6 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 break;
             }
 
-            // Verifica se bot é admin
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para deletar mensagens.");
-                break;
-            }
-
             // Verifica se há mensagem marcada
             const quotedMsg = message.message.extendedTextMessage?.contextInfo?.quotedMessage;
             if (!quotedMsg) {
@@ -5794,12 +5798,22 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                     participant: quotedParticipant
                 };
 
+                await reagirMensagem(sock, message, "⏳");
                 await sock.sendMessage(from, { delete: messageKey });
                 await reagirMensagem(sock, message, "🗑️");
                 console.log(`🗑️ Mensagem deletada por admin ${sender.split('@')[0]}`);
             } catch (err) {
                 console.error("❌ Erro ao deletar mensagem:", err);
-                await reply(sock, from, "❌ Erro ao deletar mensagem. A mensagem pode ser muito antiga ou já ter sido deletada.");
+                await reagirMensagem(sock, message, "❌");
+                
+                const errorMsg = err.message || err.toString();
+                if (errorMsg.includes('forbidden') || errorMsg.includes('not-authorized') || errorMsg.includes('401')) {
+                    await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser administrador do grupo para deletar mensagens!\n\n📝 Peça para um admin me promover primeiro.");
+                } else if (errorMsg.includes('not-found') || errorMsg.includes('404')) {
+                    await reply(sock, from, "❌ Mensagem não encontrada. Pode ter sido deletada ou é muito antiga.");
+                } else {
+                    await reply(sock, from, `❌ Erro ao deletar mensagem.\n\n🔍 A mensagem pode ser muito antiga ou já foi deletada.`);
+                }
             }
         }
         break;
