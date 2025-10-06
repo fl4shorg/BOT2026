@@ -728,30 +728,27 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
-        case "adddono": {
+        case "dono1":
+        case "dono2":
+        case "dono3":
+        case "dono4":
+        case "dono5":
+        case "dono6": {
             const sender = message.key.participant || from;
             
             // Só o dono oficial pode adicionar outros donos
             if (!isDonoOficial(sender)) {
-                await reply(sock, from, "❌ Apenas o dono oficial pode adicionar outros donos.");
+                await reply(sock, from, "❌ Apenas o dono oficial pode usar este comando.");
                 break;
             }
 
-            // Pega a posição (dono1, dono2, etc)
-            const posicao = args[0]?.toLowerCase();
-            const posicoesValidas = ['dono1', 'dono2', 'dono3', 'dono4', 'dono5', 'dono6'];
-            
-            if (!posicao || !posicoesValidas.includes(posicao)) {
-                const config = obterConfiguracoes();
-                await reply(sock, from, `❌ Use: ${config.prefix}adddono [dono1-6] @pessoa\n\n💡 Exemplo: ${config.prefix}adddono dono1 @pessoa`);
-                break;
-            }
+            const posicao = command.toLowerCase();
 
             // Verifica se marcou alguém
             const mentionedJid = message.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
             if (mentionedJid.length === 0) {
                 const config = obterConfiguracoes();
-                await reply(sock, from, `❌ Você precisa marcar a pessoa!\n\n💡 Use: ${config.prefix}adddono ${posicao} @pessoa`);
+                await reply(sock, from, `❌ Marque a pessoa que será ${posicao}!\n\n💡 Uso: ${config.prefix}${posicao} @pessoa`);
                 break;
             }
 
@@ -765,10 +762,10 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 salvarDonosAdicionais(donosAdicionais);
                 
                 await reagirMensagem(sock, message, "✅");
-                await reply(sock, from, `✅ *Dono adicionado com sucesso!*\n\n👤 Posição: ${posicao}\n🔑 LID: \`${targetLid}\``, [targetUser]);
+                await reply(sock, from, `✅ *${posicao.toUpperCase()} definido!*\n\n🔑 LID: \`${targetLid}\``, [targetUser]);
             } catch (err) {
-                console.error("❌ Erro ao adicionar dono:", err);
-                await reply(sock, from, "❌ Erro ao adicionar dono. Tente novamente.");
+                console.error("❌ Erro ao definir dono:", err);
+                await reply(sock, from, "❌ Erro ao definir dono. Tente novamente.");
             }
             break;
         }
