@@ -2,9 +2,10 @@
 node_modules/
 npm-debug.log*
 
-# WhatsApp session files (SECURITY - contains authentication data)
-conexao/
-*.session*
+# WhatsApp session files 
+# IMPORTANTE: Pasta conexao/ NÃO está mais ignorada para preservar arquivos de sessão
+# Os arquivos de sessão serão mantidos permanentemente
+# *.session*
 
 # Runtime database files
 database/grupos/games/akinator.json
