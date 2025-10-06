@@ -1637,6 +1637,89 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
+        case 'metadinha': {
+            console.log('💑 Comando metadinha acionado');
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                const response = await axios.get('https://raw.githubusercontent.com/iamriz7/kopel_/main/kopel.json', {
+                    timeout: 15000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+                    await reagirMensagem(sock, message, "❌");
+                    await sock.sendMessage(from, {
+                        text: '❌ Erro ao buscar metadinhas. Tente novamente!'
+                    }, { quoted: message });
+                    break;
+                }
+
+                const random = response.data[Math.floor(Math.random() * response.data.length)];
+                const config = obterConfiguracoes();
+
+                // Envia imagem masculina
+                await sock.sendMessage(from, {
+                    image: { url: random.male },
+                    caption: `💙 *MASCULINA*`,
+                    footer: config.nomeDoBot,
+                    contextInfo: {
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        },
+                        externalAdReply: {
+                            title: "💙 METADINHA MASCULINA",
+                            body: "© NEEXT LTDA • Instagram: @neet.tk",
+                            thumbnailUrl: random.male,
+                            mediaType: 1,
+                            sourceUrl: "https://www.neext.online"
+                        }
+                    }
+                }, { quoted: selinho });
+
+                // Aguarda um pouco entre os envios
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Envia imagem feminina
+                await sock.sendMessage(from, {
+                    image: { url: random.female },
+                    caption: `💖 *FEMININA*`,
+                    footer: config.nomeDoBot,
+                    contextInfo: {
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        },
+                        externalAdReply: {
+                            title: "💖 METADINHA FEMININA",
+                            body: "© NEEXT LTDA • Instagram: @neet.tk",
+                            thumbnailUrl: random.female,
+                            mediaType: 1,
+                            sourceUrl: "https://www.neext.online"
+                        }
+                    }
+                }, { quoted: selinho });
+
+                await reagirMensagem(sock, message, "✅");
+                console.log('✅ Metadinhas enviadas com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro ao buscar metadinha:', error.message);
+                await reagirMensagem(sock, message, "❌");
+                await sock.sendMessage(from, {
+                    text: '❌ Erro ao buscar metadinhas. Tente novamente mais tarde!'
+                }, { quoted: message });
+            }
+            break;
+        }
+
         // Comandos de Figurinhas (Pacotes)
         case 'figurinhasanime':
         case 'figurinhasmeme':

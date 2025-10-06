@@ -1,10 +1,10 @@
 {
   "74982159855828@lid": {
     "mensagens": 39,
-    "comandos": 26,
+    "comandos": 27,
     "stickers": 2,
     "midias": 0,
-    "ultimaAtividade": 1759748472459,
+    "ultimaAtividade": 1759752219607,
     "primeiraAtividade": 1759182504202
   },
   "256710883192848@lid": {
@@ -30,5 +30,13 @@
     "midias": 0,
     "ultimaAtividade": 1759709338028,
     "primeiraAtividade": 1759709329322
+  },
+  "undefined": {
+    "mensagens": 5,
+    "comandos": 0,
+    "stickers": 1,
+    "midias": 0,
+    "ultimaAtividade": 1759752177999,
+    "primeiraAtividade": 1759752164025
   }
 }
