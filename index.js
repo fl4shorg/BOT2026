@@ -1663,8 +1663,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 // Envia imagem masculina
                 await sock.sendMessage(from, {
                     image: { url: random.male },
-                    caption: `💙 *MASCULINA*`,
-                    footer: config.nomeDoBot,
+                    caption: `💙 *MASCULINA*\n\n© ${config.nomeDoBot}`,
                     contextInfo: {
                         forwardingScore: 100000,
                         isForwarded: true,
@@ -1688,8 +1687,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 // Envia imagem feminina
                 await sock.sendMessage(from, {
                     image: { url: random.female },
-                    caption: `💖 *FEMININA*`,
-                    footer: config.nomeDoBot,
+                    caption: `💖 *FEMININA*\n\n© ${config.nomeDoBot}`,
                     contextInfo: {
                         forwardingScore: 100000,
                         isForwarded: true,
