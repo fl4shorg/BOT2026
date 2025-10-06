@@ -10,13 +10,46 @@ function obterConfiguracoes() {
 const { obterSaudacao, contarGrupos, contarComandos } = require('../arquivos/funcoes/function.js');
 const { obterEstatisticas } = require('../arquivos/registros.js');
 
+// Função para verificar se é dono (por LID)
+function isDono(userId) {
+    if (!userId) return false;
+    
+    const userLid = userId.split('@')[0].split(':')[0];
+    const config = obterConfiguracoes();
+    
+    // Verifica dono oficial
+    if (config.lidDono && userLid === config.lidDono) {
+        return true;
+    }
+    
+    // Verifica donos adicionais
+    try {
+        const path = require('path');
+        const necessaryPath = path.join(__dirname, "..", "settings", "necessary.json");
+        const fs = require('fs');
+        if (fs.existsSync(necessaryPath)) {
+            delete require.cache[require.resolve('../settings/necessary.json')];
+            const donosAdicionais = require('../settings/necessary.json');
+            
+            for (const key in donosAdicionais) {
+                const donoLid = donosAdicionais[key];
+                if (donoLid && userLid === donoLid) {
+                    return true;
+                }
+            }
+        }
+    } catch (err) {
+        // Ignora erro
+    }
+    
+    return false;
+}
+
 // Função para determinar cargo do usuário
 async function obterCargoUsuario(sock, from, sender) {
     try {
-        // Verifica se é o dono
-        const config = obterConfiguracoes();
-        const numeroDono = config.numeroDoDono + "@s.whatsapp.net";
-        if (sender === numeroDono) {
+        // Verifica se é o dono (usando LID)
+        if (isDono(sender)) {
             return "👑 Dono";
         }
 

@@ -68,7 +68,7 @@ function obterConfiguracoes() {
             prefix: settingsFile.prefix || envConfig.botOwner.prefix || ".",
             nomeDoBot: settingsFile.nomeDoBot || envConfig.botOwner.name || "WhatsApp Bot",
             nickDoDono: settingsFile.nickDoDono || envConfig.botOwner.nickname || "Owner",
-            numeroDoDono: settingsFile.numeroDoDono || envConfig.botOwner.number || "PLACEHOLDER_NUMBER",
+            lidDono: settingsFile.lidDono || "",
             fotoDoBot: settingsFile.fotoDoBot || envConfig.media.botPhotoUrl || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
             idDoCanal: settingsFile.idDoCanal || "120363399209756764@g.us"
         };
@@ -318,14 +318,14 @@ async function isAdmin(sock, groupId, userId) {
     }
 }
 
-// Carrega donos adicionais do necessary.json
+// Carrega donos adicionais do necessary.json (settings/)
 function carregarDonosAdicionais() {
     try {
-        const necessaryPath = path.join(__dirname, "config", "necessary.json");
+        const necessaryPath = path.join(__dirname, "settings", "necessary.json");
         if (fs.existsSync(necessaryPath)) {
-            delete require.cache[require.resolve('./config/necessary.json')];
-            const necessary = require('./config/necessary.json');
-            return necessary.donos || {};
+            delete require.cache[require.resolve('./settings/necessary.json')];
+            const necessary = require('./settings/necessary.json');
+            return necessary || {};
         }
         return {};
     } catch (err) {
@@ -334,12 +334,11 @@ function carregarDonosAdicionais() {
     }
 }
 
-// Salva donos adicionais no necessary.json
+// Salva donos adicionais no necessary.json (settings/)
 function salvarDonosAdicionais(donos) {
     try {
-        const necessaryPath = path.join(__dirname, "config", "necessary.json");
-        const data = { donos };
-        fs.writeFileSync(necessaryPath, JSON.stringify(data, null, 2));
+        const necessaryPath = path.join(__dirname, "settings", "necessary.json");
+        fs.writeFileSync(necessaryPath, JSON.stringify(donos, null, 2));
         return true;
     } catch (err) {
         console.error("❌ Erro ao salvar donos adicionais:", err);
@@ -347,79 +346,20 @@ function salvarDonosAdicionais(donos) {
     }
 }
 
-// Carrega mapeamento de LID para números
-function carregarLidMapping() {
-    try {
-        const necessaryPath = path.join(__dirname, "config", "necessary.json");
-        if (fs.existsSync(necessaryPath)) {
-            delete require.cache[require.resolve('./config/necessary.json')];
-            const necessary = require('./config/necessary.json');
-            return necessary.lidMapping || {};
-        }
-        return {};
-    } catch (err) {
-        return {};
-    }
-}
-
-// Salva mapeamento LID → número
-function salvarLidMapping(lidMapping) {
-    try {
-        const necessaryPath = path.join(__dirname, "config", "necessary.json");
-        let data = {};
-        
-        if (fs.existsSync(necessaryPath)) {
-            data = JSON.parse(fs.readFileSync(necessaryPath, 'utf8'));
-        }
-        
-        data.lidMapping = lidMapping;
-        fs.writeFileSync(necessaryPath, JSON.stringify(data, null, 2));
-        return true;
-    } catch (err) {
-        console.error("❌ Erro ao salvar LID mapping:", err);
-        return false;
-    }
-}
-
-// Registra o LID do dono automaticamente
-function registrarLidDono(userId) {
-    if (!userId) return;
-    
-    const lidMapping = carregarLidMapping();
-    const userLid = userId.split('@')[0].split(':')[0];
-    
-    // Salva o mapeamento: LID → "dono_oficial"
-    if (!lidMapping[userLid]) {
-        lidMapping[userLid] = "dono_oficial";
-        salvarLidMapping(lidMapping);
-        console.log(`✅ [LID] LID ${userLid} registrado como dono oficial`);
-    }
-}
-
-// Verifica se usuário é o dono oficial do bot
+// Verifica se usuário é o dono oficial do bot (via LID em settings.json)
 function isDonoOficial(userId) {
     if (!userId) return false;
     
     const config = obterConfiguracoes();
     const userLid = userId.split('@')[0].split(':')[0];
-    const userNumber = userLid.replace(/[^0-9]/g, '');
-    const donoNumber = config.numeroDoDono.replace(/[^0-9]/g, '');
     
-    // 1. Verifica por LID mapeado
-    const lidMapping = carregarLidMapping();
-    if (lidMapping[userLid] === "dono_oficial") {
-        console.log(`✅ [isDono] Dono reconhecido por LID: ${userLid}`);
+    // Verifica se o LID do usuário corresponde ao LID do dono em settings.json
+    if (config.lidDono && userLid === config.lidDono) {
+        console.log(`✅ [isDono] Dono oficial reconhecido por LID: ${userLid}`);
         return true;
     }
     
-    // 2. Verifica por número (caso ainda use formato antigo)
-    if (userNumber === donoNumber) {
-        console.log(`✅ [isDono] Dono reconhecido por número: ${userNumber}`);
-        // Registra o LID para próximas vezes
-        registrarLidDono(userId);
-        return true;
-    }
-    
+    console.log(`❌ [isDono] Não é dono oficial (LID: ${userLid} vs ${config.lidDono})`);
     return false;
 }
 
@@ -428,35 +368,24 @@ function isDono(userId) {
     if (!userId) return false;
     
     const userLid = userId.split('@')[0].split(':')[0];
-    const userNumber = userLid.replace(/[^0-9]/g, '');
     
-    console.log(`🔍 [isDono] Verificando userId=${userId}, LID=${userLid}, número=${userNumber}`);
+    console.log(`🔍 [isDono] Verificando userId=${userId}, LID=${userLid}`);
     
-    // 1. Verifica dono oficial (por LID ou número)
+    // 1. Verifica dono oficial (por LID em settings.json)
     if (isDonoOficial(userId)) {
         return true;
     }
     
-    // 2. Verifica donos adicionais
+    // 2. Verifica donos adicionais (LID em settings/necessary.json)
     const donosAdicionais = carregarDonosAdicionais();
-    const lidMapping = carregarLidMapping();
     
-    // Verifica se o LID está mapeado como dono adicional
+    // Percorre todos os donos adicionais
     for (const key in donosAdicionais) {
-        const donoAdicionalNumber = donosAdicionais[key].replace(/[^0-9]/g, '');
+        const donoLid = donosAdicionais[key];
         
-        // Verifica por LID mapeado
-        if (lidMapping[userLid] === key) {
-            console.log(`✅ [isDono] Dono adicional reconhecido por LID: ${key}`);
-            return true;
-        }
-        
-        // Verifica por número
-        if (userNumber === donoAdicionalNumber) {
-            console.log(`✅ [isDono] Dono adicional reconhecido por número: ${key}`);
-            // Registra o LID
-            lidMapping[userLid] = key;
-            salvarLidMapping(lidMapping);
+        // Se o LID do dono adicional bate com o LID do usuário
+        if (donoLid && userLid === donoLid) {
+            console.log(`✅ [isDono] Dono adicional reconhecido - ${key}: ${userLid}`);
             return true;
         }
     }
@@ -747,7 +676,134 @@ async function handleCommand(sock, message, command, args, from, quoted) {
     await reply(sock, from, "🛡️ Esse é o dono do bot!", [sender]);
     break;
 
+        case "getlid": {
+            const sender = message.key.participant || from;
+            const userLid = sender.split('@')[0].split(':')[0];
+            await reply(sock, from, `🔑 Seu LID é: \`${userLid}\`\n\n💡 Use este LID para ser adicionado como dono do bot.`);
+            break;
+        }
 
+        case "adddono": {
+            const sender = message.key.participant || from;
+            
+            // Só o dono oficial pode adicionar outros donos
+            if (!isDonoOficial(sender)) {
+                await reply(sock, from, "❌ Apenas o dono oficial pode adicionar outros donos.");
+                break;
+            }
+
+            // Verifica se marcou alguém
+            const mentionedJid = message.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+            if (mentionedJid.length === 0) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Use: ${config.prefix}adddono [dono1-6]\n\n💡 Marque a pessoa e especifique a posição (dono1, dono2, etc)`);
+                break;
+            }
+
+            // Pega o primeiro usuário marcado
+            const targetUser = mentionedJid[0];
+            const targetLid = targetUser.split('@')[0].split(':')[0];
+
+            // Pega a posição (dono1, dono2, etc)
+            const posicao = args[0]?.toLowerCase();
+            const posicoesValidas = ['dono1', 'dono2', 'dono3', 'dono4', 'dono5', 'dono6'];
+            
+            if (!posicao || !posicoesValidas.includes(posicao)) {
+                await reply(sock, from, `❌ Posição inválida! Use: dono1, dono2, dono3, dono4, dono5 ou dono6`);
+                break;
+            }
+
+            try {
+                const donosAdicionais = carregarDonosAdicionais();
+                donosAdicionais[posicao] = targetLid;
+                salvarDonosAdicionais(donosAdicionais);
+                
+                await reagirMensagem(sock, message, "✅");
+                await reply(sock, from, `✅ @${targetLid} foi adicionado como ${posicao}!\n\n🔑 LID salvo: \`${targetLid}\``, [targetUser]);
+            } catch (err) {
+                console.error("❌ Erro ao adicionar dono:", err);
+                await reply(sock, from, "❌ Erro ao adicionar dono. Tente novamente.");
+            }
+            break;
+        }
+
+        case "removedono": {
+            const sender = message.key.participant || from;
+            
+            // Só o dono oficial pode remover outros donos
+            if (!isDonoOficial(sender)) {
+                await reply(sock, from, "❌ Apenas o dono oficial pode remover outros donos.");
+                break;
+            }
+
+            const posicao = args[0]?.toLowerCase();
+            const posicoesValidas = ['dono1', 'dono2', 'dono3', 'dono4', 'dono5', 'dono6'];
+            
+            if (!posicao || !posicoesValidas.includes(posicao)) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Use: ${config.prefix}removedono [dono1-6]\n\nExemplo: ${config.prefix}removedono dono1`);
+                break;
+            }
+
+            try {
+                const donosAdicionais = carregarDonosAdicionais();
+                
+                if (!donosAdicionais[posicao] || donosAdicionais[posicao] === "") {
+                    await reply(sock, from, `❌ ${posicao} não está configurado.`);
+                    break;
+                }
+
+                const lidRemovido = donosAdicionais[posicao];
+                donosAdicionais[posicao] = "";
+                salvarDonosAdicionais(donosAdicionais);
+                
+                await reagirMensagem(sock, message, "✅");
+                await reply(sock, from, `✅ ${posicao} removido com sucesso!\n\n🔑 LID removido: \`${lidRemovido}\``);
+            } catch (err) {
+                console.error("❌ Erro ao remover dono:", err);
+                await reply(sock, from, "❌ Erro ao remover dono. Tente novamente.");
+            }
+            break;
+        }
+
+        case "listdonos": {
+            const sender = message.key.participant || from;
+            
+            // Só donos podem ver a lista
+            if (!isDono(sender)) {
+                await reply(sock, from, "❌ Apenas donos podem usar este comando.");
+                break;
+            }
+
+            try {
+                const config = obterConfiguracoes();
+                const donosAdicionais = carregarDonosAdicionais();
+                
+                let mensagem = "👑 *LISTA DE DONOS DO BOT*\n\n";
+                mensagem += `📌 *Dono Oficial:*\n`;
+                mensagem += `   LID: \`${config.lidDono || 'Não configurado'}\`\n\n`;
+                mensagem += `📋 *Donos Adicionais:*\n`;
+                
+                let temDonosAdicionais = false;
+                for (const key in donosAdicionais) {
+                    const lid = donosAdicionais[key];
+                    if (lid && lid !== "") {
+                        mensagem += `   • ${key}: \`${lid}\`\n`;
+                        temDonosAdicionais = true;
+                    }
+                }
+                
+                if (!temDonosAdicionais) {
+                    mensagem += `   Nenhum dono adicional configurado.\n`;
+                }
+                
+                await reply(sock, from, mensagem);
+            } catch (err) {
+                console.error("❌ Erro ao listar donos:", err);
+                await reply(sock, from, "❌ Erro ao listar donos.");
+            }
+            break;
+        }
 
         case "status":
             const statusText = args.join(" ").trim();
