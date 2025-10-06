@@ -467,7 +467,7 @@ async function processarAntiSpam(sock, normalized) {
         }
 
         // Processa mensagem para verificar violações
-        const resultado = antiSpam.processarMensagem(normalized.message, from, sender);
+        const resultado = await antiSpam.processarMensagem(normalized.message, from, sender, sock);
 
         if (!resultado.violacao) return false;
 
