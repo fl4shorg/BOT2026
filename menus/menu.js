@@ -322,6 +322,9 @@ function obterMenuAdm() {
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}grupo-status - Status do grupo
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}fotodogrupo - Troca foto do grupo
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}fotodobot - Troca foto do bot
+╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}opengp HH:MM - Agendar abertura automática
+╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}closegp HH:MM - Agendar fechamento automático
+╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}time-status - Ver agendamentos do grupo
 ╎╰╌❅̸╌═⊱⋇⊰🏮⊱⋇⊰═╌❅̸╌╯
 ╰═══════════════════ ⪨
 © NEEXT LTDA - ${nickDoDono}

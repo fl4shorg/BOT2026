@@ -4920,6 +4920,127 @@ Seu ID foi salvo com segurança em nosso sistema!`;
         }
         break;
 
+        case "opengp": {
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const sender = message.key.participant || from;
+            const ehAdmin = await isAdmin(sock, from, sender);
+            const ehDono = isDono(sender);
+
+            if (!ehAdmin && !ehDono) {
+                await reply(sock, from, "❌ Apenas admins podem usar este comando.");
+                break;
+            }
+
+            const botAdmin = await botEhAdmin(sock, from);
+            if (!botAdmin) {
+                await reply(sock, from, "❌ O bot precisa ser admin para executar agendamentos.");
+                break;
+            }
+
+            const timeArg = args[0];
+            if (!timeArg) {
+                await reply(sock, from, `❌ Use: ${configBot.prefix}opengp HH:MM\n\nExemplo: ${configBot.prefix}opengp 09:07`);
+                break;
+            }
+
+            const groupSchedule = require('./arquivos/grupo-schedule.js');
+            const parsedTime = groupSchedule.parseTime(timeArg);
+            
+            if (!parsedTime) {
+                await reply(sock, from, "❌ Formato de hora inválido! Use HH:MM (ex: 09:07 ou 14:30)");
+                break;
+            }
+
+            groupSchedule.setSchedule(from, 'open', parsedTime.formatted);
+            await reagirMensagem(sock, message, "🔓");
+            await reply(sock, from, `✅ *AGENDAMENTO CONFIGURADO!*\n\n🔓 Abertura automática: ${parsedTime.formatted}\n⏰ O grupo abrirá automaticamente todos os dias neste horário.`);
+            console.log(`⏰ Agendamento de abertura configurado para ${from} às ${parsedTime.formatted}`);
+        }
+        break;
+
+        case "closegp": {
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const sender = message.key.participant || from;
+            const ehAdmin = await isAdmin(sock, from, sender);
+            const ehDono = isDono(sender);
+
+            if (!ehAdmin && !ehDono) {
+                await reply(sock, from, "❌ Apenas admins podem usar este comando.");
+                break;
+            }
+
+            const botAdmin = await botEhAdmin(sock, from);
+            if (!botAdmin) {
+                await reply(sock, from, "❌ O bot precisa ser admin para executar agendamentos.");
+                break;
+            }
+
+            const timeArg = args[0];
+            if (!timeArg) {
+                await reply(sock, from, `❌ Use: ${configBot.prefix}closegp HH:MM\n\nExemplo: ${configBot.prefix}closegp 21:50`);
+                break;
+            }
+
+            const groupSchedule = require('./arquivos/grupo-schedule.js');
+            const parsedTime = groupSchedule.parseTime(timeArg);
+            
+            if (!parsedTime) {
+                await reply(sock, from, "❌ Formato de hora inválido! Use HH:MM (ex: 21:50 ou 23:00)");
+                break;
+            }
+
+            groupSchedule.setSchedule(from, 'close', parsedTime.formatted);
+            await reagirMensagem(sock, message, "🔒");
+            await reply(sock, from, `✅ *AGENDAMENTO CONFIGURADO!*\n\n🔒 Fechamento automático: ${parsedTime.formatted}\n⏰ O grupo fechará automaticamente todos os dias neste horário.`);
+            console.log(`⏰ Agendamento de fechamento configurado para ${from} às ${parsedTime.formatted}`);
+        }
+        break;
+
+        case "time-status": {
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const groupSchedule = require('./arquivos/grupo-schedule.js');
+            const schedule = groupSchedule.getSchedule(from);
+            
+            let statusMsg = "⏰ *AGENDAMENTOS DO GRUPO*\n\n";
+            
+            if (schedule.open || schedule.close) {
+                if (schedule.open) {
+                    statusMsg += `🔓 *Abertura automática:* ${schedule.open}\n`;
+                } else {
+                    statusMsg += `🔓 *Abertura automática:* Não configurada\n`;
+                }
+                
+                if (schedule.close) {
+                    statusMsg += `🔒 *Fechamento automático:* ${schedule.close}\n`;
+                } else {
+                    statusMsg += `🔒 *Fechamento automático:* Não configurado\n`;
+                }
+                
+                statusMsg += `\n✅ O bot executará as ações automaticamente nos horários configurados.`;
+            } else {
+                statusMsg += `❌ Nenhum agendamento configurado.\n\n`;
+                statusMsg += `💡 *Configure agendamentos:*\n`;
+                statusMsg += `• ${configBot.prefix}opengp HH:MM\n`;
+                statusMsg += `• ${configBot.prefix}closegp HH:MM`;
+            }
+            
+            await reagirMensagem(sock, message, "⏰");
+            await reply(sock, from, statusMsg);
+        }
+        break;
+
         case "delmsg":
         case "del":
         case "delete": {

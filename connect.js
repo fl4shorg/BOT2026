@@ -214,6 +214,13 @@ async function startBot() {
             const { setupListeners } = require("./index.js");
             setupListeners(sock);
             console.log("🔧 Listeners de mensagens configurados!");
+            
+            // Inicia sistema de agendamento automático de grupos
+            const groupSchedule = require('./arquivos/grupo-schedule.js');
+            setInterval(() => {
+                groupSchedule.checkSchedules(sock);
+            }, 60000); // Verifica a cada 1 minuto
+            console.log("⏰ Sistema de agendamento de grupos iniciado!");
         } else if(connection==="close"){
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const reason = lastDisconnect?.error?.output?.payload?.message;
