@@ -141,6 +141,11 @@ async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState(pastaConexao);
     const { version } = await fetchLatestBaileysVersion();
 
+    // Verificar arquivos de sessão existentes
+    const arquivosExistentes = fs.readdirSync(pastaConexao).filter(f => f !== '.keep');
+    console.log(`📂 Arquivos de sessão encontrados: ${arquivosExistentes.length > 0 ? arquivosExistentes.join(', ') : 'nenhum (novo login necessário)'}`);
+    console.log(`🔐 Sessão registrada: ${state.creds.registered ? 'Sim' : 'Não'}`);
+
     let metodo = "qr";
     if(!state.creds.registered) metodo = await perguntarMetodoConexao();
 
@@ -174,7 +179,10 @@ async function startBot() {
         }
     }
 
-    sock.ev.on("creds.update", saveCreds);
+    sock.ev.on("creds.update", async () => {
+        await saveCreds();
+        console.log("💾 Credenciais salvas em:", pastaConexao);
+    });
 
     sock.ev.on("connection.update", async (update)=>{
         const { connection, lastDisconnect, qr } = update;
@@ -193,6 +201,13 @@ async function startBot() {
         if(connection==="open"){
             mostrarBanner();
             console.log(`✅ Conectado ao sistema da Neext em ${new Date().toLocaleString()}`);
+            
+            // Verificar arquivos salvos após conexão
+            const path = require('path');
+            const arquivosSalvos = fs.readdirSync(pastaConexao).filter(f => f !== '.keep');
+            console.log(`💾 Arquivos de sessão persistidos: ${arquivosSalvos.length} arquivo(s)`);
+            console.log(`📁 Localização: ${pastaConexao}`);
+            
             await enviarContatoSelinho(sock);
             
             // Configura listeners de mensagens após conectar (sempre, incluindo reconexões)
