@@ -109,6 +109,11 @@ function obterMenuMembro() {
 • \`${prefix}rg\` - Registra-se no sistema do bot
 • \`${prefix}hermitwhite [dados]\` - Cria ID no sistema NEEXT
 
+📚 *CONHECIMENTO:*
+• \`${prefix}pensador [personagem]\` - Frases de pensadores
+• \`${prefix}frasesanime\` - Frases de animes
+• \`${prefix}wikipedia [assunto]\` - Busca na Wikipedia
+
 🏷️ *STICKERS:*
 • \`${prefix}s\` - Converte mídia em sticker
 • \`${prefix}rename [pack|author]\` - Renomeia sticker

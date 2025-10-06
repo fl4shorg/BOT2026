@@ -1765,6 +1765,261 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
+        // Comando Pensador - Frases de pensadores
+        case 'pensador': {
+            const personagem = args.join(' ');
+            if (!personagem) {
+                const config = obterConfiguracoes();
+                await sock.sendMessage(from, {
+                    text: `💭 *Como usar o comando pensador:*\n\n` +
+                          `📝 \`${config.prefix}pensador [personagem]\`\n\n` +
+                          `💡 *Exemplo:*\n` +
+                          `\`${config.prefix}pensador Einstein\`\n` +
+                          `\`${config.prefix}pensador Shakespeare\`\n\n` +
+                          `🔍 Digite o nome de um pensador ou personagem!`
+                }, { quoted: message });
+                break;
+            }
+
+            console.log(`💭 Buscando frases de: ${personagem}`);
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                const response = await axios.get(`https://www.api.neext.online/frases/pensador?q=${encodeURIComponent(personagem)}`, {
+                    timeout: 15000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                console.log(`📥 Resposta API Pensador:`, response.data);
+
+                if (!Array.isArray(response.data) || response.data.length === 0) {
+                    await reagirMensagem(sock, message, "❌");
+                    await sock.sendMessage(from, {
+                        text: `❌ Nenhuma frase encontrada para "${personagem}".\n\n💡 Tente outro pensador ou personagem!`
+                    }, { quoted: message });
+                    break;
+                }
+
+                // Pega até 3 frases aleatórias
+                const frasesParaEnviar = response.data.slice(0, 3);
+                
+                await reagirMensagem(sock, message, "✅");
+
+                // Envia cada frase
+                for (let i = 0; i < frasesParaEnviar.length; i++) {
+                    const frase = frasesParaEnviar[i];
+                    
+                    const mensagem = `💭 *FRASE ${i + 1}/${frasesParaEnviar.length}*\n\n` +
+                                   `📝 "${frase.text}"\n\n` +
+                                   `✍️ *Autor:* ${frase.author}\n\n` +
+                                   `🔍 *Busca:* ${personagem}\n` +
+                                   `© NEEXT LTDA`;
+
+                    await sock.sendMessage(from, {
+                        text: mensagem
+                    }, { quoted: selinho });
+
+                    // Aguarda entre envios
+                    if (i < frasesParaEnviar.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+
+                console.log(`✅ ${frasesParaEnviar.length} frases de ${personagem} enviadas!`);
+
+            } catch (error) {
+                console.error('❌ Erro ao buscar frases do pensador:', error.message);
+                
+                let errorMessage = '❌ Erro ao buscar frases.';
+                
+                if (error.code === 'ENOTFOUND') {
+                    errorMessage += ' API indisponível.';
+                } else if (error.code === 'ETIMEDOUT') {
+                    errorMessage += ' Timeout. Tente novamente.';
+                } else if (error.response?.status >= 500) {
+                    errorMessage += ' Servidor fora do ar.';
+                } else {
+                    errorMessage += ' Tente novamente mais tarde.';
+                }
+                
+                await reagirMensagem(sock, message, "❌");
+                await sock.sendMessage(from, {
+                    text: errorMessage
+                }, { quoted: message });
+            }
+            break;
+        }
+
+        // Comando Frases Anime
+        case 'frasesanime': {
+            console.log(`🎌 Buscando frase de anime...`);
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                const response = await axios.get('https://www.api.neext.online/frases/frasesanime', {
+                    timeout: 15000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                console.log(`📥 Resposta API Frases Anime:`, response.data);
+
+                if (!response.data || !response.data.frase) {
+                    await reagirMensagem(sock, message, "❌");
+                    await sock.sendMessage(from, {
+                        text: '❌ Erro ao buscar frase de anime. Tente novamente!'
+                    }, { quoted: message });
+                    break;
+                }
+
+                await reagirMensagem(sock, message, "✅");
+
+                const mensagem = `🎌 *FRASE DE ANIME*\n\n` +
+                               `📝 "${response.data.frase}"\n\n` +
+                               `✍️ *Personagem:* ${response.data.personagem || 'Desconhecido'}\n` +
+                               `📺 *Anime:* ${response.data.anime || 'Desconhecido'}\n\n` +
+                               `© NEEXT LTDA`;
+
+                await sock.sendMessage(from, {
+                    text: mensagem,
+                    contextInfo: {
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        }
+                    }
+                }, { quoted: selinho });
+
+                console.log(`✅ Frase de anime enviada com sucesso!`);
+
+            } catch (error) {
+                console.error('❌ Erro ao buscar frase de anime:', error.message);
+                
+                let errorMessage = '❌ Erro ao buscar frase de anime.';
+                
+                if (error.code === 'ENOTFOUND') {
+                    errorMessage += ' API indisponível.';
+                } else if (error.code === 'ETIMEDOUT') {
+                    errorMessage += ' Timeout. Tente novamente.';
+                } else if (error.response?.status >= 500) {
+                    errorMessage += ' Servidor fora do ar.';
+                } else {
+                    errorMessage += ' Tente novamente mais tarde.';
+                }
+                
+                await reagirMensagem(sock, message, "❌");
+                await sock.sendMessage(from, {
+                    text: errorMessage
+                }, { quoted: message });
+            }
+            break;
+        }
+
+        // Comando Wikipedia
+        case 'wikipedia':
+        case 'wiki': {
+            const assunto = args.join(' ');
+            if (!assunto) {
+                const config = obterConfiguracoes();
+                await sock.sendMessage(from, {
+                    text: `📚 *Como usar o comando Wikipedia:*\n\n` +
+                          `📝 \`${config.prefix}wikipedia [assunto]\`\n` +
+                          `📝 \`${config.prefix}wiki [assunto]\`\n\n` +
+                          `💡 *Exemplo:*\n` +
+                          `\`${config.prefix}wikipedia Brasil\`\n` +
+                          `\`${config.prefix}wiki Inteligência Artificial\`\n\n` +
+                          `🔍 Digite o assunto que deseja pesquisar!`
+                }, { quoted: message });
+                break;
+            }
+
+            console.log(`📚 Pesquisando na Wikipedia: ${assunto}`);
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                const response = await axios.get(`https://www.api.neext.online/search/wiki?q=${encodeURIComponent(assunto)}`, {
+                    timeout: 15000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                console.log(`📥 Resposta API Wikipedia:`, response.data);
+
+                if (!response.data || response.data.status !== 200 || !response.data.dados) {
+                    await reagirMensagem(sock, message, "❌");
+                    await sock.sendMessage(from, {
+                        text: `❌ Nenhum resultado encontrado para "${assunto}".\n\n💡 Tente reformular sua pesquisa!`
+                    }, { quoted: message });
+                    break;
+                }
+
+                const dados = response.data.dados;
+                
+                // Limita a descrição a 1000 caracteres
+                let descricao = dados.descricao || 'Descrição não disponível';
+                if (descricao.length > 1000) {
+                    descricao = descricao.substring(0, 997) + '...';
+                }
+
+                await reagirMensagem(sock, message, "✅");
+
+                const mensagem = `📚 *WIKIPEDIA*\n\n` +
+                               `📖 *Título:* ${dados.titulo}\n\n` +
+                               `📝 *Descrição:*\n${descricao}\n\n` +
+                               `🔗 *Link:* ${dados.url}\n\n` +
+                               `🔍 *Busca:* ${assunto}\n` +
+                               `© NEEXT LTDA`;
+
+                await sock.sendMessage(from, {
+                    text: mensagem,
+                    contextInfo: {
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        },
+                        externalAdReply: {
+                            title: "📚 WIKIPEDIA NEEXT",
+                            body: `Resultado da busca • ${assunto}`,
+                            thumbnailUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png',
+                            mediaType: 1,
+                            sourceUrl: dados.url
+                        }
+                    }
+                }, { quoted: selinho });
+
+                console.log(`✅ Resultado da Wikipedia enviado: ${dados.titulo}`);
+
+            } catch (error) {
+                console.error('❌ Erro ao buscar na Wikipedia:', error.message);
+                
+                let errorMessage = '❌ Erro ao buscar na Wikipedia.';
+                
+                if (error.code === 'ENOTFOUND') {
+                    errorMessage += ' API indisponível.';
+                } else if (error.code === 'ETIMEDOUT') {
+                    errorMessage += ' Timeout. Tente novamente.';
+                } else if (error.response?.status >= 500) {
+                    errorMessage += ' Servidor fora do ar.';
+                } else {
+                    errorMessage += ' Tente novamente mais tarde.';
+                }
+                
+                await reagirMensagem(sock, message, "❌");
+                await sock.sendMessage(from, {
+                    text: errorMessage
+                }, { quoted: message });
+            }
+            break;
+        }
+
         case 'rename': {
             if (!args.length) {
                 await sock.sendMessage(from, {
