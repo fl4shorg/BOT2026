@@ -124,7 +124,13 @@ function detectarLinksHard(texto) {
 
 // Detecta conteúdo pornográfico
 function detectarPorno(texto, message) {
-    if (!texto && !message) return false;
+    // Só verifica antiporno em MÍDIAS (imagens e vídeos)
+    // Não verifica em texto puro para evitar falsos positivos
+    if (!message) return false;
+    
+    // Verifica se é uma imagem ou vídeo
+    const ehMidia = message.imageMessage || message.videoMessage;
+    if (!ehMidia) return false;
     
     // Lista de palavras relacionadas a pornografia
     const palavrasPorno = [
@@ -155,37 +161,19 @@ function detectarPorno(texto, message) {
             .trim();
     }
 
-    // Verifica no texto
-    if (texto) {
-        const textoLimpo = normalizarTexto(texto);
+    // Verifica APENAS em legendas de mídia (imagem/vídeo)
+    const caption = message.imageMessage?.caption || message.videoMessage?.caption || '';
+    if (caption) {
+        const captionLimpa = normalizarTexto(caption);
         for (const palavra of palavrasPorno) {
             const palavraNormalizada = normalizarTexto(palavra);
-            if (textoLimpo.includes(palavraNormalizada)) {
+            if (captionLimpa.includes(palavraNormalizada)) {
                 return true;
             }
         }
     }
     
-    // Verifica em legendas de mídia
-    if (message) {
-        const caption = message.imageMessage?.caption || message.videoMessage?.caption || '';
-        if (caption) {
-            const captionLimpa = normalizarTexto(caption);
-            for (const palavra of palavrasPorno) {
-                const palavraNormalizada = normalizarTexto(palavra);
-                if (captionLimpa.includes(palavraNormalizada)) {
-                    return true;
-                }
-            }
-        }
-        
-        // Verifica se é mídia suspeita (imagem/vídeo sem caption em contexto suspeito)
-        if (message.imageMessage || message.videoMessage) {
-            // Por segurança, se não houver caption mas for mídia, pode ser verificado por moderador
-            return false; // Por enquanto não bloqueia automaticamente mídia sem caption
-        }
-    }
-    
+    // Se chegou aqui, é uma mídia sem legenda ou com legenda limpa
     return false;
 }
 
