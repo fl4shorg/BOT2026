@@ -139,24 +139,59 @@ function contarComandos() {
         const indexPath = path.join(__dirname, '../../index.js');
         const indexContent = fs.readFileSync(indexPath, 'utf8');
         
-        // Procura por todos os cases no switch da função handleCommand
-        const casePattern = /case\s+"([^"]+)"/g;
-        const matches = [];
-        let match;
+        // Procura pelo switch principal até default
+        const lines = indexContent.split('\n');
+        const comandosPrincipais = new Set();
         
-        while ((match = casePattern.exec(indexContent)) !== null) {
-            // Evita duplicatas e ignora cases internos como break cases
-            if (!matches.includes(match[1])) {
-                matches.push(match[1]);
+        let inSwitch = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            
+            // Detecta o switch (command) {
+            if (line.match(/^\s*switch\s*\(\s*command\s*\)\s*{/)) {
+                inSwitch = true;
+                continue;
+            }
+            
+            // Se estamos dentro do switch
+            if (inSwitch) {
+                // Procura cases com exatamente 8 espaços no início (primeiro nível)
+                const caseMatch = line.match(/^        case "([^"]+)"/);
+                if (caseMatch) {
+                    comandosPrincipais.add(caseMatch[1]);
+                }
+                
+                // Detecta default (fim do switch)
+                if (line.match(/^        default:/)) {
+                    inSwitch = false;
+                    break;
+                }
             }
         }
         
-        console.log(`📊 Total de comandos encontrados automaticamente: ${matches.length}`);
-        return matches.length;
+        // Conta comandos principais
+        const totalPrincipais = comandosPrincipais.size;
+        
+        // Adiciona os comandos hentai
+        let totalHentai = 0;
+        try {
+            const hentaiPath = path.join(__dirname, '../hentai.js');
+            const hentai = require(hentaiPath);
+            const comandosHentai = Object.keys(hentai.HENTAI_COMMANDS || {});
+            totalHentai = comandosHentai.length;
+            comandosHentai.forEach(cmd => comandosPrincipais.add(cmd));
+        } catch (err) {
+            console.log('⚠️ Não foi possível carregar comandos hentai:', err.message);
+        }
+        
+        const total = comandosPrincipais.size;
+        console.log(`📊 Comandos principais: ${totalPrincipais} | Hentai: ${totalHentai} | Total: ${total}`);
+        return total;
     } catch (error) {
         console.error('❌ Erro ao contar comandos automaticamente:', error);
         // Fallback para contagem manual se houver erro
-        return 25; // estimativa atual
+        return 246;
     }
 }
 
