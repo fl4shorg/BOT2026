@@ -203,7 +203,29 @@ async function startBot() {
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const shouldReconnect = statusCode !== 401 && statusCode !== 403;
             console.log(`❌ Conexão fechada (${statusCode || 'desconhecido'}). Reconectando... (${shouldReconnect?"sim":"não"})`);
-            if(shouldReconnect) setTimeout(()=>startBot(),5000);
+            
+            if(!shouldReconnect && (statusCode === 401 || statusCode === 403)){
+                console.log("🔄 Sessão inválida detectada! Limpando credenciais antigas...");
+                try {
+                    await sock.logout().catch(()=>{});
+                    const path = require('path');
+                    const files = fs.readdirSync(pastaConexao);
+                    for(const file of files){
+                        if(file !== '.keep'){
+                            const filePath = path.join(pastaConexao, file);
+                            fs.unlinkSync(filePath);
+                        }
+                    }
+                    console.log("✅ Credenciais antigas removidas!");
+                    console.log("🔄 Reiniciando para novo login...\n");
+                    setTimeout(()=>startBot(), 2000);
+                } catch(err){
+                    console.log("❌ Erro ao limpar sessão:", err.message);
+                    process.exit(1);
+                }
+            } else if(shouldReconnect){
+                setTimeout(()=>startBot(),5000);
+            }
         }
     });
 }
