@@ -737,11 +737,21 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
+            // Pega a posição (dono1, dono2, etc)
+            const posicao = args[0]?.toLowerCase();
+            const posicoesValidas = ['dono1', 'dono2', 'dono3', 'dono4', 'dono5', 'dono6'];
+            
+            if (!posicao || !posicoesValidas.includes(posicao)) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Use: ${config.prefix}adddono [dono1-6] @pessoa\n\n💡 Exemplo: ${config.prefix}adddono dono1 @pessoa`);
+                break;
+            }
+
             // Verifica se marcou alguém
             const mentionedJid = message.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
             if (mentionedJid.length === 0) {
                 const config = obterConfiguracoes();
-                await reply(sock, from, `❌ Use: ${config.prefix}adddono [dono1-6]\n\n💡 Marque a pessoa e especifique a posição (dono1, dono2, etc)`);
+                await reply(sock, from, `❌ Você precisa marcar a pessoa!\n\n💡 Use: ${config.prefix}adddono ${posicao} @pessoa`);
                 break;
             }
 
@@ -749,22 +759,13 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             const targetUser = mentionedJid[0];
             const targetLid = targetUser.split('@')[0].split(':')[0];
 
-            // Pega a posição (dono1, dono2, etc)
-            const posicao = args[0]?.toLowerCase();
-            const posicoesValidas = ['dono1', 'dono2', 'dono3', 'dono4', 'dono5', 'dono6'];
-            
-            if (!posicao || !posicoesValidas.includes(posicao)) {
-                await reply(sock, from, `❌ Posição inválida! Use: dono1, dono2, dono3, dono4, dono5 ou dono6`);
-                break;
-            }
-
             try {
                 const donosAdicionais = carregarDonosAdicionais();
                 donosAdicionais[posicao] = targetLid;
                 salvarDonosAdicionais(donosAdicionais);
                 
                 await reagirMensagem(sock, message, "✅");
-                await reply(sock, from, `✅ @${targetLid} foi adicionado como ${posicao}!\n\n🔑 LID salvo: \`${targetLid}\``, [targetUser]);
+                await reply(sock, from, `✅ *Dono adicionado com sucesso!*\n\n👤 Posição: ${posicao}\n🔑 LID: \`${targetLid}\``, [targetUser]);
             } catch (err) {
                 console.error("❌ Erro ao adicionar dono:", err);
                 await reply(sock, from, "❌ Erro ao adicionar dono. Tente novamente.");
