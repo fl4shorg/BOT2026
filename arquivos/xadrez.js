@@ -39,8 +39,8 @@ function gerarImagemTabuleiro(fen, ultimaJogada = null) {
     // Remove a parte extra do FEN (só precisamos da posição das peças)
     const fenSimples = fen.split(' ')[0];
     
-    // Monta URL da API do Lichess
-    let url = `https://lichess1.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown`;
+    // Monta URL da API do Lichess com coordenadas visíveis
+    let url = `https://lichess1.org/export/fen.gif?fen=${encodeURIComponent(fenSimples)}&theme=brown&coordinates=1`;
     
     // Adiciona última jogada se existir (destacar movimento)
     if (ultimaJogada) {

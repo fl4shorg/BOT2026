@@ -3485,7 +3485,23 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                     await sock.sendMessage(from, {
                         image: { url: resultado.imagem },
                         caption: resultado.mensagem,
-                        mentions: resultado.mentions
+                        mentions: resultado.mentions,
+                        contextInfo: {
+                            mentionedJid: resultado.mentions,
+                            isForwarded: true,
+                            forwardingScore: 100000,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: config.idDoCanal,
+                                newsletterName: "© NEEXT LTDA"
+                            },
+                            externalAdReply: {
+                                title: "♟️ Xadrez NEEXT",
+                                body: "Jogo de Xadrez no WhatsApp",
+                                thumbnailUrl: config.fotoDoBot,
+                                mediaType: 1,
+                                sourceUrl: "www.neext.online"
+                            }
+                        }
                     });
                     await reagirMensagem(sock, message, "♟️");
                 } else {
@@ -3498,7 +3514,23 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                     await sock.sendMessage(from, {
                         image: { url: resultado.imagem },
                         caption: resultado.mensagem,
-                        mentions: resultado.mentions
+                        mentions: resultado.mentions,
+                        contextInfo: {
+                            mentionedJid: resultado.mentions,
+                            isForwarded: true,
+                            forwardingScore: 100000,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: config.idDoCanal,
+                                newsletterName: "© NEEXT LTDA"
+                            },
+                            externalAdReply: {
+                                title: "♟️ Xadrez NEEXT",
+                                body: "Status da Partida",
+                                thumbnailUrl: config.fotoDoBot,
+                                mediaType: 1,
+                                sourceUrl: "www.neext.online"
+                            }
+                        }
                     });
                 } else {
                     await reply(sock, from, resultado.mensagem, resultado.mentions);
@@ -3536,7 +3568,23 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                     await sock.sendMessage(from, {
                         image: { url: resultado.imagem },
                         caption: resultado.mensagem,
-                        mentions: resultado.mentions
+                        mentions: resultado.mentions,
+                        contextInfo: {
+                            mentionedJid: resultado.mentions,
+                            isForwarded: true,
+                            forwardingScore: 100000,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: config.idDoCanal,
+                                newsletterName: "© NEEXT LTDA"
+                            },
+                            externalAdReply: {
+                                title: "♟️ Xadrez NEEXT",
+                                body: "Nova Partida Iniciada",
+                                thumbnailUrl: config.fotoDoBot,
+                                mediaType: 1,
+                                sourceUrl: "www.neext.online"
+                            }
+                        }
                     });
                     await reagirMensagem(sock, message, "♟️");
                 } else {
