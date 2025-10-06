@@ -6011,27 +6011,14 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
         break;
 
         default: {
-            // Comando não encontrado - mensagem bonita
+            // Comando não encontrado - mensagem compacta
             const config = obterConfiguracoes();
-            const agora = new Date();
-            const dataHora = agora.toLocaleString('pt-BR');
             
-            await sock.sendMessage(from, {
-                text: `╭═══════════════════ ⪩
-╎❌ *COMANDO NÃO ENCONTRADO*
-╎
-╎📝 *Comando digitado:* ${config.prefix}${command}
-╎⏰ *Data/Hora:* ${dataHora}
-╎
-╎💡 *Como usar:*
-╎• Digite *${config.prefix}menu* para ver todos os comandos
-╎• Digite *${config.prefix}menuadm* para comandos de admin
-╎• Digite *${config.prefix}ajuda* para obter ajuda
-╎
-╰═══════════════════ ⪨
-© NEEXT LTDA - Use comandos válidos!`,
-                mentions: []
-            }, { quoted: message });
+            await reply(sock, from, `❌ *COMANDO NÃO ENCONTRADO*
+
+📝 Comando: *${config.prefix}${command}*
+
+💡 Use *${config.prefix}menu* para ver os comandos`);
         }
         break;
     }
