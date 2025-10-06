@@ -318,11 +318,58 @@ async function isAdmin(sock, groupId, userId) {
     }
 }
 
-// Verifica se usuário é o dono do bot
-function isDono(userId) {
+// Carrega donos adicionais do necessary.json
+function carregarDonosAdicionais() {
+    try {
+        const necessaryPath = path.join(__dirname, "config", "necessary.json");
+        if (fs.existsSync(necessaryPath)) {
+            delete require.cache[require.resolve('./config/necessary.json')];
+            const necessary = require('./config/necessary.json');
+            return necessary.donos || {};
+        }
+        return {};
+    } catch (err) {
+        console.error("❌ Erro ao carregar donos adicionais:", err);
+        return {};
+    }
+}
+
+// Salva donos adicionais no necessary.json
+function salvarDonosAdicionais(donos) {
+    try {
+        const necessaryPath = path.join(__dirname, "config", "necessary.json");
+        const data = { donos };
+        fs.writeFileSync(necessaryPath, JSON.stringify(data, null, 2));
+        return true;
+    } catch (err) {
+        console.error("❌ Erro ao salvar donos adicionais:", err);
+        return false;
+    }
+}
+
+// Verifica se usuário é o dono oficial do bot
+function isDonoOficial(userId) {
     const config = obterConfiguracoes();
     const numeroDono = config.numeroDoDono + "@s.whatsapp.net";
     return userId === numeroDono;
+}
+
+// Verifica se usuário é o dono do bot (oficial ou adicional)
+function isDono(userId) {
+    // Verifica dono oficial
+    if (isDonoOficial(userId)) return true;
+    
+    // Verifica donos adicionais
+    const donosAdicionais = carregarDonosAdicionais();
+    const userNumber = userId.replace("@s.whatsapp.net", "");
+    
+    for (const key in donosAdicionais) {
+        if (donosAdicionais[key] === userNumber) {
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 // Remove mensagem do grupo
@@ -3782,6 +3829,124 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             } catch (error) {
                 console.error("Erro ao alterar nick do dono:", error);
                 await reply(sock, from, "❌ Erro interno ao alterar nick. Tente novamente.");
+            }
+        }
+        break;
+
+        case "donos": {
+            const config = obterConfiguracoes();
+            const donosAdicionais = carregarDonosAdicionais();
+            const numeroDono = config.numeroDoDono;
+            
+            let mensagem = `╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮  
+│╭─━─━─━─━─━─━─━─
+├╾❲ 🧸⃟➮𝑫𝑶𝑵𝑶 𝑶𝑭𝑪: wa.me/${numeroDono} 
+│╰─━─━─━─━─━─━─━─
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
+
+ 『 𝐃𝐎𝐍𝐎𝐒 𝐃𝐎 𝐁𝐎𝐓 』↴   
+          
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮  
+│╭─━─━─━─━─━─━─━─\n`;
+
+            for (let i = 1; i <= 6; i++) {
+                const dono = donosAdicionais[`dono${i}`];
+                if (dono && dono.trim() !== "") {
+                    mensagem += `│╞『${i}』- wa.me/${dono}\n│┊\n`;
+                } else {
+                    mensagem += `│╞『${i}』- Vazio\n│┊\n`;
+                }
+            }
+
+            mensagem += `│╰─━─━─━─━─━─━─━─
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
+
+⏤͟͟͞͞${config.nomeDoBot}💌⃟✧ ᭄
+     ✰ ✰ ✰ ✰ ✰ ✰ `;
+
+            await reply(sock, from, mensagem);
+        }
+        break;
+
+        case "adddono":
+        case "adicionardono": {
+            const sender = message.key.participant || from;
+
+            // Apenas o dono oficial pode adicionar outros donos
+            if (!isDonoOficial(sender)) {
+                await reply(sock, from, "❌ Apenas o dono oficial pode adicionar novos donos!");
+                break;
+            }
+
+            // Verifica argumentos: slot e número
+            if (args.length < 2) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Use: ${config.prefix}adddono [slot 1-6] [número]\n\nExemplo: ${config.prefix}adddono 1 5521999999999`);
+                break;
+            }
+
+            const slot = parseInt(args[0]);
+            const numero = args[1].replace(/[^0-9]/g, '');
+
+            if (isNaN(slot) || slot < 1 || slot > 6) {
+                await reply(sock, from, "❌ O slot deve ser um número entre 1 e 6!");
+                break;
+            }
+
+            if (!numero || numero.length < 10) {
+                await reply(sock, from, "❌ Número inválido! Use o formato: 5521999999999");
+                break;
+            }
+
+            const donosAdicionais = carregarDonosAdicionais();
+            donosAdicionais[`dono${slot}`] = numero;
+
+            if (salvarDonosAdicionais(donosAdicionais)) {
+                await reply(sock, from, `✅ *DONO ADICIONADO COM SUCESSO!*\n\n📍 **Slot:** ${slot}\n👤 **Número:** wa.me/${numero}\n\n💡 Agora @${numero} tem permissões de dono!`, [`${numero}@s.whatsapp.net`]);
+            } else {
+                await reply(sock, from, "❌ Erro ao adicionar dono. Tente novamente.");
+            }
+        }
+        break;
+
+        case "rmdono":
+        case "removerdono": {
+            const sender = message.key.participant || from;
+
+            // Apenas o dono oficial pode remover outros donos
+            if (!isDonoOficial(sender)) {
+                await reply(sock, from, "❌ Apenas o dono oficial pode remover donos!");
+                break;
+            }
+
+            // Verifica argumentos: slot
+            if (args.length < 1) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Use: ${config.prefix}rmdono [slot 1-6]\n\nExemplo: ${config.prefix}rmdono 1`);
+                break;
+            }
+
+            const slot = parseInt(args[0]);
+
+            if (isNaN(slot) || slot < 1 || slot > 6) {
+                await reply(sock, from, "❌ O slot deve ser um número entre 1 e 6!");
+                break;
+            }
+
+            const donosAdicionais = carregarDonosAdicionais();
+            const numeroRemovido = donosAdicionais[`dono${slot}`];
+
+            if (!numeroRemovido || numeroRemovido.trim() === "") {
+                await reply(sock, from, `❌ O slot ${slot} já está vazio!`);
+                break;
+            }
+
+            donosAdicionais[`dono${slot}`] = "";
+
+            if (salvarDonosAdicionais(donosAdicionais)) {
+                await reply(sock, from, `✅ *DONO REMOVIDO COM SUCESSO!*\n\n📍 **Slot:** ${slot}\n👤 **Número removido:** wa.me/${numeroRemovido}\n\n⚠️ @${numeroRemovido} não tem mais permissões de dono!`, [`${numeroRemovido}@s.whatsapp.net`]);
+            } else {
+                await reply(sock, from, "❌ Erro ao remover dono. Tente novamente.");
             }
         }
         break;
