@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const tf = require('@tensorflow/tfjs-node');
 const nsfw = require('nsfwjs');
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
 // Modelo NSFW para detecção de pornografia
 let nsfwModel = null;
@@ -222,7 +223,15 @@ async function detectarPorno(texto, message, sock) {
     // Para imagens, usa IA para analisar o conteúdo visual
     if (ehImagem && sock) {
         try {
-            const buffer = await sock.downloadMediaMessage(message);
+            // Download da imagem usando o método correto do Baileys
+            const stream = await downloadContentFromMessage(message.imageMessage, 'image');
+            let buffer = Buffer.from([]);
+            
+            // Lê o stream em um buffer
+            for await (const chunk of stream) {
+                buffer = Buffer.concat([buffer, chunk]);
+            }
+            
             const resultado = await analisarImagemComIA(buffer);
             return resultado.isPorn;
         } catch (err) {
