@@ -2846,31 +2846,22 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         }
                     });
 
-                    console.log(`📥 [PLAY] Resposta COMPLETA da API:`, JSON.stringify(response.data, null, 2));
+                    console.log(`📥 [PLAY] Resposta da API:`, JSON.stringify(response.data, null, 2));
 
-                    if (!response.data || !response.data.status || !response.data.result) {
-                        console.error("❌ [PLAY] API retornou dados inválidos:", response.data);
+                    if (!response.data || !response.data.data || response.data.data.status !== 'success') {
+                        console.error("❌ [PLAY] API retornou erro:", response.data);
                         await reagirMensagem(sock, message, "❌");
-                        await reply(sock, from, "❌ Não foi possível processar esta música. API não retornou dados válidos.");
+                        await reply(sock, from, "❌ Não foi possível processar esta música. API retornou erro.");
                         break;
                     }
 
-                    const result = response.data.result;
-                    console.log(`📥 [PLAY] Objeto result:`, JSON.stringify(result, null, 2));
-                    
-                    let downloadUrl = result.downloadUrl || result.download || result.url || result.link || result.audio;
+                    const result = response.data.data;
+                    const downloadUrl = result.dlink;
                     
                     if (!downloadUrl) {
-                        console.error("❌ [PLAY] Link de download não encontrado. Campos disponíveis:", Object.keys(result));
+                        console.error("❌ [PLAY] Link de download não encontrado:", result);
                         await reagirMensagem(sock, message, "❌");
                         await reply(sock, from, "❌ Link de download não encontrado para esta música.");
-                        break;
-                    }
-
-                    if (downloadUrl.includes('undefined')) {
-                        console.error("❌ [PLAY] URL malformada detectada:", downloadUrl);
-                        await reagirMensagem(sock, message, "❌");
-                        await reply(sock, from, "❌ A API retornou um link inválido. Tente outra música.");
                         break;
                     }
 
@@ -2897,12 +2888,12 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     }
 
                     let thumbnailBuffer = null;
-                    if (result.cover) {
+                    if (result.img) {
                         try {
-                            console.log(`📸 [PLAY] Baixando capa de: ${result.cover}`);
+                            console.log(`📸 [PLAY] Baixando capa de: ${result.img}`);
                             const thumbnailResponse = await axios({
                                 method: 'GET',
-                                url: result.cover,
+                                url: result.img,
                                 responseType: 'arraybuffer',
                                 timeout: 10000
                             });
@@ -2913,11 +2904,14 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         }
                     }
 
+                    const songName = result.song_name || firstResult.name;
+                    const artistName = result.artist || firstResult.artists;
+
                     console.log(`📤 [PLAY] Enviando áudio para WhatsApp...`);
                     await sock.sendMessage(from, {
                         audio: audioBuffer,
                         mimetype: 'audio/mp4',
-                        fileName: `${result.title || firstResult.name} - ${result.artist || firstResult.artists}.mp3`,
+                        fileName: `${songName} - ${artistName}.mp3`,
                         jpegThumbnail: thumbnailBuffer,
                         contextInfo: {
                             forwardingScore: 100000,
@@ -2927,9 +2921,9 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                                 newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
                             },
                             externalAdReply: {
-                                title: `🎵 ${result.title || firstResult.name}`,
-                                body: `🎤 ${result.artist || firstResult.artists} • ⏱️ ${result.duration || ''}`,
-                                thumbnailUrl: result.cover || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                                title: `🎵 ${songName}`,
+                                body: `🎤 ${artistName}`,
+                                thumbnailUrl: result.img || "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
                                 mediaType: 2,
                                 sourceUrl: spotifyLink,
                                 showAdAttribution: true
