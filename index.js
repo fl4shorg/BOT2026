@@ -48,6 +48,9 @@ const akinator = require("./arquivos/akinator.js");
 // Sistema de Damas
 const damas = require("./arquivos/damas.js");
 
+// Sistema de Hentai
+const hentai = require("./arquivos/hentai.js");
+
 // importa banner + logger centralizados
 const { mostrarBanner, logMensagem } = require("./export");
 
@@ -6951,6 +6954,13 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
         break;
 
         default: {
+            // Verifica se é um comando hentai
+            if (hentai.isHentaiCommand(command)) {
+                const sender = message.key.participant || from;
+                await hentai.handleHentaiCommand(sock, command, from, sender, message);
+                break;
+            }
+            
             // Comando não encontrado - mensagem compacta
             const config = obterConfiguracoes();
             

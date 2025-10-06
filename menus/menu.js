@@ -571,29 +571,95 @@ function obterMenuBrincadeira() {
 }
 
 // ========================
-// MENU HENTAI (coming soon)
+// MENU HENTAI
 // ========================
 function obterMenuHentai() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
-    return `
-🔞 *MENU HENTAI*
+    return `🔞 *MENU HENTAI - DANBOORU API*
 
-⚠️ *EM DESENVOLVIMENTO*
+⚠️ *AVISO IMPORTANTE:*
+• Comandos em GRUPO: Imagem enviada no seu PV
+• Comandos no PV: Imagem enviada diretamente
+• Conteúdo +18 - Uso responsável
+• API: api.neext.online
 
-🚧 Este menu está sendo finalizado e em breve terá:
+╭──────────────────⪩
+│ 🎌 *CATEGORIAS GERAIS*
+│ • ${prefix}hentai - Hentai aleatório
+│ • ${prefix}yaoi - Yaoi aleatório
+│ • ${prefix}yuri - Yuri aleatório
+│ • ${prefix}nude - Nude aleatório
+│ • ${prefix}sex - Sex aleatório
+│
+│ 🔗 *BONDAGE & BDSM*
+│ • ${prefix}bondage - Bondage
+│ • ${prefix}bdsm - BDSM
+│ • ${prefix}bondage_solo - Bondage solo
+│ • ${prefix}bondage_group - Bondage group
+│ • ${prefix}gag - Mordaça
+│ • ${prefix}whip - Chicote
+│ • ${prefix}handcuffs - Algemas
+│
+│ 💋 *ATOS SEXUAIS*
+│ • ${prefix}anal - Anal
+│ • ${prefix}oral - Oral
+│ • ${prefix}blowjob - Blowjob
+│ • ${prefix}handjob - Handjob
+│ • ${prefix}footjob - Footjob
+│ • ${prefix}vaginal - Vaginal
+│ • ${prefix}oral_sex - Oral sex
+│ • ${prefix}masturbation - Masturbação
+│ • ${prefix}cumshot - Cumshot
+│ • ${prefix}creampie - Creampie
+│
+│ 👗 *ROUPAS & ACESSÓRIOS*
+│ • ${prefix}panties - Calcinha
+│ • ${prefix}bra - Sutiã
+│ • ${prefix}lingerie - Lingerie
+│ • ${prefix}swimsuit - Maiô
+│ • ${prefix}bikini - Biquíni
+│ • ${prefix}stockings - Meias
+│ • ${prefix}corset - Espartilho
+│ • ${prefix}dress - Vestido
+│ • ${prefix}skirt - Saia
+│
+│ 🎭 *DOMINAÇÃO*
+│ • ${prefix}futa - Futanari
+│ • ${prefix}femdom - Femdom
+│ • ${prefix}dominant - Dominante
+│ • ${prefix}submissive - Submissa
+│ • ${prefix}face_sitting - Face sitting
+│
+│ 👥 *GRUPO & MÚLTIPLOS*
+│ • ${prefix}group_sex - Sexo em grupo
+│ • ${prefix}threesome - Ménage à trois
+│ • ${prefix}foursome - Quateto
+│ • ${prefix}orgy - Orgia
+│ • ${prefix}double_penetration - Dupla penetração
+│
+│ 🎯 *ESPECÍFICOS*
+│ • ${prefix}tentacle - Tentáculos
+│ • ${prefix}lactation - Lactação
+│ • ${prefix}sex_toy - Sex toys
+│ • ${prefix}massage - Massagem
+│ • ${prefix}teacher_student - Professor/Aluno
+│
+│ 🔞 *PARTES DO CORPO*
+│ • ${prefix}breasts - Seios
+│ • ${prefix}nipples - Mamilos
+│ • ${prefix}ass - Bunda
+│ • ${prefix}thighs - Coxas
+│ • ${prefix}pussy - Buceta
+│
+│ 🎪 *VARIAÇÕES*
+│ • ${prefix}yuri_anal - Yuri anal
+│ • ${prefix}yaoi_anal - Yaoi anal
+│ • ${prefix}futa_anal - Futa anal
+│ • ${prefix}maid_nsfw - Empregada NSFW
+│ • ${prefix}school_uniform_nsfw - Uniforme NSFW
+╰──────────────────⪨
 
-🎨 **Conteúdo Artístico:**
-• Imagens de anime
-• Wallpapers temáticos
-• Arte digital
-
-⚠️ **Importante:**
-• Conteúdo será adequado às diretrizes
-• Uso responsável obrigatório
-• Apenas em grupos privados
-
-📅 **Status:** Em desenvolvimento
-⏰ **Previsão:** Próxima atualização
+💡 *Total: 70+ comandos disponíveis*
 
 ━━━━━━━━━━━━━━━
 © NEEXT LTDA - ${nickDoDono}
