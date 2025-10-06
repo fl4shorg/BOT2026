@@ -442,52 +442,74 @@ Capture todas as peças do adversário!`
     };
 }
 
-async function gerarImagemTabuleiro(tabuleiro, turno) {
-    try {
-        let tabuleiroTexto = '';
-        
-        for (let linha = 0; linha < 8; linha++) {
-            for (let coluna = 0; coluna < 8; coluna++) {
-                const peca = tabuleiro[linha][coluna];
-                
-                if ((linha + coluna) % 2 === 0) {
-                    tabuleiroTexto += '⬜';
-                } else {
-                    if (peca === PECA_BRANCA) tabuleiroTexto += '⚪';
-                    else if (peca === PECA_PRETA) tabuleiroTexto += '⚫';
-                    else if (peca === DAMA_BRANCA) tabuleiroTexto += '🔴';
-                    else if (peca === DAMA_PRETA) tabuleiroTexto += '🟣';
-                    else tabuleiroTexto += '⬛';
-                }
+function gerarTabuleiroTexto(tabuleiro, ultimoMovimento = null) {
+    let texto = '```\n   a  b  c  d  e  f  g  h\n';
+    
+    for (let linha = 0; linha < 8; linha++) {
+        texto += `${8 - linha} `;
+        for (let coluna = 0; coluna < 8; coluna++) {
+            const peca = tabuleiro[linha][coluna];
+            const casaEscura = (linha + coluna) % 2 === 1;
+            
+            let simbolo = ' ';
+            if (casaEscura) {
+                if (peca === PECA_BRANCA) simbolo = '⚪';
+                else if (peca === PECA_PRETA) simbolo = '⚫';
+                else if (peca === DAMA_BRANCA) simbolo = '♔';
+                else if (peca === DAMA_PRETA) simbolo = '♚';
+                else simbolo = '▪';
+            } else {
+                simbolo = '□';
             }
-            tabuleiroTexto += '\n';
+            
+            texto += ` ${simbolo} `;
+        }
+        texto += `${8 - linha}\n`;
+    }
+    
+    texto += '   a  b  c  d  e  f  g  h\n```';
+    return texto;
+}
+
+function converterTabuleiroParaFEN(tabuleiro) {
+    let fen = '';
+    
+    for (let linha = 0; linha < 8; linha++) {
+        let vazios = 0;
+        for (let coluna = 0; coluna < 8; coluna++) {
+            const peca = tabuleiro[linha][coluna];
+            
+            if (peca === VAZIO) {
+                vazios++;
+            } else {
+                if (vazios > 0) {
+                    fen += vazios;
+                    vazios = 0;
+                }
+                
+                if (peca === PECA_BRANCA) fen += 'w';
+                else if (peca === PECA_PRETA) fen += 'b';
+                else if (peca === DAMA_BRANCA) fen += 'W';
+                else if (peca === DAMA_PRETA) fen += 'B';
+            }
         }
         
-        const url = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify({
-            type: 'bar',
-            data: {
-                labels: ['Damas'],
-                datasets: [{
-                    label: 'Tabuleiro',
-                    data: [1]
-                }]
-            },
-            options: {
-                plugins: {
-                    title: {
-                        display: true,
-                        text: `Jogo de Damas - Vez: ${turno === 'branco' ? 'Brancas ⚪' : 'Pretas ⚫'}`,
-                        font: { size: 20 }
-                    }
-                }
-            }
-        }))}`;
+        if (vazios > 0) fen += vazios;
+        if (linha < 7) fen += '/';
+    }
+    
+    return fen;
+}
+
+async function gerarImagemTabuleiro(tabuleiro, turno) {
+    try {
+        const fen = converterTabuleiroParaFEN(tabuleiro);
+        const url = `https://api.checklyhq.com/v1/snippets/render-image?url=${encodeURIComponent('https://checkerboard-api.herokuapp.com/board?fen=' + fen)}`;
         
         return url;
-        
     } catch (error) {
         console.error("Erro ao gerar imagem:", error);
-        return 'https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg';
+        return null;
     }
 }
 
