@@ -836,19 +836,25 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
+            // Pega o prefixo correto
+            const configBot = obterConfiguracoes();
+            const prefixAtual = configBot.prefix;
+
             const getStatusIcon = (feature) => config[feature] ? "✅" : "❌";
             const getStatusText = (feature) => config[feature] ? "ATIVO" : "INATIVO";
 
             // Conta quantos estão ativos
             const featuresAtivas = [
                 'antilink', 'anticontato', 'antidocumento',
-                'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 'modogamer'
+                'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 
+                'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'modogamer'
             ].filter(feature => config[feature]).length;
 
             // Mensagem de status real do grupo
             const statusMsg = `🛡️ *STATUS DO GRUPO - NEEXT SECURITY*\n\n` +
-                `🔰 **PROTEÇÕES**\n\n` +
+                `🔰 **PROTEÇÕES BÁSICAS**\n\n` +
                 `${getStatusIcon('antilink')} **Antilink:** ${getStatusText('antilink')}\n` +
+                `${getStatusIcon('antilinkhard')} **Antilinkhard:** ${getStatusText('antilinkhard')}\n` +
                 `${getStatusIcon('anticontato')} **Anticontato:** ${getStatusText('anticontato')}\n` +
                 `${getStatusIcon('antidocumento')} **Antidocumento:** ${getStatusText('antidocumento')}\n` +
                 `${getStatusIcon('antivideo')} **Antivideo:** ${getStatusText('antivideo')}\n` +
@@ -856,12 +862,16 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 `${getStatusIcon('antisticker')} **Antisticker:** ${getStatusText('antisticker')}\n` +
                 `${getStatusIcon('antiflod')} **Antiflod:** ${getStatusText('antiflod')}\n` +
                 `${getStatusIcon('antifake')} **Antifake:** ${getStatusText('antifake')}\n\n` +
+                `🔞 **PROTEÇÕES AVANÇADAS**\n\n` +
+                `${getStatusIcon('antiporno')} **Antiporno:** ${getStatusText('antiporno')}\n` +
+                `${getStatusIcon('antipalavrao')} **Antipalavrao:** ${getStatusText('antipalavrao')}\n` +
+                `${getStatusIcon('x9')} **X9:** ${getStatusText('x9')}\n\n` +
                 `📊 **ESTATÍSTICAS**\n\n` +
                 `📋 **Lista Negra:** ${config.listanegra ? config.listanegra.length : 0} usuários\n` +
-                `📊 **Proteções Ativas:** ${featuresAtivas}/8\n` +
-                `🔒 **Nível de Segurança:** ${featuresAtivas >= 6 ? "🟢 ALTO" : featuresAtivas >= 3 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
+                `📊 **Proteções Ativas:** ${featuresAtivas}/13\n` +
+                `🔒 **Nível de Segurança:** ${featuresAtivas >= 9 ? "🟢 ALTO" : featuresAtivas >= 5 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
                 `⚙️ **COMANDOS**\n\n` +
-                `💡 **Use:** \`${config.prefix}[comando] on/off\` para alterar\n` +
+                `💡 **Use:** \`${prefixAtual}[comando] on/off\` para alterar\n` +
                 `🛡️ **Powered by:** NEEXT SECURITY\n` +
                 `📱 **Instagram:** @neet.tk`;
 
@@ -916,18 +926,24 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
+            // Pega o prefixo correto
+            const configBot = obterConfiguracoes();
+            const prefixAtual = configBot.prefix;
+
             const getStatusIcon = (feature) => config[feature] ? "✅" : "❌";
             const getStatusText = (feature) => config[feature] ? "ATIVO" : "INATIVO";
 
             // Conta quantos estão ativos
             const featuresAtivas = [
                 'antilink', 'anticontato', 'antidocumento',
-                'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 'modogamer'
+                'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 
+                'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'modogamer'
             ].filter(feature => config[feature]).length;
 
             const statusMsg = `🛡️ *STATUS DO GRUPO - NEEXT SECURITY*\n\n` +
-                `🔰 **PROTEÇÕES**\n\n` +
+                `🔰 **PROTEÇÕES BÁSICAS**\n\n` +
                 `${getStatusIcon('antilink')} **Antilink:** ${getStatusText('antilink')}\n` +
+                `${getStatusIcon('antilinkhard')} **Antilinkhard:** ${getStatusText('antilinkhard')}\n` +
                 `${getStatusIcon('anticontato')} **Anticontato:** ${getStatusText('anticontato')}\n` +
                 `${getStatusIcon('antidocumento')} **Antidocumento:** ${getStatusText('antidocumento')}\n` +
                 `${getStatusIcon('antivideo')} **Antivideo:** ${getStatusText('antivideo')}\n` +
@@ -935,12 +951,16 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 `${getStatusIcon('antisticker')} **Antisticker:** ${getStatusText('antisticker')}\n` +
                 `${getStatusIcon('antiflod')} **Antiflod:** ${getStatusText('antiflod')}\n` +
                 `${getStatusIcon('antifake')} **Antifake:** ${getStatusText('antifake')}\n\n` +
+                `🔞 **PROTEÇÕES AVANÇADAS**\n\n` +
+                `${getStatusIcon('antiporno')} **Antiporno:** ${getStatusText('antiporno')}\n` +
+                `${getStatusIcon('antipalavrao')} **Antipalavrao:** ${getStatusText('antipalavrao')}\n` +
+                `${getStatusIcon('x9')} **X9:** ${getStatusText('x9')}\n\n` +
                 `📊 **ESTATÍSTICAS**\n\n` +
                 `📋 **Lista Negra:** ${config.listanegra ? config.listanegra.length : 0} usuários\n` +
-                `📊 **Proteções Ativas:** ${featuresAtivas}/8\n` +
-                `🔒 **Nível de Segurança:** ${featuresAtivas >= 6 ? "🟢 ALTO" : featuresAtivas >= 3 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
+                `📊 **Proteções Ativas:** ${featuresAtivas}/13\n` +
+                `🔒 **Nível de Segurança:** ${featuresAtivas >= 9 ? "🟢 ALTO" : featuresAtivas >= 5 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
                 `⚙️ **COMANDOS**\n\n` +
-                `💡 **Use:** \`${config.prefix}[comando] on/off\` para alterar\n` +
+                `💡 **Use:** \`${prefixAtual}[comando] on/off\` para alterar\n` +
                 `🛡️ **Powered by:** NEEXT SECURITY\n` +
                 `📱 **Instagram:** @neet.tk`;
 
