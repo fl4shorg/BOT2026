@@ -3511,16 +3511,11 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             } else {
                 const mentionedJid = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
                 if (!mentionedJid || mentionedJid.length === 0) {
-                    await reply(sock, from, `❌ Marque o oponente para iniciar!\n\n💡 Exemplo: \`${config.prefix}xadrez @jogador1 @jogador2\``);
+                    await reply(sock, from, `❌ Marque o oponente para iniciar!\n\n💡 Exemplo: \`${config.prefix}xadrez @oponente\``);
                     break;
                 }
                 
-                if (mentionedJid.length < 2) {
-                    await reply(sock, from, `❌ Você precisa marcar 2 jogadores!\n\n💡 Exemplo: \`${config.prefix}xadrez @jogador1 @jogador2\``);
-                    break;
-                }
-                
-                const resultado = xadrez.iniciarPartida(from, mentionedJid[0], mentionedJid[1]);
+                const resultado = xadrez.iniciarPartida(from, sender, mentionedJid[0]);
                 await reply(sock, from, resultado.mensagem, resultado.mentions);
                 
                 if (resultado.sucesso) {

@@ -240,7 +240,7 @@ function obterMenuGamer() {
 • \`${prefix}resetroleta\` - Reset roleta russa
 
 ♟️ *XADREZ:*
-• \`${prefix}xadrez @jogador1 @jogador2\` - Iniciar partida
+• \`${prefix}xadrez @oponente\` - Iniciar partida
 • \`${prefix}xadrez jogada e2e4\` - Fazer jogada
 • \`${prefix}xadrez status\` - Ver tabuleiro
 • \`${prefix}xadrez desistir\` - Desistir da partida

@@ -338,7 +338,8 @@ function mostrarAjuda(prefix) {
         sucesso: true,
         mensagem: `♟️ *COMANDOS DE XADREZ*\n\n` +
                  `🆕 *Iniciar Partida:*\n` +
-                 `${prefix}xadrez @jogador1 @jogador2\n\n` +
+                 `${prefix}xadrez @oponente\n` +
+                 `(Você jogará com as brancas)\n\n` +
                  `♟️ *Fazer Jogada:*\n` +
                  `${prefix}xadrez jogada e2e4\n` +
                  `${prefix}xadrez jogada Nf3\n\n` +
