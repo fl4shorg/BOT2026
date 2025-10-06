@@ -127,8 +127,16 @@ END:VCARD`,
 }
 
 async function startBot() {
-    const pastaConexao = join(__dirname,"conexao");
-    if(!fs.existsSync(pastaConexao)) fs.mkdirSync(pastaConexao,{recursive:true});
+    // Usa caminho absoluto e persistente para evitar que a pasta seja apagada
+    const path = require('path');
+    const pastaConexao = process.env.BOT_STATE_DIR || path.join(process.env.HOME || __dirname, '.data', 'conexao');
+    
+    // Cria diretório e arquivo .keep para garantir persistência
+    if(!fs.existsSync(pastaConexao)) {
+        fs.mkdirSync(pastaConexao, {recursive: true});
+        fs.writeFileSync(path.join(pastaConexao, '.keep'), '# Pasta de autenticação do WhatsApp Bot');
+        console.log(`📁 Pasta de conexão criada em: ${pastaConexao}`);
+    }
 
     const { state, saveCreds } = await useMultiFileAuthState(pastaConexao);
     const { version } = await fetchLatestBaileysVersion();
