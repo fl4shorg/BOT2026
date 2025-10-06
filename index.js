@@ -347,46 +347,116 @@ function salvarDonosAdicionais(donos) {
     }
 }
 
+// Carrega mapeamento de LID para números
+function carregarLidMapping() {
+    try {
+        const necessaryPath = path.join(__dirname, "config", "necessary.json");
+        if (fs.existsSync(necessaryPath)) {
+            delete require.cache[require.resolve('./config/necessary.json')];
+            const necessary = require('./config/necessary.json');
+            return necessary.lidMapping || {};
+        }
+        return {};
+    } catch (err) {
+        return {};
+    }
+}
+
+// Salva mapeamento LID → número
+function salvarLidMapping(lidMapping) {
+    try {
+        const necessaryPath = path.join(__dirname, "config", "necessary.json");
+        let data = {};
+        
+        if (fs.existsSync(necessaryPath)) {
+            data = JSON.parse(fs.readFileSync(necessaryPath, 'utf8'));
+        }
+        
+        data.lidMapping = lidMapping;
+        fs.writeFileSync(necessaryPath, JSON.stringify(data, null, 2));
+        return true;
+    } catch (err) {
+        console.error("❌ Erro ao salvar LID mapping:", err);
+        return false;
+    }
+}
+
+// Registra o LID do dono automaticamente
+function registrarLidDono(userId) {
+    if (!userId) return;
+    
+    const lidMapping = carregarLidMapping();
+    const userLid = userId.split('@')[0].split(':')[0];
+    
+    // Salva o mapeamento: LID → "dono_oficial"
+    if (!lidMapping[userLid]) {
+        lidMapping[userLid] = "dono_oficial";
+        salvarLidMapping(lidMapping);
+        console.log(`✅ [LID] LID ${userLid} registrado como dono oficial`);
+    }
+}
+
 // Verifica se usuário é o dono oficial do bot
 function isDonoOficial(userId) {
     if (!userId) return false;
     
     const config = obterConfiguracoes();
-    
-    // Extrai apenas os números do userId (funciona com @s.whatsapp.net, @lid, :XX, etc)
-    const userNumber = userId.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
+    const userLid = userId.split('@')[0].split(':')[0];
+    const userNumber = userLid.replace(/[^0-9]/g, '');
     const donoNumber = config.numeroDoDono.replace(/[^0-9]/g, '');
     
-    console.log(`🔍 [isDono] Verificando: userId=${userId}, userNumber=${userNumber}, donoNumber=${donoNumber}`);
+    // 1. Verifica por LID mapeado
+    const lidMapping = carregarLidMapping();
+    if (lidMapping[userLid] === "dono_oficial") {
+        console.log(`✅ [isDono] Dono reconhecido por LID: ${userLid}`);
+        return true;
+    }
     
-    return userNumber === donoNumber;
+    // 2. Verifica por número (caso ainda use formato antigo)
+    if (userNumber === donoNumber) {
+        console.log(`✅ [isDono] Dono reconhecido por número: ${userNumber}`);
+        // Registra o LID para próximas vezes
+        registrarLidDono(userId);
+        return true;
+    }
+    
+    return false;
 }
 
 // Verifica se usuário é o dono do bot (oficial ou adicional)
 function isDono(userId) {
     if (!userId) return false;
     
-    // Extrai apenas os números do userId (funciona com @s.whatsapp.net, @lid, :XX, etc)
-    const userNumber = userId.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
+    const userLid = userId.split('@')[0].split(':')[0];
+    const userNumber = userLid.replace(/[^0-9]/g, '');
     
-    // Verifica dono oficial
-    const config = obterConfiguracoes();
-    const donoNumber = config.numeroDoDono.replace(/[^0-9]/g, '');
+    console.log(`🔍 [isDono] Verificando userId=${userId}, LID=${userLid}, número=${userNumber}`);
     
-    console.log(`🔍 [isDono] Comparando: userNumber=${userNumber} com donoNumber=${donoNumber}`);
-    
-    if (userNumber === donoNumber) {
-        console.log(`✅ [isDono] Dono oficial confirmado!`);
+    // 1. Verifica dono oficial (por LID ou número)
+    if (isDonoOficial(userId)) {
         return true;
     }
     
-    // Verifica donos adicionais
+    // 2. Verifica donos adicionais
     const donosAdicionais = carregarDonosAdicionais();
+    const lidMapping = carregarLidMapping();
     
+    // Verifica se o LID está mapeado como dono adicional
     for (const key in donosAdicionais) {
         const donoAdicionalNumber = donosAdicionais[key].replace(/[^0-9]/g, '');
+        
+        // Verifica por LID mapeado
+        if (lidMapping[userLid] === key) {
+            console.log(`✅ [isDono] Dono adicional reconhecido por LID: ${key}`);
+            return true;
+        }
+        
+        // Verifica por número
         if (userNumber === donoAdicionalNumber) {
-            console.log(`✅ [isDono] Dono adicional confirmado: ${key}`);
+            console.log(`✅ [isDono] Dono adicional reconhecido por número: ${key}`);
+            // Registra o LID
+            lidMapping[userLid] = key;
+            salvarLidMapping(lidMapping);
             return true;
         }
     }
