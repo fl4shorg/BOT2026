@@ -1677,6 +1677,94 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
+        // Comandos de Figurinhas (Pacotes)
+        case 'figurinhasanime':
+        case 'figurinhasmeme':
+        case 'figurinhasemoji':
+        case 'figurinhascoreana':
+        case 'figurinhasdesenho':
+        case 'figurinhasraiva':
+        case 'figurinhasroblox':
+        case 'figurinhasengracadas': {
+            const tipoMap = {
+                'figurinhasanime': { tipo: 'anime', emoji: '🎌', nome: 'Anime' },
+                'figurinhasmeme': { tipo: 'meme', emoji: '😂', nome: 'Meme' },
+                'figurinhasemoji': { tipo: 'emoji', emoji: '😊', nome: 'Emoji' },
+                'figurinhascoreana': { tipo: 'coreana', emoji: '🌸', nome: 'Coreana' },
+                'figurinhasdesenho': { tipo: 'desenho', emoji: '🎨', nome: 'Desenho' },
+                'figurinhasraiva': { tipo: 'raiva', emoji: '😡', nome: 'Raiva' },
+                'figurinhasroblox': { tipo: 'roblox', emoji: '🎮', nome: 'Roblox' },
+                'figurinhasengracadas': { tipo: 'engracadas', emoji: '🤣', nome: 'Engraçadas' }
+            };
+
+            const info = tipoMap[command];
+            const apiUrl = `https://www.api.neext.online/sticker/figurinhas/${info.tipo}`;
+
+            console.log(`${info.emoji} Buscando figurinhas ${info.nome}...`);
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                await sock.sendMessage(from, {
+                    text: `${info.emoji} *Enviando 5 figurinhas ${info.nome}...*\n\n⏳ Aguarde um momento...`
+                }, { quoted: message });
+
+                // Envia 5 figurinhas
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        const response = await axios.get(apiUrl, {
+                            responseType: 'arraybuffer',
+                            timeout: 15000,
+                            headers: {
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                            }
+                        });
+
+                        // Envia a figurinha
+                        await sock.sendMessage(from, {
+                            sticker: Buffer.from(response.data)
+                        });
+
+                        console.log(`✅ Figurinha ${i + 1}/5 enviada (${info.nome})`);
+
+                        // Aguarda entre envios
+                        if (i < 4) {
+                            await new Promise(resolve => setTimeout(resolve, 800));
+                        }
+                    } catch (err) {
+                        console.error(`❌ Erro ao enviar figurinha ${i + 1}:`, err.message);
+                    }
+                }
+
+                await reagirMensagem(sock, message, "✅");
+                await sock.sendMessage(from, {
+                    text: `${info.emoji} *5 figurinhas ${info.nome} enviadas com sucesso!*\n\n© NEEXT LTDA`
+                }, { quoted: selinho });
+
+                console.log(`✅ Pacote de figurinhas ${info.nome} enviado com sucesso!`);
+
+            } catch (error) {
+                console.error(`❌ Erro ao buscar figurinhas ${info.nome}:`, error.message);
+                
+                let errorMessage = `❌ Erro ao buscar figurinhas ${info.nome}.`;
+                
+                if (error.code === 'ENOTFOUND') {
+                    errorMessage += ' API indisponível.';
+                } else if (error.code === 'ETIMEDOUT') {
+                    errorMessage += ' Timeout. Tente novamente.';
+                } else if (error.response?.status >= 500) {
+                    errorMessage += ' Servidor temporariamente fora do ar.';
+                } else {
+                    errorMessage += ' Tente novamente mais tarde.';
+                }
+                
+                await reagirMensagem(sock, message, "❌");
+                await sock.sendMessage(from, {
+                    text: errorMessage
+                }, { quoted: message });
+            }
+            break;
+        }
+
         case 'rename': {
             if (!args.length) {
                 await sock.sendMessage(from, {
@@ -2636,10 +2724,15 @@ Seu ID foi salvo com segurança em nosso sistema!`;
         }
         break;
 
-        case "menusticker":
-        case "menufigurinhas": {
+        case "menusticker": {
             const menus = require('./menus/menu.js');
             await reply(sock, from, menus.obterMenuSticker());
+        }
+        break;
+
+        case "menufigurinhas": {
+            const menus = require('./menus/menu.js');
+            await reply(sock, from, menus.obterMenuFigurinhas());
         }
         break;
 

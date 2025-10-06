@@ -477,6 +477,48 @@ function obterMenuSticker() {
 }
 
 // ========================
+// MENU FIGURINHAS (pacotes de stickers)
+// ========================
+function obterMenuFigurinhas() {
+    const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
+    return `
+🖼️ *MENU FIGURINHAS - PACOTES PRONTOS*
+
+✨ *PACOTES DISPONÍVEIS (5 figurinhas aleatórias):*
+
+🎌 *ANIME:*
+• \`${prefix}figurinhasanime\` - Figurinhas de anime
+
+😂 *HUMOR:*
+• \`${prefix}figurinhasmeme\` - Figurinhas de meme
+• \`${prefix}figurinhasengracadas\` - Figurinhas engraçadas
+
+😊 *EMOJI:*
+• \`${prefix}figurinhasemoji\` - Figurinhas de emoji
+
+🌸 *ESTILO K-POP:*
+• \`${prefix}figurinhascoreana\` - Figurinhas coreanas
+
+🎨 *DESENHOS:*
+• \`${prefix}figurinhasdesenho\` - Figurinhas de desenho
+
+😡 *REAÇÕES:*
+• \`${prefix}figurinhasraiva\` - Figurinhas de raiva
+
+🎮 *ROBLOX:*
+• \`${prefix}figurinhasroblox\` - Figurinhas do Roblox
+
+💡 *COMO USAR:*
+• Digite o comando e receba 5 figurinhas aleatórias
+• Figurinhas em formato WebP otimizado
+• Novos pacotes adicionados regularmente
+
+━━━━━━━━━━━━━━━
+© NEEXT LTDA - ${nickDoDono}
+`;
+}
+
+// ========================
 // MENU BRINCADEIRAS (coming soon)
 // ========================
 function obterMenuBrincadeira() {
@@ -619,6 +661,7 @@ module.exports = {
     obterMenuAnti,
     obterMenuRPG,
     obterMenuSticker,
+    obterMenuFigurinhas,
     obterMenuBrincadeira,
     obterMenuHentai,
     obterMenuDonoAvancado,
