@@ -106,7 +106,7 @@ async function fetchHentaiImage(url) {
     }
 }
 
-async function handleHentaiCommand(sock, command, from, sender, message) {
+async function handleHentaiCommand(sock, command, from, sender, message, reply) {
     const apiUrl = HENTAI_COMMANDS[command];
     
     if (!apiUrl) {
@@ -127,9 +127,17 @@ async function handleHentaiCommand(sock, command, from, sender, message) {
         
         if (result.success) {
             await sock.sendMessage(targetJid, {
-                image: result.imageBuffer,
-                caption: `🔞 *${command.toUpperCase()}*\n\n📸 Imagem aleatória da API Neext\n🌐 api.neext.online\n\n⚠️ Conteúdo +18`
+                image: result.imageBuffer
             });
+            
+            if (reply) {
+                await reply(sock, targetJid, `🔞 *${command.toUpperCase()}*\n\n⚠️ Conteúdo +18`);
+            } else {
+                await sock.sendMessage(targetJid, {
+                    text: `🔞 *${command.toUpperCase()}*\n\n⚠️ Conteúdo +18`
+                });
+            }
+            
             console.log(`🔞 Imagem ${command} enviada no PV de ${sender.split('@')[0]}`);
         } else {
             await sock.sendMessage(targetJid, {
@@ -141,9 +149,17 @@ async function handleHentaiCommand(sock, command, from, sender, message) {
         
         if (result.success) {
             await sock.sendMessage(from, {
-                image: result.imageBuffer,
-                caption: `🔞 *${command.toUpperCase()}*\n\n📸 Imagem aleatória da API Neext\n🌐 api.neext.online\n\n⚠️ Conteúdo +18`
+                image: result.imageBuffer
             }, { quoted: message });
+            
+            if (reply) {
+                await reply(sock, from, `🔞 *${command.toUpperCase()}*\n\n⚠️ Conteúdo +18`);
+            } else {
+                await sock.sendMessage(from, {
+                    text: `🔞 *${command.toUpperCase()}*\n\n⚠️ Conteúdo +18`
+                }, { quoted: message });
+            }
+            
             console.log(`🔞 Imagem ${command} enviada no PV de ${sender.split('@')[0]}`);
         } else {
             await sock.sendMessage(from, {

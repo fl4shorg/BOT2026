@@ -6957,7 +6957,7 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             // Verifica se é um comando hentai
             if (hentai.isHentaiCommand(command)) {
                 const sender = message.key.participant || from;
-                await hentai.handleHentaiCommand(sock, command, from, sender, message);
+                await hentai.handleHentaiCommand(sock, command, from, sender, message, reply);
                 break;
             }
             
