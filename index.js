@@ -2143,7 +2143,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
             // Verifica se o jogador já iniciou o jogo e se a data é a mesma
             if (!akinator.some(game => game.id === from) && akinator.length > 0 && Number(akinator[0].dia) === Number(moment.tz('America/Sao_Paulo').format('DD'))) {
-                await reply(sock, from, "Volte mais tarde...");
+                await reply(sock, from, "⏰ *LIMITE DIÁRIO ATINGIDO*\n\nJá houve uma partida hoje neste grupo.\n\n💡 Volte amanhã para jogar novamente!");
                 break;
             }
 
@@ -2156,7 +2156,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
             // Se o jogador não estiver participando de um jogo
             if (!akinator.some(game => game.id === from)) {
-                await reply(sock, from, `Atenção ${pushname}, irei iniciar o jogo do Akinator.\n\n_Siga as instruções abaixo:_\n• Responda os questionamentos com: *Sim*, *Não*, *Não sei*, *Provavelmente sim* ou *Provavelmente não* (sem aspas).\n\nBoa sorte!`);
+                await reply(sock, from, `🧞‍♂️ *BEM-VINDO AO AKINATOR!*\n\n👤 Jogador: ${pushname}\n\n📝 *INSTRUÇÕES:*\nPense em um personagem (real ou fictício) e responda as perguntas com:\n\n• ✅ *Sim*\n• ❌ *Não*\n• 🤷 *Não sei*\n• 👍 *Provavelmente sim*\n• 👎 *Provavelmente não*\n• ⬅️ *Voltar* (volta para pergunta anterior)\n\n🎮 O Akinator tentará adivinhar seu personagem!\n\n⏳ Conectando ao Akinator...`);
                 await reagirMensagem(sock, message, "⏳");
 
                 const dateAKI = moment.tz('America/Sao_Paulo').format('DD');
@@ -2188,23 +2188,25 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                     salvarAkinator();
 
-                    await reply(sock, from, `🧞‍♂️ *𝐀𝐊𝐈𝐍𝐀𝐓𝐎𝐑 𝐐𝐔𝐄𝐒𝐓𝐈𝐎𝐍𝐒:*\n• Questão: *${aki.question}*`);
+                    const progressBar = '▓'.repeat(1) + '░'.repeat(9);
+                    await reply(sock, from, `🧞‍♂️ *AKINATOR - QUESTÃO 1*\n\n📊 Progresso: [${progressBar}] 10%\n\n❓ *${aki.question}*\n\n💬 Responda: Sim | Não | Não sei | Provavelmente sim | Provavelmente não`);
                     await reagirMensagem(sock, message, "🧞‍♂️");
 
                 } catch (err) {
                     console.error("❌ Erro ao iniciar Akinator:", err);
                     await reagirMensagem(sock, message, "❌");
-                    await reply(sock, from, "❌ Erro ao conectar com o Akinator. O serviço pode estar temporariamente indisponível. Tente novamente em alguns minutos.");
+                    await reply(sock, from, "❌ *ERRO DE CONEXÃO*\n\nNão foi possível conectar ao Akinator.\n\n💡 O serviço pode estar temporariamente indisponível.\n🔄 Tente novamente em alguns minutos.");
                 }
             } else {
                 // Informa se alguém já está jogando
                 const jogadorAtual = akinator.find(game => game.id === from).jogador.split('@')[0];
-                await reply(sock, from, `@${jogadorAtual} já iniciou uma partida. Aguarde ele(a) finalizar para começar uma nova.`, [akinator.find(game => game.id === from).jogador]);
+                await reply(sock, from, `🎮 *PARTIDA EM ANDAMENTO*\n\n@${jogadorAtual} já iniciou uma partida!\n\n⏰ Aguarde ele(a) finalizar ou use \`.resetakinator\` (apenas admin/jogador).`, [akinator.find(game => game.id === from).jogador]);
             }
         }
         break;
 
-        case 'resetaki': {
+        case 'resetaki':
+        case 'resetakinator': {
             // Só funciona em grupos
             if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
                 await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
@@ -2214,7 +2216,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             const sender = message.key.participant || from;
 
             if (!JSON.stringify(akinator).includes(from) && !isDono(sender)) {
-                await reply(sock, from, "Não existe nenhuma sessão ainda em andamento no grupo.");
+                await reply(sock, from, "❌ Não existe nenhuma sessão do Akinator em andamento no grupo.");
                 break;
             }
 
@@ -2222,7 +2224,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             const gameData = akinator[gameIndex];
 
             if (!gameData) {
-                await reply(sock, from, "Não existe nenhuma sessão ainda em andamento no grupo.");
+                await reply(sock, from, "❌ Não existe nenhuma sessão do Akinator em andamento no grupo.");
                 break;
             }
 
@@ -2234,10 +2236,10 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 jogo.now = true;
                 akinator.splice(gameIndex, 1);
                 salvarAkinator();
-                await reply(sock, from, `O akinator foi resetado com sucesso, a sessão foi deletada.`);
+                await reply(sock, from, `🧞‍♂️ *AKINATOR RESETADO*\n\n✅ A sessão foi deletada com sucesso!\n\n💡 Use \`.akinator\` para começar um novo jogo!`);
                 await reagirMensagem(sock, message, "✅");
             } else {
-                await reply(sock, from, "Somente o(s) adm(s) ou a pessoa que iniciou o jogo podem resetar.");
+                await reply(sock, from, "⛔ Somente o(s) admin(s) ou a pessoa que iniciou o jogo podem resetar.");
             }
         }
         break;
@@ -6491,6 +6493,115 @@ function setupListeners(sock) {
                     // Processa mensagens que não são comandos
                     if (text.toLowerCase() === 'prefixo') {
                         await reply(sock, from, `🤖 *Prefixo atual:* \`${prefix}\`\n\n💡 Use ${prefix}menu para ver os comandos disponíveis.`);
+                    }
+                    
+                    // Sistema de respostas do Akinator
+                    const gameData = akinator.find(game => game.id === from);
+                    if (gameData && gameData.finish === 0 && gameData.jogador === sender) {
+                        const resposta = text.toLowerCase().trim();
+                        const respostasValidas = {
+                            'sim': 0,
+                            's': 0,
+                            'yes': 0,
+                            'y': 0,
+                            'não': 1,
+                            'nao': 1,
+                            'n': 1,
+                            'no': 1,
+                            'não sei': 2,
+                            'nao sei': 2,
+                            'ns': 2,
+                            'idk': 2,
+                            'provavelmente sim': 3,
+                            'provavelmente': 3,
+                            'probably yes': 3,
+                            'probably': 3,
+                            'p sim': 3,
+                            'provavelmente não': 4,
+                            'provavelmente nao': 4,
+                            'probably not': 4,
+                            'p não': 4,
+                            'p nao': 4,
+                            'voltar': 'back',
+                            'back': 'back',
+                            'b': 'back'
+                        };
+
+                        if (respostasValidas.hasOwnProperty(resposta)) {
+                            const answerNum = respostasValidas[resposta];
+                            
+                            try {
+                                await reagirMensagem(sock, normalized, "⏳");
+                                
+                                if (answerNum === 'back') {
+                                    if (gameData.step > 0) {
+                                        await gameData.aki.back();
+                                        gameData.step--;
+                                        
+                                        const progress = Math.min(Math.round((gameData.step / 80) * 100), 100);
+                                        const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
+                                        
+                                        await reply(sock, from, `🧞‍♂️ *AKINATOR - QUESTÃO ${gameData.step + 1}*\n\n📊 Progresso: [${progressBar}] ${progress}%\n\n❓ *${gameData.aki.question}*\n\n💬 Responda: Sim | Não | Não sei | Provavelmente sim | Provavelmente não | Voltar`);
+                                        await reagirMensagem(sock, normalized, "⬅️");
+                                    } else {
+                                        await reply(sock, from, "⚠️ Você já está na primeira questão!");
+                                        await reagirMensagem(sock, normalized, "⚠️");
+                                    }
+                                } else {
+                                    await gameData.aki.answer(answerNum);
+                                    gameData.step++;
+                                    
+                                    if (gameData.aki.progress >= 80 || gameData.step >= 78) {
+                                        await gameData.aki.win();
+                                        const firstGuess = gameData.aki.answers[0];
+                                        
+                                        if (firstGuess) {
+                                            gameData.finish = 1;
+                                            jogo.now = true;
+                                            
+                                            const photoUrl = firstGuess.absolute_picture_path || 'https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg';
+                                            
+                                            await sock.sendMessage(from, {
+                                                image: { url: photoUrl },
+                                                caption: `🧞‍♂️ *AKINATOR - RESULTADO!*\n\n✨ Eu acho que você está pensando em...\n\n👤 *${firstGuess.name}*\n📝 ${firstGuess.description || 'Sem descrição'}\n\n🎯 *Progresso:* ${gameData.aki.progress}%\n❓ *Questões:* ${gameData.step}\n\n🎮 É essa pessoa? 🎮\n\n© NEEXT LTDA`
+                                            });
+                                            
+                                            await reagirMensagem(sock, normalized, "🎉");
+                                            
+                                            akinator.splice(akinator.indexOf(gameData), 1);
+                                            salvarAkinator();
+                                            
+                                            console.log(`🎯 Akinator finalizou - Palpite: ${firstGuess.name}`);
+                                        } else {
+                                            await reply(sock, from, "❌ Desculpe, não consegui adivinhar! Você venceu! 🏆");
+                                            await reagirMensagem(sock, normalized, "🏆");
+                                            
+                                            gameData.finish = 1;
+                                            jogo.now = true;
+                                            akinator.splice(akinator.indexOf(gameData), 1);
+                                            salvarAkinator();
+                                        }
+                                    } else {
+                                        const progress = Math.min(Math.round((gameData.step / 80) * 100), 100);
+                                        const progressBar = '▓'.repeat(Math.floor(progress / 10)) + '░'.repeat(10 - Math.floor(progress / 10));
+                                        
+                                        await reply(sock, from, `🧞‍♂️ *AKINATOR - QUESTÃO ${gameData.step + 1}*\n\n📊 Progresso: [${progressBar}] ${progress}%\n🎯 Certeza: ${gameData.aki.progress}%\n\n❓ *${gameData.aki.question}*\n\n💬 Responda: Sim | Não | Não sei | Provavelmente sim | Provavelmente não | Voltar`);
+                                        await reagirMensagem(sock, normalized, "🧞‍♂️");
+                                    }
+                                }
+                                
+                                salvarAkinator();
+                            } catch (err) {
+                                console.error("❌ Erro ao processar resposta do Akinator:", err);
+                                await reagirMensagem(sock, normalized, "❌");
+                                await reply(sock, from, "❌ Erro ao processar sua resposta. Use `.resetakinator` para recomeçar.");
+                                
+                                gameData.finish = 1;
+                                jogo.now = true;
+                                akinator.splice(akinator.indexOf(gameData), 1);
+                                salvarAkinator();
+                            }
+                        }
                     }
                 }
                 
