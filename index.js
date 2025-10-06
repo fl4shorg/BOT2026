@@ -7334,13 +7334,6 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 break;
             }
 
-            // VERIFICA SE O BOT É ADMIN
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser admin do grupo para promover usuários!\n\n📝 Peça para um admin me promover primeiro.");
-                break;
-            }
-
             // Verifica se há usuário mencionado ou mensagem marcada
             let targetUser = null;
             
@@ -7369,13 +7362,24 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             try {
+                await reagirMensagem(sock, message, "⏳");
                 await sock.groupParticipantsUpdate(from, [targetUser], "promote");
                 await reagirMensagem(sock, message, "⬆️");
                 await reply(sock, from, `⬆️ *USUÁRIO PROMOVIDO!*\n\n✅ @${targetUser.split('@')[0]} agora é administrador do grupo!\n\n👤 Promovido por: @${sender.split('@')[0]}`, [targetUser, sender]);
                 console.log(`⬆️ Usuário ${targetUser.split('@')[0]} promovido a admin por ${sender.split('@')[0]} no grupo ${from}`);
             } catch (err) {
                 console.error("❌ Erro ao promover usuário:", err);
-                await reply(sock, from, "❌ Erro ao promover usuário. Verifique se o bot tem permissões de admin.");
+                await reagirMensagem(sock, message, "❌");
+                
+                // Detecta o tipo de erro e dá mensagem específica
+                const errorMsg = err.message || err.toString();
+                if (errorMsg.includes('forbidden') || errorMsg.includes('not-authorized') || errorMsg.includes('401')) {
+                    await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser administrador do grupo para promover usuários!\n\n📝 Peça para um admin me promover primeiro.");
+                } else if (errorMsg.includes('participant-not-found') || errorMsg.includes('404')) {
+                    await reply(sock, from, "❌ Usuário não encontrado no grupo.");
+                } else {
+                    await reply(sock, from, `❌ Erro ao promover usuário.\n\n🔍 Detalhes: ${errorMsg.substring(0, 100)}`);
+                }
             }
         }
         break;
@@ -7393,13 +7397,6 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
             if (!ehAdmin && !ehDono) {
                 await reply(sock, from, "❌ Apenas admins podem usar este comando.");
-                break;
-            }
-
-            // VERIFICA SE O BOT É ADMIN
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser admin do grupo para rebaixar usuários!\n\n📝 Peça para um admin me promover primeiro.");
                 break;
             }
 
@@ -7431,13 +7428,24 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             try {
+                await reagirMensagem(sock, message, "⏳");
                 await sock.groupParticipantsUpdate(from, [targetUser], "demote");
                 await reagirMensagem(sock, message, "⬇️");
                 await reply(sock, from, `⬇️ *USUÁRIO REBAIXADO!*\n\n✅ @${targetUser.split('@')[0]} não é mais administrador do grupo!\n\n👤 Rebaixado por: @${sender.split('@')[0]}`, [targetUser, sender]);
                 console.log(`⬇️ Usuário ${targetUser.split('@')[0]} rebaixado por ${sender.split('@')[0]} no grupo ${from}`);
             } catch (err) {
                 console.error("❌ Erro ao rebaixar usuário:", err);
-                await reply(sock, from, "❌ Erro ao rebaixar usuário. Verifique se o bot tem permissões de admin.");
+                await reagirMensagem(sock, message, "❌");
+                
+                // Detecta o tipo de erro e dá mensagem específica
+                const errorMsg = err.message || err.toString();
+                if (errorMsg.includes('forbidden') || errorMsg.includes('not-authorized') || errorMsg.includes('401')) {
+                    await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser administrador do grupo para rebaixar usuários!\n\n📝 Peça para um admin me promover primeiro.");
+                } else if (errorMsg.includes('participant-not-found') || errorMsg.includes('404')) {
+                    await reply(sock, from, "❌ Usuário não encontrado no grupo.");
+                } else {
+                    await reply(sock, from, `❌ Erro ao rebaixar usuário.\n\n🔍 Detalhes: ${errorMsg.substring(0, 100)}`);
+                }
             }
         }
         break;
@@ -7607,13 +7615,6 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 break;
             }
 
-            // VERIFICA SE O BOT É ADMIN
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser admin do grupo para banir usuários!\n\n📝 Peça para um admin me promover primeiro.");
-                break;
-            }
-
             try {
                 let userToBan = null;
                 
@@ -7649,32 +7650,30 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
                 await reagirMensagem(sock, message, "⏳");
 
-                // Bane o usuário
-                const resultado = await banirUsuario(sock, from, userToBan);
-                
-                if (resultado.success) {
+                // Tenta banir o usuário diretamente
+                try {
+                    await sock.groupParticipantsUpdate(from, [userToBan], "remove");
                     await reagirMensagem(sock, message, "✅");
                     await reply(sock, from, `⚔️ *USUÁRIO BANIDO*\n\n@${userToBan.split('@')[0]} foi removido do grupo!\n\n👤 Banido por: @${sender.split('@')[0]}\n⏰ ${new Date().toLocaleString('pt-BR')}`, [userToBan, sender]);
-                } else {
+                    console.log(`✅ Usuário ${userToBan.split('@')[0]} banido com sucesso por ${sender.split('@')[0]}`);
+                } catch (banError) {
+                    console.error("❌ Erro ao banir:", banError);
                     await reagirMensagem(sock, message, "❌");
-                    let motivo = "";
-                    switch(resultado.reason) {
-                        case "bot_nao_admin":
-                            motivo = "Bot não é admin do grupo";
-                            break;
-                        case "sem_permissao":
-                            motivo = "Bot sem permissão para banir";
-                            break;
-                        default:
-                            motivo = "Erro técnico no banimento";
+                    
+                    const errorMsg = banError.message || banError.toString();
+                    if (errorMsg.includes('forbidden') || errorMsg.includes('not-authorized') || errorMsg.includes('401')) {
+                        await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser administrador do grupo para banir usuários!\n\n📝 Peça para um admin me promover primeiro.");
+                    } else if (errorMsg.includes('participant-not-found') || errorMsg.includes('404')) {
+                        await reply(sock, from, "❌ Usuário não encontrado no grupo.");
+                    } else {
+                        await reply(sock, from, `❌ *FALHA AO BANIR*\n\n⚠️ Não foi possível remover o usuário\n\n🔍 Detalhes: ${errorMsg.substring(0, 80)}`);
                     }
-                    await reply(sock, from, `❌ *FALHA AO BANIR*\n\n⚠️ Não foi possível remover o usuário\n📋 Motivo: ${motivo}`);
                 }
                 
             } catch (error) {
                 console.error("❌ Erro no comando ban:", error);
                 await reagirMensagem(sock, message, "❌");
-                await reply(sock, from, "❌ Erro ao banir usuário. Tente novamente.");
+                await reply(sock, from, "❌ Erro ao processar comando. Tente novamente.");
             }
         }
         break;
