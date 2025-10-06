@@ -44,11 +44,47 @@ function mostrarBanner() {
 // ---------------------------
 const mensagensRegistradas = new Set();
 
-function logMensagem(m, text = "", isCommand = false) {
+// Helper para tentar resolver o número de telefone a partir do JID/LID
+function resolverNumero(jidCompleto, sock) {
+    try {
+        if (!jidCompleto || !sock) return null;
+        
+        // Tenta usar decodeJid (Baileys mantém mapeamento LID→WID)
+        const decoded = sock.decodeJid ? sock.decodeJid(jidCompleto) : jidCompleto;
+        
+        // Se temos um número normal (não é LID), extrai ele
+        if (decoded && !decoded.includes(':lid')) {
+            const numero = decoded.split('@')[0];
+            // Verifica se é um número válido (não é grupo, status, etc)
+            if (numero && /^\d+$/.test(numero)) {
+                return numero;
+            }
+        }
+        
+        // Tenta buscar no mapeamento do state (fallback)
+        if (sock.authState?.creds?.lidJidMapping?.lidToWid) {
+            const mapping = sock.authState.creds.lidJidMapping.lidToWid;
+            const wid = mapping[jidCompleto];
+            if (wid) {
+                const numero = wid.split('@')[0];
+                if (numero && /^\d+$/.test(numero)) {
+                    return numero;
+                }
+            }
+        }
+        
+        return null;
+    } catch (err) {
+        return null;
+    }
+}
+
+function logMensagem(m, text = "", isCommand = false, sock = null) {
     const fromMe = m?.key?.fromMe || false;
     const jid = m?.key?.remoteJid || "";
     const isGroup = jid.endsWith("@g.us") || jid.endsWith("@lid");
-    const sender = (m?.key?.participant || jid)?.split("@")[0] || "desconhecido";
+    const senderJid = m?.key?.participant || jid;
+    const sender = senderJid?.split("@")[0] || "desconhecido";
     const pushName = m?.pushName || "Sem nome";
 
     const conteudo = text || (() => {
@@ -66,12 +102,17 @@ function logMensagem(m, text = "", isCommand = false) {
 
     const tipo = isCommand || (conteudo.startsWith(prefix)) ? "[COMANDO]" : "[MENSAGEM]";
     const local = isGroup ? "GRUPO" : "PV";
-    const remetente = `${pushName} (${sender})${fromMe ? " [EU]" : ""}`;
+    
+    // Tenta resolver o número real
+    const numero = resolverNumero(senderJid, sock);
+    const infoRemetente = numero 
+        ? `${pushName} (📞 ${numero} | LID: ${sender})${fromMe ? " [EU]" : ""}`
+        : `${pushName} (LID: ${sender})${fromMe ? " [EU]" : ""}`;
 
     const logText = `
 ───────────────────────────────
 ${tipo} ${local}
-De: ${remetente}
+De: ${infoRemetente}
 Conteúdo: ${conteudo}
 ───────────────────────────────`;
 
