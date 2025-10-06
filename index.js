@@ -350,21 +350,33 @@ function salvarDonosAdicionais(donos) {
 // Verifica se usuário é o dono oficial do bot
 function isDonoOficial(userId) {
     const config = obterConfiguracoes();
-    const numeroDono = config.numeroDoDono + "@s.whatsapp.net";
-    return userId === numeroDono;
+    
+    // Normaliza o userId (remove sufixos e formata)
+    const userNumber = userId.split('@')[0].replace(/[^0-9]/g, '');
+    const donoNumber = config.numeroDoDono.replace(/[^0-9]/g, '');
+    
+    return userNumber === donoNumber;
 }
 
 // Verifica se usuário é o dono do bot (oficial ou adicional)
 function isDono(userId) {
+    // Normaliza o userId (remove sufixos e formata)
+    const userNumber = userId.split('@')[0].replace(/[^0-9]/g, '');
+    
     // Verifica dono oficial
-    if (isDonoOficial(userId)) return true;
+    const config = obterConfiguracoes();
+    const donoNumber = config.numeroDoDono.replace(/[^0-9]/g, '');
+    
+    if (userNumber === donoNumber) {
+        return true;
+    }
     
     // Verifica donos adicionais
     const donosAdicionais = carregarDonosAdicionais();
-    const userNumber = userId.replace("@s.whatsapp.net", "");
     
     for (const key in donosAdicionais) {
-        if (donosAdicionais[key] === userNumber) {
+        const donoAdicionalNumber = donosAdicionais[key].replace(/[^0-9]/g, '');
+        if (userNumber === donoAdicionalNumber) {
             return true;
         }
     }
@@ -7322,10 +7334,10 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 break;
             }
 
-            // Verifica se bot é admin
+            // VERIFICA SE O BOT É ADMIN
             const botAdmin = await botEhAdmin(sock, from);
             if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para promover usuários.");
+                await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser admin do grupo para promover usuários!\n\n📝 Peça para um admin me promover primeiro.");
                 break;
             }
 
@@ -7384,10 +7396,10 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 break;
             }
 
-            // Verifica se bot é admin
+            // VERIFICA SE O BOT É ADMIN
             const botAdmin = await botEhAdmin(sock, from);
             if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para rebaixar usuários.");
+                await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser admin do grupo para rebaixar usuários!\n\n📝 Peça para um admin me promover primeiro.");
                 break;
             }
 
@@ -7595,6 +7607,13 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 break;
             }
 
+            // VERIFICA SE O BOT É ADMIN
+            const botAdmin = await botEhAdmin(sock, from);
+            if (!botAdmin) {
+                await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ Preciso ser admin do grupo para banir usuários!\n\n📝 Peça para um admin me promover primeiro.");
+                break;
+            }
+
             try {
                 let userToBan = null;
                 
@@ -7611,7 +7630,7 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
                 if (!userToBan) {
                     const config = obterConfiguracoes();
-                    await reply(sock, from, `❌ *USO INCORRETO*\n\n📝 Como usar:\n• Marque a mensagem da pessoa e digite ${config.prefix}ban\n• Ou mencione: ${config.prefix}ban @user\n\n⚠️ Você precisa ser admin e o bot também`);
+                    await reply(sock, from, `❌ *USO INCORRETO*\n\n📝 Como usar:\n• Marque a mensagem da pessoa e digite ${config.prefix}ban\n• Ou mencione: ${config.prefix}ban @user`);
                     break;
                 }
 
