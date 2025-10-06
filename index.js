@@ -859,8 +859,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             const antipvAtivo = settingsGlobal.antipv || false;
             const anticallAtivo = settingsGlobal.anticall || false;
 
-            const getStatusIcon = (feature) => config[feature] ? "✅" : "❌";
-            const getStatusText = (feature) => config[feature] ? "ATIVO" : "INATIVO";
+            const getStatusText = (feature) => config[feature] ? 'ᴀᴛɪᴠᴏ ✅' : 'ɪɴᴀᴛɪᴠᴏ ❌';
 
             // Conta quantos estão ativos
             const featuresAtivas = [
@@ -869,38 +868,56 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'modogamer', 'rankativo'
             ].filter(feature => config[feature]).length;
 
-            // Mensagem de status real do grupo
-            const statusMsg = `🛡️ *STATUS DO GRUPO - NEEXT SECURITY*\n\n` +
-                `🔰 **PROTEÇÕES BÁSICAS**\n\n` +
-                `${getStatusIcon('antilink')} **Antilink:** ${getStatusText('antilink')}\n` +
-                `${getStatusIcon('antilinkhard')} **Antilinkhard:** ${getStatusText('antilinkhard')}\n` +
-                `${getStatusIcon('anticontato')} **Anticontato:** ${getStatusText('anticontato')}\n` +
-                `${getStatusIcon('antidocumento')} **Antidocumento:** ${getStatusText('antidocumento')}\n` +
-                `${getStatusIcon('antivideo')} **Antivideo:** ${getStatusText('antivideo')}\n` +
-                `${getStatusIcon('antiaudio')} **Antiaudio:** ${getStatusText('antiaudio')}\n` +
-                `${getStatusIcon('antisticker')} **Antisticker:** ${getStatusText('antisticker')}\n` +
-                `${getStatusIcon('antiflod')} **Antiflod:** ${getStatusText('antiflod')}\n` +
-                `${getStatusIcon('antifake')} **Antifake:** ${getStatusText('antifake')}\n\n` +
-                `🔞 **PROTEÇÕES AVANÇADAS**\n\n` +
-                `${getStatusIcon('antiporno')} **Antiporno:** ${getStatusText('antiporno')}\n` +
-                `${getStatusIcon('antipalavrao')} **Antipalavrao:** ${getStatusText('antipalavrao')}\n` +
-                `${getStatusIcon('x9')} **X9:** ${getStatusText('x9')}\n\n` +
-                `🎮 **SISTEMAS DO GRUPO**\n\n` +
-                `${welcomeAtivo ? "✅" : "❌"} **Welcome:** ${welcomeAtivo ? "ATIVO" : "INATIVO"}\n` +
-                `${rpgAtivo ? "✅" : "❌"} **RPG:** ${rpgAtivo ? "ATIVO" : "INATIVO"}\n` +
-                `${getStatusIcon('modogamer')} **Modo Gamer:** ${getStatusText('modogamer')}\n` +
-                `${getStatusIcon('rankativo')} **Rank Ativo:** ${getStatusText('rankativo')}\n\n` +
-                `🤖 **CONFIGURAÇÕES GLOBAIS (DONO)**\n\n` +
-                `${antipvAtivo ? "✅" : "❌"} **AntiPV:** ${antipvAtivo ? "ATIVO" : "INATIVO"}\n` +
-                `${anticallAtivo ? "✅" : "❌"} **AntiCall:** ${anticallAtivo ? "ATIVO" : "INATIVO"}\n\n` +
-                `📊 **ESTATÍSTICAS**\n\n` +
-                `📋 **Lista Negra:** ${config.listanegra ? config.listanegra.length : 0} usuários\n` +
-                `📊 **Proteções Ativas:** ${featuresAtivas}/14\n` +
-                `🔒 **Nível de Segurança:** ${featuresAtivas >= 10 ? "🟢 ALTO" : featuresAtivas >= 6 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
-                `⚙️ **COMANDOS**\n\n` +
-                `💡 **Use:** \`${prefixAtual}[comando] on/off\` para alterar\n` +
-                `🛡️ **Powered by:** NEEXT SECURITY\n` +
-                `📱 **Instagram:** @neet.tk`;
+            // Calcula nível de segurança
+            const nivelSeguranca = featuresAtivas >= 10 ? "🟢 ALTO" : featuresAtivas >= 6 ? "🟡 MÉDIO" : "🔴 BAIXO";
+
+            // Mensagem de status real do grupo com novo visual
+            const statusMsg = `├╾❲ 𝑺𝑻𝑨𝑻𝑼𝑺 𝑫𝑶 𝑮𝑹𝑼𝑷𝑶 - 𝑵𝑬𝑬𝑿𝑻 𝑺𝑬𝑪𝑼𝑹𝑰𝑻𝒀 ❳ 🛡️
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
+
+│╭─━─⋆｡°✩🔰 PROTEÇÕES BÁSICAS ✩°｡⋆ ━─━╮
+││￫ 𝑨𝑵𝑻𝑰-𝑳𝑰𝑵𝑲:       ${getStatusText('antilink')}
+││￫ 𝑨𝑵𝑻𝑰-𝑳𝑰𝑵𝑲-𝑯𝑨𝑹𝑫: ${getStatusText('antilinkhard')}
+││￫ 𝑨𝑵𝑻𝑰-𝑪𝑻𝑻:        ${getStatusText('anticontato')}
+││￫ 𝑨𝑵𝑻𝑰-𝑫𝑶𝑪:        ${getStatusText('antidocumento')}
+││￫ 𝑨𝑵𝑻𝑰-𝑽𝑰𝑫𝑬𝑶:      ${getStatusText('antivideo')}
+││￫ 𝑨𝑵𝑻𝑰-𝑨𝑼𝑫𝑰𝑶:      ${getStatusText('antiaudio')}
+││￫ 𝑨𝑵𝑻𝑰-𝑺𝑻𝑰𝑪𝑲𝑬𝑹:   ${getStatusText('antisticker')}
+││￫ 𝑨𝑵𝑻𝑰-𝑭𝑳𝑶𝑶𝑫:      ${getStatusText('antiflod')}
+││￫ 𝑨𝑵𝑻𝑰-𝑭𝑨𝑲𝑬:       ${getStatusText('antifake')}
+│╰─━─⋆｡°✩🔰✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🔞 PROTEÇÕES AVANÇADAS ✩°｡⋆ ━─━╮
+││￫ 𝑨𝑵𝑻𝑰-𝑷𝑶𝑹𝑵𝑶:       ${getStatusText('antiporno')}
+││￫ 𝑨𝑵𝑻𝑰-𝑷𝑨𝑳𝑨𝑽𝑹𝑨𝑶:     ${getStatusText('antipalavrao')}
+││￫ 𝑿9:                    ${getStatusText('x9')}
+│╰─━─⋆｡°✩🔞✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🎮 SISTEMAS DO GRUPO ✩°｡⋆ ━─━╮
+││￫ 𝑾𝒆𝒍𝒄𝒐𝒎𝒆:           ${welcomeAtivo ? 'ᴀᴛɪᴠᴏ ✅' : 'ɪɴᴀᴛɪᴠᴏ ❌'}
+││￫ 𝑹𝑷𝑮:                ${rpgAtivo ? 'ᴀᴛɪᴠᴏ ✅' : 'ɪɴᴀᴛɪᴠᴏ ❌'}
+││￫ 𝑴𝒐𝒅𝒐 𝑮𝒂𝒎𝒆𝒓:        ${getStatusText('modogamer')}
+││￫ 𝑹𝒂𝒏𝒌 𝑨𝒕𝒊𝒗𝒐:       ${getStatusText('rankativo')}
+│╰─━─⋆｡°✩🎮✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🤖 CONFIGURAÇÕES GLOBAIS (DONO) ✩°｡⋆ ━─━╮
+││￫ 𝑨𝑵𝑻𝑰-𝑷𝑽:          ${antipvAtivo ? 'ᴀᴛɪᴠᴏ ✅' : 'ɪɴᴀᴛɪᴠᴏ ❌'}
+││￫ 𝑨𝑵𝑻𝑰-𝑪𝑨𝑳𝑳:        ${anticallAtivo ? 'ᴀᴛɪᴠᴏ ✅' : 'ɪɴᴀᴛɪᴠᴏ ❌'}
+│╰─━─⋆｡°✩🤖✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩📊 ESTATÍSTICAS ✩°｡⋆ ━─━╮
+││￫ 𝑳𝑰𝑺𝑻𝑨 𝑵𝑬𝑮𝑹𝑨:       ${config.listanegra ? config.listanegra.length : 0} usuários
+││￫ 𝑷𝑹𝑶𝑻𝑬𝑪𝑶̃𝑬𝑺 𝑨𝑻𝑰𝑽𝑨𝑫𝑨𝑺: ${featuresAtivas}/14
+││￫ 𝑵𝑰́𝑽𝑬𝑳 𝑫𝑬 𝑺𝑬𝑮𝑼𝑹𝑨𝑵𝑪̧𝑨: ${nivelSeguranca}
+│╰─━─⋆｡°✩📊✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩⚙️ COMANDOS ✩°｡⋆ ━─━╮
+││￫ 𝑼𝑺𝑬: \`${prefixAtual}[comando] on/off\` para alterar
+││￫ 𝑷𝑶𝑾𝑬𝑹𝑬𝑫 𝑩𝒀: NEEXT SECURITY
+││￫ 𝑰𝑵𝑺𝑻𝑨𝑮𝑹𝑨𝑴: @neet.tk
+│╰─━─⋆｡°✩⚙️✩°｡⋆ ━─━╯
+
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯`;
 
             // Envia System NEEXT com status do sistema + selinho + reply + status real numa única mensagem
             await sock.sendMessage(from, {
