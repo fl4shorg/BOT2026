@@ -49,7 +49,7 @@ function resolverNumero(jidCompleto, sock) {
     try {
         if (!jidCompleto || !sock) return null;
         
-        // Tenta usar decodeJid (Baileys mantém mapeamento LID→WID)
+        // Método 1: Tenta usar decodeJid (Baileys mantém mapeamento LID→WID)
         const decoded = sock.decodeJid ? sock.decodeJid(jidCompleto) : jidCompleto;
         
         // Se temos um número normal (não é LID), extrai ele
@@ -61,7 +61,7 @@ function resolverNumero(jidCompleto, sock) {
             }
         }
         
-        // Tenta buscar no mapeamento do state (fallback)
+        // Método 2: Busca no mapeamento do authState (lidJidMapping)
         if (sock.authState?.creds?.lidJidMapping?.lidToWid) {
             const mapping = sock.authState.creds.lidJidMapping.lidToWid;
             const wid = mapping[jidCompleto];
@@ -73,8 +73,43 @@ function resolverNumero(jidCompleto, sock) {
             }
         }
         
+        // Método 3: Busca no store de contatos do Baileys
+        if (sock.store?.contacts?.[jidCompleto]) {
+            const contact = sock.store.contacts[jidCompleto];
+            if (contact.id) {
+                const numero = contact.id.split('@')[0].split(':')[0];
+                if (numero && /^\d+$/.test(numero)) {
+                    return numero;
+                }
+            }
+        }
+        
+        // Método 4: Extrai o LID e tenta buscar mapeamento reverso
+        if (jidCompleto.includes('@lid')) {
+            const lidNumero = jidCompleto.split('@')[0].split(':')[0];
+            
+            // Tenta buscar no mapeamento reverso
+            if (sock.authState?.creds?.lidJidMapping?.widToLid) {
+                const mappingReverso = sock.authState.creds.lidJidMapping.widToLid;
+                for (const [wid, lid] of Object.entries(mappingReverso)) {
+                    if (lid === jidCompleto) {
+                        const numero = wid.split('@')[0];
+                        if (numero && /^\d+$/.test(numero)) {
+                            return numero;
+                        }
+                    }
+                }
+            }
+            
+            // Se o LID tem número, tenta extrair diretamente
+            if (lidNumero && /^\d+$/.test(lidNumero)) {
+                return lidNumero;
+            }
+        }
+        
         return null;
     } catch (err) {
+        console.error('❌ Erro ao resolver número:', err.message);
         return null;
     }
 }
