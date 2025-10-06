@@ -699,40 +699,61 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 let lidEncontrado = null;
                 let metodoEncontrado = "";
 
-                // MÉTODO 1: Busca direta no mapeamento LID do WhatsApp
+                // MÉTODO 1: Busca no arquivo de mapeamento LID (mais confiável)
                 try {
-                    const jidFormatado = `${numeroLimpo}@s.whatsapp.net`;
+                    const fs = require('fs');
+                    const path = require('path');
+                    const pastaConexao = path.join(__dirname, 'conexao');
+                    const arquivoMapeamento = path.join(pastaConexao, `lid-mapping-${numeroLimpo}.json`);
                     
-                    // Tenta usar a API onWhatsApp para verificar se o número existe
-                    const [result] = await sock.onWhatsApp(jidFormatado);
-                    
-                    if (result && result.exists) {
-                        const jidCompleto = result.jid;
+                    if (fs.existsSync(arquivoMapeamento)) {
+                        const lidArquivo = JSON.parse(fs.readFileSync(arquivoMapeamento, 'utf8'));
+                        if (lidArquivo && typeof lidArquivo === 'string') {
+                            lidEncontrado = lidArquivo;
+                            metodoEncontrado = "Arquivo de mapeamento LID";
+                            console.log(`✅ LID encontrado em arquivo: ${lidEncontrado}`);
+                        }
+                    }
+                } catch (fileErr) {
+                    console.log("⚠️ Método arquivo falhou:", fileErr.message);
+                }
+
+                // MÉTODO 2: Busca direta no mapeamento LID do WhatsApp em memória
+                if (!lidEncontrado) {
+                    try {
+                        const jidFormatado = `${numeroLimpo}@s.whatsapp.net`;
                         
-                        // Se retornou um LID, extrai ele
-                        if (jidCompleto.includes('@lid')) {
-                            lidEncontrado = jidCompleto.split('@')[0];
-                            metodoEncontrado = "API WhatsApp";
-                        } else {
-                            // Se retornou número tradicional, tenta converter para LID
-                            // Busca no mapeamento widToLid
-                            if (sock.authState?.creds?.lidJidMapping?.widToLid) {
-                                const mapping = sock.authState.creds.lidJidMapping.widToLid;
-                                const lidMapeado = mapping[jidCompleto];
-                                
-                                if (lidMapeado) {
-                                    lidEncontrado = lidMapeado.split('@')[0];
-                                    metodoEncontrado = "Mapeamento WID→LID";
-                                    console.log(`✅ LID encontrado via mapeamento: ${lidEncontrado}`);
-                                } else {
-                                    // Número tradicional sem LID - não salva ainda, vai tentar outros métodos
-                                    console.log(`⚠️ Número tradicional sem LID no mapeamento`);
+                        // Tenta usar a API onWhatsApp para verificar se o número existe
+                        const [result] = await sock.onWhatsApp(jidFormatado);
+                        
+                        if (result && result.exists) {
+                            const jidCompleto = result.jid;
+                            
+                            // Se retornou um LID, extrai ele
+                            if (jidCompleto.includes('@lid')) {
+                                lidEncontrado = jidCompleto.split('@')[0];
+                                metodoEncontrado = "API WhatsApp";
+                            } else {
+                                // Se retornou número tradicional, tenta converter para LID
+                                // Busca no mapeamento widToLid
+                                if (sock.authState?.creds?.lidJidMapping?.widToLid) {
+                                    const mapping = sock.authState.creds.lidJidMapping.widToLid;
+                                    const lidMapeado = mapping[jidCompleto];
+                                    
+                                    if (lidMapeado) {
+                                        lidEncontrado = lidMapeado.split('@')[0];
+                                        metodoEncontrado = "Mapeamento WID→LID";
+                                        console.log(`✅ LID encontrado via mapeamento: ${lidEncontrado}`);
+                                    } else {
+                                        // Número tradicional sem LID - não salva ainda, vai tentar outros métodos
+                                        console.log(`⚠️ Número tradicional sem LID no mapeamento`);
+                                    }
                                 }
                             }
                         }
+                    } catch (apiErr) {
+                        console.log("⚠️ Método API falhou, tentando método de grupos:", apiErr.message);
                     }
-                } catch (apiErr) {
-                    console.log("⚠️ Método API falhou, tentando método de grupos:", apiErr.message);
                 }
 
                 // MÉTODO 2: Se não encontrou pela API, busca nos grupos (fallback)
