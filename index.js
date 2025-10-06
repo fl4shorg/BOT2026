@@ -1718,6 +1718,73 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
+        case 'attp': {
+            const text = args.join(' ');
+            if (!text) {
+                const config = obterConfiguracoes();
+                await sock.sendMessage(from, { 
+                    text: `❌ Digite um texto para criar o sticker animado!\n\nExemplo: *${config.prefix}attp NEEXT LTDA*` 
+                }, { quoted: message });
+                break;
+            }
+
+            console.log(`✨ Gerando ATTP: "${text}"`);
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                // API para ATTP - cria sticker animado com texto piscando
+                const apiUrl = `https://api.neext.online/sticker/attp?text=${encodeURIComponent(text)}`;
+                console.log(`🔗 Chamando API ATTP: ${apiUrl}`);
+
+                const response = await axios.get(apiUrl, {
+                    responseType: 'arraybuffer',
+                    timeout: 30000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        'Accept': '*/*'
+                    }
+                });
+
+                if (!response.data || response.data.length === 0) {
+                    throw new Error('API retornou dados vazios');
+                }
+
+                const stickerBuffer = Buffer.from(response.data);
+                console.log(`📥 ATTP baixado: ${stickerBuffer.length} bytes`);
+
+                // Envia o sticker animado
+                await sock.sendMessage(from, {
+                    sticker: stickerBuffer
+                }, { quoted: selinho });
+
+                await reagirMensagem(sock, message, "✅");
+                console.log('✅ ATTP enviado com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro detalhado ao gerar ATTP:', error);
+
+                let errorMessage = '❌ Erro ao gerar sticker animado.';
+
+                if (error.code === 'ENOTFOUND') {
+                    errorMessage += ' Problema de conexão.';
+                } else if (error.code === 'ETIMEDOUT') {
+                    errorMessage += ' Timeout na requisição.';
+                } else if (error.response?.status === 404) {
+                    errorMessage += ' API temporariamente indisponível.';
+                } else if (error.response?.status === 429) {
+                    errorMessage += ' Limite de requisições atingido.';
+                } else {
+                    errorMessage += ' Tente novamente.';
+                }
+
+                await sock.sendMessage(from, {
+                    text: errorMessage
+                }, { quoted: message });
+                await reagirMensagem(sock, message, "❌");
+            }
+            break;
+        }
+
         // Comandos de Figurinhas (Pacotes)
         case 'figurinhasanime':
         case 'figurinhasmeme':
