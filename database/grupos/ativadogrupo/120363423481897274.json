@@ -20,5 +20,6 @@
   "floodConfig": {
     "maxMensagens": 5,
     "tempoSegundos": 10
-  }
+  },
+  "antipagamento": true
 }

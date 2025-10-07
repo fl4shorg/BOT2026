@@ -1266,7 +1266,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             const featuresAtivas = [
                 'antilink', 'anticontato', 'antidocumento',
                 'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 
-                'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'modogamer', 'rankativo'
+                'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'antipagamento', 'modogamer', 'rankativo'
             ].filter(feature => config[feature]).length;
 
             // Calcula nível de segurança
@@ -1291,6 +1291,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 │╭─━─⋆｡°✩🔞 PROTEÇÕES AVANÇADAS ✩°｡⋆ ━─━╮
 ││￫ 𝑨𝑵𝑻𝑰-𝑷𝑶𝑹𝑵𝑶:       ${getStatusText('antiporno')}
 ││￫ 𝑨𝑵𝑻𝑰-𝑷𝑨𝑳𝑨𝑽𝑹𝑨𝑶:     ${getStatusText('antipalavrao')}
+││￫ 𝑨𝑵𝑻𝑰-𝑷𝑨𝑮𝑨𝑴𝑬𝑵𝑻𝑶:   ${getStatusText('antipagamento')}
 ││￫ 𝑿9:                    ${getStatusText('x9')}
 │╰─━─⋆｡°✩🔞✩°｡⋆ ━─━╯
 
@@ -1308,7 +1309,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
 │╭─━─⋆｡°✩📊 ESTATÍSTICAS ✩°｡⋆ ━─━╮
 ││￫ 𝑳𝑰𝑺𝑻𝑨 𝑵𝑬𝑮𝑹𝑨:       ${config.listanegra ? config.listanegra.length : 0} usuários
-││￫ 𝑷𝑹𝑶𝑻𝑬𝑪𝑶̃𝑬𝑺 𝑨𝑻𝑰𝑽𝑨𝑫𝑨𝑺: ${featuresAtivas}/14
+││￫ 𝑷𝑹𝑶𝑻𝑬𝑪𝑶̃𝑬𝑺 𝑨𝑻𝑰𝑽𝑨𝑫𝑨𝑺: ${featuresAtivas}/15
 ││￫ 𝑵𝑰́𝑽𝑬𝑳 𝑫𝑬 𝑺𝑬𝑮𝑼𝑹𝑨𝑵𝑪̧𝑨: ${nivelSeguranca}
 │╰─━─⋆｡°✩📊✩°｡⋆ ━─━╯
 
