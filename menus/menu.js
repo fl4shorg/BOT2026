@@ -126,33 +126,40 @@ async function obterMenuPrincipal(sock, from, sender, pushName) {
 function obterMenuMembro() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
     return `
-👥 *COMANDOS PARA MEMBROS*
+╭─━─━⋆｡°✩🦋✩°｡⋆ ━─━─╮
+│     𝐌𝐄𝐍𝐔 𝐌𝐄𝐌𝐁𝐑𝐎 - 𝐍𝐄𝐄𝐗𝐓
+╰─━─━⋆｡°✩🦋✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
 
-🤖 *INFORMAÇÕES DO BOT:*
-• \`${prefix}ping\` - Status e informações do sistema
-• \`${prefix}hora\` - Horário atual
-• \`${prefix}dono\` - Informações do dono
-• \`${prefix}recado\` - Confirma que o bot está ativo
-• \`prefixo\` - Mostra o prefixo atual
+│╭─━─⋆｡°✩🤖✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}ping
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}hora
+│╰─━─⋆｡°✩🤖✩°｡⋆ ━─━╯
 
-📝 *UTILITÁRIOS:*
-• \`${prefix}rg\` - Registra-se no sistema do bot
+│╭─━─⋆｡°✩📝✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}rg
+│╰─━─⋆｡°✩📝✩°｡⋆ ━─━╯
 
-📚 *CONHECIMENTO:*
-• \`${prefix}pensador [personagem]\` - Frases de pensadores
-• \`${prefix}frasesanime\` - Frases de animes
-• \`${prefix}wikipedia [assunto]\` - Busca na Wikipedia
+│╭─━─⋆｡°✩📚✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}pensador [personagem]
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}frasesanime
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}wikipedia [assunto]
+│╰─━─⋆｡°✩📚✩°｡⋆ ━─━╯
 
-🎲 *DIVERSÃO:*
-• \`${prefix}chance [texto]\` - Calcula chance de algo acontecer
-• \`${prefix}correio [número]/[mensagem]\` - Envia mensagem anônima
+│╭─━─⋆｡°✩🎲✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}chance [texto]
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}correio [número]/[mensagem]
+│╰─━─⋆｡°✩🎲✩°｡⋆ ━─━╯
 
-🏷️ *STICKERS:*
-• \`${prefix}s\` - Converte mídia em sticker
-• \`${prefix}rename [pack|author]\` - Renomeia sticker
+│╭─━─⋆｡°✩🏷️✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}s
+│┊𖥨ํ∘̥⃟⸽⃟🦋￫ ${prefix}rename [pack|author]
+│╰─━─⋆｡°✩🏷️✩°｡⋆ ━─━╯
 
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
 ━━━━━━━━━━━━━━━
-© NEEXT LTDA - ${nickDoDono}
+© NEEXT LTDA - Flash
 `;
 }
 
