@@ -7812,11 +7812,20 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 // MORTE!
                 delete global.roletaRussa[from];
                 
-                await sock.sendMessage(from, {
-                    image: { url: "https://i.ibb.co/DgWJjj0K/58712ef364b6fdef5ae9bcbb48fc0fdb.gif" },
-                    caption: `💀 *BANG! VOCÊ MORREU!* 💀\n\n@${sender.split('@')[0]} pegou a bala! 🔫💥\n\n⚰️ Game Over! RIP...\n\n🏆 **Vencedor:** @${jogo.vezDe === jogo.jogador1 ? jogo.jogador2.split('@')[0] : jogo.jogador1.split('@')[0]}`,
-                    mentions: [jogo.jogador1, jogo.jogador2]
-                });
+                // Envia GIF usando método correto (vídeo com gifPlayback)
+                const gifEnviado = await enviarGif(
+                    sock,
+                    from,
+                    "https://i.ibb.co/DgWJjj0K/58712ef364b6fdef5ae9bcbb48fc0fdb.gif",
+                    `💀 *BANG! VOCÊ MORREU!* 💀\n\n@${sender.split('@')[0]} pegou a bala! 🔫💥\n\n⚰️ Game Over! RIP...\n\n🏆 **Vencedor:** @${jogo.vezDe === jogo.jogador1 ? jogo.jogador2.split('@')[0] : jogo.jogador1.split('@')[0]}`,
+                    [jogo.jogador1, jogo.jogador2],
+                    message
+                );
+                
+                if (!gifEnviado) {
+                    // Fallback para texto se o GIF falhar
+                    await reply(sock, from, `💀 *BANG! VOCÊ MORREU!* 💀\n\n@${sender.split('@')[0]} pegou a bala! 🔫💥\n\n⚰️ Game Over! RIP...\n\n🏆 **Vencedor:** @${jogo.vezDe === jogo.jogador1 ? jogo.jogador2.split('@')[0] : jogo.jogador1.split('@')[0]}`, [jogo.jogador1, jogo.jogador2]);
+                }
                 
                 await reagirMensagem(sock, message, "💀");
                 break;
