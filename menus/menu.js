@@ -441,91 +441,53 @@ function obterMenuAnti() {
 function obterMenuRPG() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
     return `
-💰 *SISTEMA RPG - NEEXTCITY MEGA 2.0*
+╭─━─━⋆｡°✩🎮✩°｡⋆ ━─━─╮
+│        𝐌𝐄𝐍𝐔 𝐑𝐏𝐆 - 𝐍𝐄𝐄𝐗𝐓𝐂𝐈𝐓𝐘
+╰─━─━⋆｡°✩🎮✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
 
-⚠️ *Requer \`${prefix}rpg on\` ativo no grupo*
+│╭─━─⋆｡°✩📊✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}perfil
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}depositar [valor]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}sacar [valor]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}daily
+│╰─━─⋆｡°✩📊✩°｡⋆ ━─━╯
 
-👤 *CADASTRO:*
-• \`${prefix}registrar [nome] [banco]\` - Registrar no RPG
-• \`${prefix}saldo\` - Ver saldo e estatísticas
-• \`${prefix}perfil\` - Ver perfil completo
-• \`${prefix}rank\` - Ranking dos mais ricos
+│╭─━─⋆｡°✩💼✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}trabalhos
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}escolhertrabalho [id]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}trabalhar
+│╰─━─⋆｡°✩💼✩°｡⋆ ━─━╯
 
-💼 *TRABALHOS (GANHAR GOLD):*
-• \`${prefix}pescar\` - Pescar para ganhar gold (vara necessária)
-• \`${prefix}minerar\` - Minerar recursos preciosos (picareta necessária)
-• \`${prefix}trabalhar\` - Trabalhar com base nos seus itens
-• \`${prefix}cacar\` - Caçar animais selvagens (rifle necessário)
-• \`${prefix}coletar\` - Coletar itens da natureza
-• \`${prefix}agricultura\` - Plantar e colher (sementes e fazenda necessárias)
-• \`${prefix}entrega\` - Fazer entregas na cidade
+│╭─━─⋆｡°✩🎓✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}educacao
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}estudar
+│╰─━─⋆｡°✩🎓✩°｡⋆ ━─━╯
 
-🏴‍☠️ *ATIVIDADES ILEGAIS:*
-• \`${prefix}assalto @user\` - Assaltar outro jogador
-• \`${prefix}roubar [local]\` - Roubar locais (casas, lojas, bancos)
+│╭─━─⋆｡°✩🎣✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}pescar
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}minerar
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}coletar
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}cacar
+│╰─━─⋆｡°✩🎣✩°｡⋆ ━─━╯
 
-🛒 *LOJA E INVENTÁRIO (8 CATEGORIAS):*
-• \`${prefix}loja\` - Ver todas as 8 categorias
-• \`${prefix}loja propriedades\` - Casas, fazendas, hotéis, ilhas
-• \`${prefix}loja animais\` - Pets, criações, dragões
-• \`${prefix}loja ferramentas\` - Picaretas, varas, rifles, sementes
-• \`${prefix}loja veiculos\` - Carros, motos, aviões, foguetes
-• \`${prefix}loja negocios\` - Empresas, restaurantes, multinacionais
-• \`${prefix}loja tecnologia\` - Computadores, setups, estúdios
-• \`${prefix}loja decoracao\` - Móveis, arte, piscinas
-• \`${prefix}loja seguranca\` - Proteções, blindagem, bunkers
-• \`${prefix}comprar [item_id] [qtd]\` - Comprar itens (1-10)
-• \`${prefix}inventario\` - Ver seus itens
+│╭─━─⋆｡°✩🏪✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}loja
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}loja [categoria]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}comprar [item]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}inventario
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}vender [item]
+│╰─━─⋆｡°✩🏪✩°｡⋆ ━─━╯
 
-🎥 *INFLUENCIADOR DIGITAL:*
-• \`${prefix}youtube\` - Criar vídeo no YouTube (setup necessário)
-• \`${prefix}tiktok\` - Criar vídeo no TikTok (setup necessário)
-• \`${prefix}twitch\` - Fazer stream na Twitch (setup necessário)
+│╭─━─⋆｡°✩🎮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}tigrinho [valor]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}assaltar @user
+│╰─━─⋆｡°✩🎮✩°｡⋆ ━─━╯
 
-🎰 *JOGOS E INVESTIMENTOS:*
-• \`${prefix}tigrinho [valor]\` - Caça-níquel
-• \`${prefix}apostar [valor]\` - Apostar na sorte
-• \`${prefix}investir [tipo] [valor]\` - 7 tipos de investimentos
-
-📚 *EDUCAÇÃO E CRESCIMENTO:*
-• \`${prefix}estudar\` - Ver cursos disponíveis
-• \`${prefix}estudar [num]\` - Fazer curso específico
-
-💸 *SISTEMA BANCÁRIO:*
-• \`${prefix}pix @user [valor]\` - Transferir gold (18 bancos disponíveis)
-
-⚠️ *RECURSOS AVANÇADOS:*
-• Limites diários realistas (8 pescas, 6 minerações, 4 trabalhos)
-• Sistema de riscos (mortes, acidentes, prisões)
-• 100+ itens únicos com benefícios específicos
-• Progressão educacional (7 níveis de estudo)
-• Cooldowns balanceados para gameplay justo
-
-🌟 *NOVIDADES MEGA 2.0:*
-✅ Loja com 8 categorias e 100+ itens
-✅ Sistema YouTuber/TikTok/Twitch
-✅ Comando roubar com 12 locais
-✅ 18 bancos diferentes para escolher
-✅ Riscos realistas (mortes, falhas)
-✅ Ferramentas obrigatórias para trabalhos
-✅ Limites diários para gameplay equilibrado
-
-💸 *SISTEMA BANCÁRIO:*
-• \`${prefix}pix @user [valor]\` - Transferir gold
-• \`${prefix}saldo\` - Ver saldo e estatísticas
-• \`${prefix}rank\` - Ranking dos mais ricos
-
-🏪 *CATEGORIAS DA LOJA:*
-• **Propriedades** - Casas, fazendas, empresas
-• **Animais** - Galinhas, cavalos, gatos
-• **Veículos** - Motos, carros, aviões
-• **Ferramentas** - Varas, picaretas, tratores
-• **Negócios** - Lanchonetes, academias
-
-💡 *Ganhe gold, compre itens e domine NeextCity!*
-
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
 ━━━━━━━━━━━━━━━
-© NEEXT LTDA - ${nickDoDono}
+© NEEXT LTDA - Flash
 `;
 }
 
