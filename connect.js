@@ -184,6 +184,9 @@ async function startBot() {
         console.log("💾 Credenciais salvas em:", pastaConexao);
     });
 
+    // Flag para garantir que listeners sejam configurados apenas uma vez
+    let listenersConfigurados = false;
+    
     sock.ev.on("connection.update", async (update)=>{
         const { connection, lastDisconnect, qr } = update;
         
@@ -210,10 +213,15 @@ async function startBot() {
             
             await enviarContatoSelinho(sock);
             
-            // Configura listeners de mensagens após conectar (sempre, incluindo reconexões)
-            const { setupListeners } = require("./index.js");
-            setupListeners(sock);
-            console.log("🔧 Listeners de mensagens configurados!");
+            // Configura listeners de mensagens após conectar (apenas UMA VEZ)
+            if (!listenersConfigurados) {
+                const { setupListeners } = require("./index.js");
+                setupListeners(sock);
+                listenersConfigurados = true;
+                console.log("🔧 Listeners de mensagens configurados!");
+            } else {
+                console.log("⏭️ Listeners já configurados, pulando...");
+            }
             
             // Inicia sistema de agendamento automático de grupos
             const groupSchedule = require('./arquivos/grupo-schedule.js');
