@@ -74,6 +74,7 @@ function carregarConfigGrupo(groupId) {
                 antipalavrao: false,
                 antipv: false,
                 anticall: false,
+                antipagamento: false,
                 rankativo: false,
                 welcome1: false,
                 listanegra: [],
@@ -325,6 +326,11 @@ function isStickerMessage(message) {
     return !!(message.stickerMessage);
 }
 
+// Verifica se é solicitação de pagamento (payment request)
+function isPaymentMessage(message) {
+    return !!(message.requestPaymentMessage || message.sendPaymentMessage);
+}
+
 // Controle de flood
 function verificarFlood(userId, groupId, config) {
     if (!config.antiflod) return false;
@@ -402,7 +408,7 @@ function toggleAntiFeature(groupId, feature, estado) {
     const config = carregarConfigGrupo(groupId);
     if (!config) return false;
     
-    const validFeatures = ['antilink', 'anticontato', 'antidocumento', 'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'antipv', 'anticall', 'rankativo'];
+    const validFeatures = ['antilink', 'anticontato', 'antidocumento', 'antivideo', 'antiaudio', 'antisticker', 'antiflod', 'antifake', 'x9', 'antiporno', 'antilinkhard', 'antipalavrao', 'antipv', 'anticall', 'antipagamento', 'rankativo'];
     
     if (!validFeatures.includes(feature)) return false;
     
@@ -479,6 +485,11 @@ async function processarMensagem(message, groupId, userId, sock) {
         violations.push('antisticker');
     }
     
+    // Verifica antipagamento (solicitação de pagamento)
+    if (config.antipagamento && isPaymentMessage(message)) {
+        violations.push('antipagamento');
+    }
+    
     // Verifica antiflod
     if (verificarFlood(userId, groupId, config)) {
         violations.push('antiflod');
@@ -518,6 +529,7 @@ module.exports = {
     isVideoMessage,
     isAudioMessage,
     isStickerMessage,
+    isPaymentMessage,
     verificarFlood,
     isNumeroBrasileiro,
     

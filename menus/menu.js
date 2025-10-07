@@ -372,6 +372,7 @@ function obterMenuAdm() {
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}antifake on/off - Anti-números fake
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}antiporno on/off - Anti-pornografia
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}antipalavrao on/off - Anti-palavrões
+╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}antipagamento on/off - Anti-pagamento
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}listanegra add @user - Adicionar usuário
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}listanegra remove @user - Remover usuário
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}listanegra list - Ver lista negra

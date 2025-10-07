@@ -1532,6 +1532,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 `🎥 Antivideo: ${getStatus('antivideo')}\n` +
                 `🎵 Antiaudio: ${getStatus('antiaudio')}\n` +
                 `🏷️ Antisticker: ${getStatus('antisticker')}\n` +
+                `💰 Antipagamento: ${getStatus('antipagamento')}\n` +
                 `🌊 Antiflod: ${getStatus('antiflod')}\n` +
                 `📊 X9 Monitor: ${getStatus('x9')}\n\n` +
                 `📋 Lista Negra: ${config.listanegra ? config.listanegra.length : 0} usuários\n\n` +
@@ -1554,6 +1555,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         case "antiporno":
         case "antilinkhard":
         case "antipalavrao":
+        case "antipagamento":
         case "rankativo":
         case "welcome1": {
             // Só funciona em grupos
