@@ -112,6 +112,7 @@ async function obterMenuPrincipal(sock, from, sender, pushName) {
 │ 𖧈∘̥⸽🧑‍🤝‍🧑⃟ menuMembro
 │ 𖧈∘̥⸽🎮⃟ menuGamer
 │ 𖧈∘̥⸽🌐⃟ menuNeext
+│ 𖧈∘̥⸽🎲⃟ menurandom
 ╰──────────────────────⪨
 
 © NEEXT LTDA`;
@@ -788,6 +789,138 @@ function obterConfigurarBot() {
 `;
 }
 
+// ========================
+// MENU RANDOM - DANBOORU
+// ========================
+function obterMenuRandom() {
+    const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
+    return `
+🎲 *MENU RANDOM - DANBOORU API*
+
+🎨 *PERSONAGENS E GRUPOS:*
+• \`${prefix}1girl\` - 1 garota
+• \`${prefix}1boy\` - 1 garoto  
+• \`${prefix}2girls\` - 2 garotas
+• \`${prefix}solo\` - Solo
+• \`${prefix}group\` - Grupo
+• \`${prefix}female\` - Feminino
+• \`${prefix}male\` - Masculino
+
+👤 *CARACTERÍSTICAS:*
+• \`${prefix}long_hair\` - Cabelo longo
+• \`${prefix}short_hair\` - Cabelo curto
+• \`${prefix}smile\` - Sorriso
+• \`${prefix}blush\` - Corado
+• \`${prefix}happy\` - Feliz
+• \`${prefix}sad\` - Triste
+• \`${prefix}angry\` - Bravo
+
+👗 *ROUPAS E UNIFORMES:*
+• \`${prefix}cosplay\` - Cosplay
+• \`${prefix}uniform\` - Uniforme
+• \`${prefix}school_uniform\` - Uniforme escolar
+• \`${prefix}maid\` - Empregada
+• \`${prefix}nurse\` - Enfermeira
+• \`${prefix}witch\` - Bruxa
+
+⚔️ *AÇÃO E FANTASIA:*
+• \`${prefix}armor\` - Armadura
+• \`${prefix}sword\` - Espada
+• \`${prefix}gun\` - Arma
+• \`${prefix}magic\` - Magia
+• \`${prefix}fantasy\` - Fantasia
+
+🤖 *ESTILOS:*
+• \`${prefix}robot\` - Robô
+• \`${prefix}cyberpunk\` - Cyberpunk
+• \`${prefix}steampunk\` - Steampunk
+
+👻 *CRIATURAS:*
+• \`${prefix}vampire\` - Vampiro
+• \`${prefix}demon\` - Demônio
+• \`${prefix}angel\` - Anjo
+• \`${prefix}ghost\` - Fantasma
+
+🎃 *FESTAS E ESTAÇÕES:*
+• \`${prefix}halloween\` - Halloween
+• \`${prefix}christmas\` - Natal
+• \`${prefix}summer\` - Verão
+• \`${prefix}beach\` - Praia
+• \`${prefix}winter\` - Inverno
+• \`${prefix}snow\` - Neve
+• \`${prefix}autumn\` - Outono
+• \`${prefix}rain\` - Chuva
+
+🌿 *NATUREZA:*
+• \`${prefix}animal\` - Animal
+• \`${prefix}flower\` - Flor
+• \`${prefix}tree\` - Árvore
+• \`${prefix}forest\` - Floresta
+• \`${prefix}mountain\` - Montanha
+
+🌅 *CENÁRIOS:*
+• \`${prefix}scenery\` - Cenário
+• \`${prefix}city\` - Cidade
+• \`${prefix}building\` - Prédio
+• \`${prefix}street\` - Rua
+• \`${prefix}night\` - Noite
+• \`${prefix}sunset\` - Pôr do sol
+• \`${prefix}sunrise\` - Nascer do sol
+
+☁️ *CÉUS E ÁGUAS:*
+• \`${prefix}clouds\` - Nuvens
+• \`${prefix}sky\` - Céu
+• \`${prefix}moon\` - Lua
+• \`${prefix}stars\` - Estrelas
+• \`${prefix}river\` - Rio
+• \`${prefix}lake\` - Lago
+• \`${prefix}ocean\` - Oceano
+
+🚗 *VEÍCULOS:*
+• \`${prefix}train\` - Trem
+• \`${prefix}car\` - Carro
+• \`${prefix}bike\` - Bicicleta
+
+🏫 *LOCAIS INTERNOS:*
+• \`${prefix}school\` - Escola
+• \`${prefix}classroom\` - Sala de aula
+• \`${prefix}library\` - Biblioteca
+• \`${prefix}room\` - Quarto
+• \`${prefix}bed\` - Cama
+• \`${prefix}chair\` - Cadeira
+• \`${prefix}table\` - Mesa
+
+🍰 *COMIDAS E BEBIDAS:*
+• \`${prefix}food\` - Comida
+• \`${prefix}drink\` - Bebida
+• \`${prefix}coffee\` - Café
+• \`${prefix}tea\` - Chá
+• \`${prefix}cake\` - Bolo
+• \`${prefix}chocolate\` - Chocolate
+• \`${prefix}fruit\` - Fruta
+
+🎮 *ANIMES/JOGOS:*
+• \`${prefix}genshin_impact\` - Genshin Impact
+• \`${prefix}naruto\` - Naruto
+• \`${prefix}one_piece\` - One Piece
+• \`${prefix}attack_on_titan\` - Attack on Titan
+• \`${prefix}my_hero_academia\` - My Hero Academia
+• \`${prefix}demon_slayer\` - Demon Slayer
+• \`${prefix}spy_x_family\` - Spy x Family
+• \`${prefix}jojo\` - JoJo
+• \`${prefix}dragon_ball\` - Dragon Ball
+• \`${prefix}bleach\` - Bleach
+• \`${prefix}tokyo_revengers\` - Tokyo Revengers
+• \`${prefix}original\` - Original
+
+📌 *TOTAL: 89 comandos disponíveis*
+💡 *Cada comando retorna 5 imagens aleatórias em carrossel!*
+
+━━━━━━━━━━━━━━━
+© NEEXT LTDA - ${nickDoDono}
+`;
+}
+
 module.exports = {
     obterMenuPrincipal,
     obterMenuMembro,
@@ -803,5 +936,6 @@ module.exports = {
     obterMenuBrincadeira,
     obterMenuHentai,
     obterMenuDonoAvancado,
-    obterConfigurarBot
+    obterConfigurarBot,
+    obterMenuRandom
 };

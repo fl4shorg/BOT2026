@@ -612,7 +612,86 @@ async function processarListaNegra(sock, participants, groupId, action) {
     }
 }
 
+// Função genérica para processar comandos Danbooru
+async function processarDanbooru(sock, from, message, tag, titulo) {
+    console.log(`🎨 Comando danbooru/${tag} acionado`);
+    await reagirMensagem(sock, message, "⏳");
 
+    try {
+        const config = obterConfiguracoes();
+        const apiUrl = `https://www.api.neext.online/danbooru/${tag}`;
+        
+        // Faz 5 requisições em paralelo
+        const imagePromises = Array(5).fill(null).map(() => 
+            axios.get(apiUrl, { 
+                responseType: 'arraybuffer',
+                timeout: 15000,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            })
+        );
+
+        const imageResponses = await Promise.all(imagePromises);
+        
+        // Prepara as imagens para o carrossel
+        const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');
+        
+        const mediaPromises = imageResponses.map(response => 
+            prepareWAMessageMedia(
+                { image: Buffer.from(response.data) },
+                { upload: sock.waUploadToServer }
+            )
+        );
+
+        const mediaArray = await Promise.all(mediaPromises);
+
+        // Cria os cards do carrossel
+        const cards = mediaArray.map((media, index) => ({
+            header: {
+                imageMessage: media.imageMessage,
+                hasMediaAttachment: true
+            },
+            body: {
+                text: `${titulo} - Imagem ${index + 1}/5`
+            },
+            nativeFlowMessage: {
+                buttons: []
+            }
+        }));
+
+        // Cria mensagem em carrossel
+        const carouselMessage = generateWAMessageFromContent(from, {
+            viewOnceMessage: {
+                message: {
+                    messageContextInfo: {
+                        deviceListMetadata: {},
+                        deviceListMetadataVersion: 2
+                    },
+                    interactiveMessage: {
+                        body: {
+                            text: `🎲 *${titulo}* 🎲\n\n📌 5 imagens aleatórias\n\n© ${config.nomeDoBot}`
+                        },
+                        carouselMessage: {
+                            cards: cards
+                        }
+                    }
+                }
+            }
+        }, { quoted: message });
+
+        await sock.relayMessage(from, carouselMessage.message, {});
+        await reagirMensagem(sock, message, "✅");
+        console.log(`✅ ${tag} - Carrossel enviado com sucesso!`);
+
+    } catch (error) {
+        console.error(`❌ Erro ao buscar ${tag}:`, error.message);
+        await reagirMensagem(sock, message, "❌");
+        await sock.sendMessage(from, {
+            text: `❌ Erro ao buscar imagens de ${titulo}. Tente novamente!`
+        }, { quoted: message });
+    }
+}
 
 // Função principal de comandos
 async function handleCommand(sock, message, command, args, from, quoted) {
@@ -3990,6 +4069,111 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             }, { quoted: message });
         }
         break;
+
+        case "menurandom": {
+            const menus = require('./menus/menu.js');
+            await sock.sendMessage(from, {
+                text: menus.obterMenuRandom()
+            }, { quoted: message });
+        }
+        break;
+
+        // ============================================
+        // COMANDOS DANBOORU - RANDOM IMAGES (89 comandos)
+        // ============================================
+        
+        case "1girl": { await processarDanbooru(sock, from, message, "1girl", "1 Garota"); break; }
+        case "1boy": { await processarDanbooru(sock, from, message, "1boy", "1 Garoto"); break; }
+        case "2girls": { await processarDanbooru(sock, from, message, "2girls", "2 Garotas"); break; }
+        case "animal": { await processarDanbooru(sock, from, message, "animal", "Animal"); break; }
+        case "scenery": { await processarDanbooru(sock, from, message, "scenery", "Cenário"); break; }
+        case "original": { await processarDanbooru(sock, from, message, "original", "Original"); break; }
+        case "solo": { await processarDanbooru(sock, from, message, "solo", "Solo"); break; }
+        case "group": { await processarDanbooru(sock, from, message, "group", "Grupo"); break; }
+        case "female": { await processarDanbooru(sock, from, message, "female", "Feminino"); break; }
+        case "male": { await processarDanbooru(sock, from, message, "male", "Masculino"); break; }
+        case "long_hair": { await processarDanbooru(sock, from, message, "long_hair", "Cabelo Longo"); break; }
+        case "short_hair": { await processarDanbooru(sock, from, message, "short_hair", "Cabelo Curto"); break; }
+        case "smile": { await processarDanbooru(sock, from, message, "smile", "Sorriso"); break; }
+        case "blush": { await processarDanbooru(sock, from, message, "blush", "Corado"); break; }
+        case "happy": { await processarDanbooru(sock, from, message, "happy", "Feliz"); break; }
+        case "sad": { await processarDanbooru(sock, from, message, "sad", "Triste"); break; }
+        case "angry": { await processarDanbooru(sock, from, message, "angry", "Bravo"); break; }
+        case "cosplay": { await processarDanbooru(sock, from, message, "cosplay", "Cosplay"); break; }
+        case "uniform": { await processarDanbooru(sock, from, message, "uniform", "Uniforme"); break; }
+        case "school_uniform": { await processarDanbooru(sock, from, message, "school_uniform", "Uniforme Escolar"); break; }
+        case "maid": { await processarDanbooru(sock, from, message, "maid", "Empregada"); break; }
+        case "nurse": { await processarDanbooru(sock, from, message, "nurse", "Enfermeira"); break; }
+        case "witch": { await processarDanbooru(sock, from, message, "witch", "Bruxa"); break; }
+        case "armor": { await processarDanbooru(sock, from, message, "armor", "Armadura"); break; }
+        case "sword": { await processarDanbooru(sock, from, message, "sword", "Espada"); break; }
+        case "gun": { await processarDanbooru(sock, from, message, "gun", "Arma"); break; }
+        case "magic": { await processarDanbooru(sock, from, message, "magic", "Magia"); break; }
+        case "fantasy": { await processarDanbooru(sock, from, message, "fantasy", "Fantasia"); break; }
+        case "robot": { await processarDanbooru(sock, from, message, "robot", "Robô"); break; }
+        case "cyberpunk": { await processarDanbooru(sock, from, message, "cyberpunk", "Cyberpunk"); break; }
+        case "steampunk": { await processarDanbooru(sock, from, message, "steampunk", "Steampunk"); break; }
+        case "vampire": { await processarDanbooru(sock, from, message, "vampire", "Vampiro"); break; }
+        case "demon": { await processarDanbooru(sock, from, message, "demon", "Demônio"); break; }
+        case "angel": { await processarDanbooru(sock, from, message, "angel", "Anjo"); break; }
+        case "ghost": { await processarDanbooru(sock, from, message, "ghost", "Fantasma"); break; }
+        case "halloween": { await processarDanbooru(sock, from, message, "halloween", "Halloween"); break; }
+        case "christmas": { await processarDanbooru(sock, from, message, "christmas", "Natal"); break; }
+        case "summer": { await processarDanbooru(sock, from, message, "summer", "Verão"); break; }
+        case "beach": { await processarDanbooru(sock, from, message, "beach", "Praia"); break; }
+        case "winter": { await processarDanbooru(sock, from, message, "winter", "Inverno"); break; }
+        case "snow": { await processarDanbooru(sock, from, message, "snow", "Neve"); break; }
+        case "autumn": { await processarDanbooru(sock, from, message, "autumn", "Outono"); break; }
+        case "rain": { await processarDanbooru(sock, from, message, "rain", "Chuva"); break; }
+        case "flower": { await processarDanbooru(sock, from, message, "flower", "Flor"); break; }
+        case "tree": { await processarDanbooru(sock, from, message, "tree", "Árvore"); break; }
+        case "forest": { await processarDanbooru(sock, from, message, "forest", "Floresta"); break; }
+        case "mountain": { await processarDanbooru(sock, from, message, "mountain", "Montanha"); break; }
+        case "city": { await processarDanbooru(sock, from, message, "city", "Cidade"); break; }
+        case "building": { await processarDanbooru(sock, from, message, "building", "Prédio"); break; }
+        case "street": { await processarDanbooru(sock, from, message, "street", "Rua"); break; }
+        case "night": { await processarDanbooru(sock, from, message, "night", "Noite"); break; }
+        case "sunset": { await processarDanbooru(sock, from, message, "sunset", "Pôr do Sol"); break; }
+        case "sunrise": { await processarDanbooru(sock, from, message, "sunrise", "Nascer do Sol"); break; }
+        case "clouds": { await processarDanbooru(sock, from, message, "clouds", "Nuvens"); break; }
+        case "sky": { await processarDanbooru(sock, from, message, "sky", "Céu"); break; }
+        case "moon": { await processarDanbooru(sock, from, message, "moon", "Lua"); break; }
+        case "stars": { await processarDanbooru(sock, from, message, "stars", "Estrelas"); break; }
+        case "river": { await processarDanbooru(sock, from, message, "river", "Rio"); break; }
+        case "lake": { await processarDanbooru(sock, from, message, "lake", "Lago"); break; }
+        case "ocean": { await processarDanbooru(sock, from, message, "ocean", "Oceano"); break; }
+        case "train": { await processarDanbooru(sock, from, message, "train", "Trem"); break; }
+        case "car": { await processarDanbooru(sock, from, message, "car", "Carro"); break; }
+        case "bike": { await processarDanbooru(sock, from, message, "bike", "Bicicleta"); break; }
+        case "school": { await processarDanbooru(sock, from, message, "school", "Escola"); break; }
+        case "classroom": { await processarDanbooru(sock, from, message, "classroom", "Sala de Aula"); break; }
+        case "library": { await processarDanbooru(sock, from, message, "library", "Biblioteca"); break; }
+        case "room": { await processarDanbooru(sock, from, message, "room", "Quarto"); break; }
+        case "bed": { await processarDanbooru(sock, from, message, "bed", "Cama"); break; }
+        case "chair": { await processarDanbooru(sock, from, message, "chair", "Cadeira"); break; }
+        case "table": { await processarDanbooru(sock, from, message, "table", "Mesa"); break; }
+        case "food": { await processarDanbooru(sock, from, message, "food", "Comida"); break; }
+        case "drink": { await processarDanbooru(sock, from, message, "drink", "Bebida"); break; }
+        case "coffee": { await processarDanbooru(sock, from, message, "coffee", "Café"); break; }
+        case "tea": { await processarDanbooru(sock, from, message, "tea", "Chá"); break; }
+        case "cake": { await processarDanbooru(sock, from, message, "cake", "Bolo"); break; }
+        case "chocolate": { await processarDanbooru(sock, from, message, "chocolate", "Chocolate"); break; }
+        case "fruit": { await processarDanbooru(sock, from, message, "fruit", "Fruta"); break; }
+        case "genshin_impact": { await processarDanbooru(sock, from, message, "genshin_impact", "Genshin Impact"); break; }
+        case "naruto": { await processarDanbooru(sock, from, message, "naruto", "Naruto"); break; }
+        case "one_piece": { await processarDanbooru(sock, from, message, "one_piece", "One Piece"); break; }
+        case "attack_on_titan": { await processarDanbooru(sock, from, message, "attack_on_titan", "Attack on Titan"); break; }
+        case "my_hero_academia": { await processarDanbooru(sock, from, message, "my_hero_academia", "My Hero Academia"); break; }
+        case "demon_slayer": { await processarDanbooru(sock, from, message, "demon_slayer", "Demon Slayer"); break; }
+        case "spy_x_family": { await processarDanbooru(sock, from, message, "spy_x_family", "Spy x Family"); break; }
+        case "jojo": { await processarDanbooru(sock, from, message, "jojo", "JoJo"); break; }
+        case "dragon_ball": { await processarDanbooru(sock, from, message, "dragon_ball", "Dragon Ball"); break; }
+        case "bleach": { await processarDanbooru(sock, from, message, "bleach", "Bleach"); break; }
+        case "tokyo_revengers": { await processarDanbooru(sock, from, message, "tokyo_revengers", "Tokyo Revengers"); break; }
+
+        // ============================================
+        // FIM DOS COMANDOS DANBOORU
+        // ============================================
 
         case "menudono": {
             const menus = require('./menus/menu.js');
