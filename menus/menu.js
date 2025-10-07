@@ -136,9 +136,7 @@ function obterMenuMembro() {
 • \`prefixo\` - Mostra o prefixo atual
 
 📝 *UTILITÁRIOS:*
-• \`${prefix}status [texto]\` - Atualiza status do bot
 • \`${prefix}rg\` - Registra-se no sistema do bot
-• \`${prefix}hermitwhite [dados]\` - Cria ID no sistema NEEXT
 
 📚 *CONHECIMENTO:*
 • \`${prefix}pensador [personagem]\` - Frases de pensadores
