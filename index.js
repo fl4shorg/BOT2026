@@ -6882,26 +6882,30 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
     try {
         console.log(`🎬 Enviando GIF: ${gifUrl}`);
 
-        // Baixa o GIF
+        // Baixa o GIF com headers adequados
         const response = await axios({
             method: 'GET',
             url: gifUrl,
             responseType: 'arraybuffer',
-            timeout: 10000
+            timeout: 15000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
         });
 
         const gifBuffer = Buffer.from(response.data);
         console.log(`📥 GIF baixado: ${gifBuffer.length} bytes`);
 
-        // Envia como vídeo com gifPlayback (método padrão Baileys)
+        // Envia como vídeo com gifPlayback e mimetype correto
         await sock.sendMessage(from, {
             video: gifBuffer,
             gifPlayback: true,
             caption: caption,
-            mentions: mentions
+            mentions: mentions,
+            mimetype: 'video/mp4'
         }, quoted ? { quoted } : {});
 
-        console.log("✅ GIF enviado como vídeo");
+        console.log("✅ GIF enviado como vídeo MP4");
         return true;
 
     } catch (error) {
