@@ -7153,8 +7153,19 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
             const target = mentioned[0];
 
-            // Envia texto diretamente com emojis, mais confiável
-            await reply(sock, from, `💋 *BEIJINHO!*\n\n@${sender.split('@')[0]} deu um beijinho em @${target.split('@')[0]}! 😘\n\n💕 Que fofo! 💋💋💋`, [sender, target]);
+            // Envia GIF de beijo
+            const gifEnviado = await enviarGif(
+                sock,
+                from,
+                "https://media.tenor.com/LXB6kbzW_YgAAAAM/kiss-love.gif",
+                `💋 *BEIJINHO!*\n\n@${sender.split('@')[0]} deu um beijinho em @${target.split('@')[0]}! 😘\n\n💕 Que fofo! 💋💋💋`,
+                [sender, target],
+                message
+            );
+
+            if (!gifEnviado) {
+                await reply(sock, from, `💋 *BEIJINHO!*\n\n@${sender.split('@')[0]} deu um beijinho em @${target.split('@')[0]}! 😘\n\n💕 Que fofo! 💋💋💋`, [sender, target]);
+            }
         }
         break;
 
@@ -7183,7 +7194,19 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
             const target = mentioned[0];
 
-            await reply(sock, from, `🚗💨 *ATROPELAMENTO!*\n\n@${target.split('@')[0]} foi atropelado(a) por @${sender.split('@')[0]}! 🚑\n\n😵‍💫 Chamem o SAMU! 🚨🚨🚨`, [sender, target]);
+            // Envia GIF de atropelamento
+            const gifEnviado = await enviarGif(
+                sock,
+                from,
+                "https://media.tenor.com/8QkVf_hCXmcAAAAM/car-crash.gif",
+                `🚗💨 *ATROPELAMENTO!*\n\n@${target.split('@')[0]} foi atropelado(a) por @${sender.split('@')[0]}! 🚑\n\n😵‍💫 Chamem o SAMU! 🚨🚨🚨`,
+                [sender, target],
+                message
+            );
+
+            if (!gifEnviado) {
+                await reply(sock, from, `🚗💨 *ATROPELAMENTO!*\n\n@${target.split('@')[0]} foi atropelado(a) por @${sender.split('@')[0]}! 🚑\n\n😵‍💫 Chamem o SAMU! 🚨🚨🚨`, [sender, target]);
+            }
         }
         break;
 
@@ -7212,7 +7235,19 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
             const target = mentioned[0];
 
-            await reply(sock, from, `🖕 *DEDO!*\n\n@${sender.split('@')[0]} fez dedo para @${target.split('@')[0]}! 😠\n\n🤬 Vai se lascar! 🖕🖕🖕`, [sender, target]);
+            // Envia GIF de dedo
+            const gifEnviado = await enviarGif(
+                sock,
+                from,
+                "https://media.tenor.com/c6hotL40p0oAAAAM/middle-finger.gif",
+                `🖕 *DEDO!*\n\n@${sender.split('@')[0]} fez dedo para @${target.split('@')[0]}! 😠\n\n🤬 Vai se lascar! 🖕🖕🖕`,
+                [sender, target],
+                message
+            );
+
+            if (!gifEnviado) {
+                await reply(sock, from, `🖕 *DEDO!*\n\n@${sender.split('@')[0]} fez dedo para @${target.split('@')[0]}! 😠\n\n🤬 Vai se lascar! 🖕🖕🖕`, [sender, target]);
+            }
         }
         break;
 
@@ -7241,7 +7276,19 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
             const target = mentioned[0];
 
-            await reply(sock, from, `🍑 *SARRADA!*\n\n@${sender.split('@')[0]} deu uma sarrada em @${target.split('@')[0]}! 🔥\n\n😈 Que safadeza! 🔥🔥🔥`, [sender, target]);
+            // Envia GIF de sarrada/dança
+            const gifEnviado = await enviarGif(
+                sock,
+                from,
+                "https://media.tenor.com/jkGbj0f_c_0AAAAM/dance-twerk.gif",
+                `🍑 *SARRADA!*\n\n@${sender.split('@')[0]} deu uma sarrada em @${target.split('@')[0]}! 🔥\n\n😈 Que safadeza! 🔥🔥🔥`,
+                [sender, target],
+                message
+            );
+
+            if (!gifEnviado) {
+                await reply(sock, from, `🍑 *SARRADA!*\n\n@${sender.split('@')[0]} deu uma sarrada em @${target.split('@')[0]}! 🔥\n\n😈 Que safadeza! 🔥🔥🔥`, [sender, target]);
+            }
         }
         break;
 
