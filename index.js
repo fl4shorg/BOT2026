@@ -4103,6 +4103,20 @@ Seu ID foi salvo com segurança em nosso sistema!`;
         }
         break;
 
+        case "teste": {
+            console.log("🧪 TESTE: Enviando mensagem simples...");
+            console.log("🧪 TESTE: from =", from);
+            console.log("🧪 TESTE: sock.user =", sock.user);
+            
+            try {
+                const resultado = await sock.sendMessage(from, { text: "🧪 Teste de mensagem simples!" });
+                console.log("🧪 TESTE: Resultado do envio =", resultado);
+            } catch (err) {
+                console.error("🧪 TESTE: ERRO =", err);
+            }
+        }
+        break;
+
         case "menumembro": {
             const menus = require('./menus/menu.js');
             await reply(sock, from, menus.obterMenuMembro());
