@@ -2922,6 +2922,98 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             break;
         }
 
+        case 'take': {
+            // Verifica se tem figurinha citada
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            if (!quotedMsg || !quotedMsg.stickerMessage) {
+                await sock.sendMessage(from, {
+                    text: '❌ Você precisa responder a uma figurinha para usar este comando!\n\n💡 *Como usar:*\nResponda uma figurinha com `.take`'
+                }, { quoted: message });
+                break;
+            }
+
+            await reagirMensagem(sock, message, "⏳");
+
+            try {
+                // Pega o nome da pessoa do perfil WhatsApp
+                const senderName = message.pushName || "Usuário";
+                
+                // Monta o packname com o emoji e nome da pessoa
+                const packname = `𖥨ํ∘̥⃟🐦‍🔥${senderName}`;
+                const author = "© NEEXT LTDA";
+
+                console.log(`🏷️ Take figurinha para: "${senderName}"`);
+
+                // Baixa a figurinha original
+                const stickerBuffer = await downloadContentFromMessage(
+                    quotedMsg.stickerMessage,
+                    'sticker'
+                );
+
+                let buffer = Buffer.concat([]);
+                for await (const chunk of stickerBuffer) {
+                    buffer = Buffer.concat([buffer, chunk]);
+                }
+
+                // Opções personalizadas com o nome da pessoa
+                const options = {
+                    packname: packname,
+                    author: author
+                };
+
+                // Detecta se é animada de forma mais precisa
+                let isAnimated = false;
+
+                // Primeiro verifica se está marcada como animada no metadado
+                if (quotedMsg.stickerMessage.isAnimated === true) {
+                    isAnimated = true;
+                } else {
+                    // Verifica headers WebP para detectar animação
+                    const hexString = buffer.toString('hex').toUpperCase();
+                    // WebP animado contém 'WEBPVP8X' ou 'WEBPVP8L' com flag de animação
+                    if (hexString.includes('5745425056503858') || // WEBPVP8X
+                        hexString.includes('5745425056503841')) {   // WEBPVP8A (com alpha/animação)
+                        isAnimated = true;
+                    }
+                }
+
+                console.log(`📊 Tipo de figurinha detectado: ${isAnimated ? 'Animada' : 'Estática'}`);
+
+                // Reenvia a figurinha com novos metadados
+                try {
+                    if (isAnimated) {
+                        await sendVideoAsSticker(sock, from, buffer, message, options);
+                    } else {
+                        await sendImageAsSticker(sock, from, buffer, message, options);
+                    }
+                } catch (stickerError) {
+                    console.log(`⚠️ Erro ao processar como ${isAnimated ? 'animada' : 'estática'}, tentando método alternativo...`);
+                    // Se falhar, tenta o método alternativo
+                    try {
+                        if (isAnimated) {
+                            await sendImageAsSticker(sock, from, buffer, message, options);
+                        } else {
+                            await sendVideoAsSticker(sock, from, buffer, message, options);
+                        }
+                    } catch (fallbackError) {
+                        console.error('❌ Ambos os métodos falharam:', fallbackError.message);
+                        throw new Error('Não foi possível processar a figurinha');
+                    }
+                }
+
+                await reagirMensagem(sock, message, "✅");
+                console.log(`✅ Figurinha "take" criada com sucesso para ${senderName}!`);
+
+            } catch (error) {
+                console.error('❌ Erro no comando take:', error.message);
+                await reagirMensagem(sock, message, "❌");
+                await sock.sendMessage(from, {
+                    text: '❌ Erro ao processar figurinha. Tente novamente!'
+                }, { quoted: message });
+            }
+            break;
+        }
+
         case "instagram":
         case "ig": {
             try {

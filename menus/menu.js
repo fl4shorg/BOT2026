@@ -510,7 +510,7 @@ function obterMenuSticker() {
 
 🎨 *EDITAR STICKERS:*
 • \`${prefix}rename [pack|author]\` - Renomear sticker
-• \`${prefix}take [pack] [author]\` - Roubar sticker
+• \`${prefix}take\` - Pega figurinha com seu nome
 • \`${prefix}toimg\` - Converter sticker em imagem
 
 🎭 *STICKERS ESPECIAIS:*
@@ -552,6 +552,7 @@ function obterMenuFigurinhas() {
 │┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}s - Criar sticker de mídia
 │┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}brat [texto] - Gerar imagem BRAT
 │┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}rename [pack|autor] - Editar sticker
+│┊𖥨ํ∘̥⃟⸽⃟💮￫ ${prefix}take - Pega figurinha com seu nome
 │╰─━─⋆｡°✩🏮✩°｡⋆ ━─━╯
 ╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
 
