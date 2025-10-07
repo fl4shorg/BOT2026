@@ -190,9 +190,6 @@ function formatarVitoria(name, description, photo) {
 📝 *Descrição:*
 ${description || "Sem descrição"}
 
-🖼️ *Foto:*
-${photo}
-
 ✨ *Eu acertei?*
 🔮 Use .akinator para jogar novamente!`;
 }
