@@ -303,13 +303,6 @@ function obterMenuGamer() {
 • \`${prefix}xadrez player [nome]\` - Buscar jogador Chess.com
 • \`${prefix}xadrez ajuda\` - Ajuda completa
 
-🎲 *DAMAS:*
-• \`${prefix}damas @oponente\` - Iniciar partida
-• \`${prefix}damasjogada origem destino\` - Fazer jogada
-• \`${prefix}damastabuleiro\` - Ver tabuleiro
-• \`${prefix}damasparar\` - Encerrar partida
-• \`${prefix}damasajuda\` - Ver regras
-
 🎉 *DIVERSÃO:*
 • \`${prefix}eununca\` - Eu nunca poll
 • \`${prefix}impostor\` - Escolhe impostor aleatório
