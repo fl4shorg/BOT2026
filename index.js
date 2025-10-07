@@ -8008,6 +8008,54 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
         }
         break;
 
+        case "seradmin": {
+            // Só funciona em grupos
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const sender = message.key.participant || from;
+            const ehDono = isDono(sender);
+
+            // Apenas o dono do bot pode usar
+            if (!ehDono) {
+                await reply(sock, from, "❌ Apenas o dono do bot pode usar este comando.");
+                break;
+            }
+
+            // Verifica se o dono já é admin
+            const jaEhAdmin = await isAdmin(sock, from, sender);
+            if (jaEhAdmin) {
+                await reply(sock, from, `⚠️ Você já é administrador deste grupo!`);
+                break;
+            }
+
+            try {
+                await reagirMensagem(sock, message, "⏳");
+                
+                // Promove o dono a admin
+                await sock.groupParticipantsUpdate(from, [sender], "promote");
+                
+                await reagirMensagem(sock, message, "👑");
+                await reply(sock, from, `👑 *DONO PROMOVIDO!*\n\n✅ Você agora é administrador do grupo!\n\n🔐 Privilégio exclusivo do dono do bot\n\n© NEEXT LTDA`);
+                console.log(`👑 Dono ${sender.split('@')[0]} se auto-promoveu a admin no grupo ${from}`);
+            } catch (err) {
+                console.error("❌ Erro ao promover dono:", err);
+                await reagirMensagem(sock, message, "❌");
+                
+                const errorMsg = err.message || err.toString();
+                if (errorMsg.includes('forbidden') || errorMsg.includes('not-authorized') || errorMsg.includes('401')) {
+                    await reply(sock, from, "❌ *BOT NÃO É ADMIN*\n\n⚠️ O bot precisa ser administrador do grupo para te promover!\n\n📝 Peça para um admin promover o bot primeiro.");
+                } else if (errorMsg.includes('participant-not-found') || errorMsg.includes('404')) {
+                    await reply(sock, from, "❌ Você não está participando deste grupo.");
+                } else {
+                    await reply(sock, from, `❌ Erro ao promover.\n\n🔍 Detalhes: ${errorMsg.substring(0, 100)}`);
+                }
+            }
+        }
+        break;
+
         case "transmissão":
         case "transmissao": {
             const sender = message.key.participant || from;
