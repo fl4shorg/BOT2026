@@ -7941,14 +7941,14 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             // Comando não encontrado - mensagem com visual personalizado
             const config = obterConfiguracoes();
             
-            await reply(sock, from, `╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
+            await reply(sock, from, `╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
 │╭─━─⋆｡°✩🛑✩°｡⋆ ━─━╮
 ││￫ 𝑪𝑶𝑴𝑨𝑵𝑫𝑶 𝑵𝑨̃𝑶 𝑬𝑵𝑪𝑶𝑵𝑻𝑹𝑨𝑫𝑶 ❌
 ││
 ││📝 𝑪𝑶𝑴𝑨𝑵𝑫𝑶: ${config.prefix}${command}
-││💡 𝑼𝑺𝑬: ${config.prefix}menu para ver todos os comandos
+││💡 𝑼𝑺𝑬: &prefixmenu para ver todos os comandos
 │╰─━─⋆｡°✩🛑✩°｡⋆ ━─━╯
-╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯`);
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯`);
         }
         break;
     }
