@@ -8056,6 +8056,41 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
         }
         break;
 
+        case "sair": {
+            // Só funciona em grupos
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const sender = message.key.participant || from;
+            const ehDono = isDono(sender);
+
+            // Apenas o dono do bot pode usar
+            if (!ehDono) {
+                await reply(sock, from, "❌ Apenas o dono do bot pode usar este comando.");
+                break;
+            }
+
+            try {
+                await reagirMensagem(sock, message, "👋");
+                
+                // Mensagem de despedida
+                await reply(sock, from, `👋 *SAINDO DO GRUPO*\n\n🤖 Bot está saindo do grupo por ordem do dono\n\n© NEEXT LTDA`);
+                
+                // Aguarda 2 segundos e sai do grupo
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                await sock.groupLeave(from);
+                
+                console.log(`👋 Bot saiu do grupo ${from} por ordem do dono ${sender.split('@')[0]}`);
+            } catch (err) {
+                console.error("❌ Erro ao sair do grupo:", err);
+                await reagirMensagem(sock, message, "❌");
+                await reply(sock, from, `❌ Erro ao sair do grupo.\n\n🔍 Detalhes: ${err.message || err.toString()}`);
+            }
+        }
+        break;
+
         case "transmissão":
         case "transmissao": {
             const sender = message.key.participant || from;
