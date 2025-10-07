@@ -2940,7 +2940,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 
                 // Monta o packname com o emoji e nome da pessoa
                 const packname = `𖥨ํ∘̥⃟🐦‍🔥${senderName}`;
-                const author = senderName;
+                const author = `『 ${senderName} 』`;
 
                 console.log(`🏷️ Take figurinha para: "${senderName}"`);
 
