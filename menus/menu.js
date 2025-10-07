@@ -794,131 +794,137 @@ function obterConfigurarBot() {
 // ========================
 function obterMenuRandom() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
-    return `
-🎲 *MENU RANDOM - DANBOORU API*
+    return `╭─━─━⋆｡°✩🎲✩°｡⋆ ━─━─╮
+│ 𝐌𝐄𝐍𝐔 𝐑𝐀𝐍𝐃𝐎𝐌 
+╰─━─━⋆｡°✩🎲✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
 
-🎨 *PERSONAGENS E GRUPOS:*
-• \`${prefix}1girl\` - 1 garota
-• \`${prefix}1boy\` - 1 garoto  
-• \`${prefix}2girls\` - 2 garotas
-• \`${prefix}solo\` - Solo
-• \`${prefix}group\` - Grupo
-• \`${prefix}female\` - Feminino
-• \`${prefix}male\` - Masculino
+│╭─━─⋆｡°✩🎨✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}1girl — 1 garota
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}1boy — 1 garoto
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}2girls — 2 garotas
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}solo — Solo
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}group — Grupo
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}female — Feminino
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}male — Masculino
+│╰─━─⋆｡°✩🎨✩°｡⋆ ━─━╯
 
-👤 *CARACTERÍSTICAS:*
-• \`${prefix}long_hair\` - Cabelo longo
-• \`${prefix}short_hair\` - Cabelo curto
-• \`${prefix}smile\` - Sorriso
-• \`${prefix}blush\` - Corado
-• \`${prefix}happy\` - Feliz
-• \`${prefix}sad\` - Triste
-• \`${prefix}angry\` - Bravo
+│╭─━─⋆｡°✩👤✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}long_hair — Cabelo longo
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}short_hair — Cabelo curto
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}smile — Sorriso
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}blush — Corado
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}happy — Feliz
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}sad — Triste
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}angry — Bravo
+│╰─━─⋆｡°✩👤✩°｡⋆ ━─━╯
 
-👗 *ROUPAS E UNIFORMES:*
-• \`${prefix}cosplay\` - Cosplay
-• \`${prefix}uniform\` - Uniforme
-• \`${prefix}school_uniform\` - Uniforme escolar
-• \`${prefix}maid\` - Empregada
-• \`${prefix}nurse\` - Enfermeira
-• \`${prefix}witch\` - Bruxa
+│╭─━─⋆｡°✩👗✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}cosplay — Cosplay
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}uniform — Uniforme
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}school_uniform — Uniforme escolar
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}maid — Empregada
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}nurse — Enfermeira
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}witch — Bruxa
+│╰─━─⋆｡°✩👗✩°｡⋆ ━─━╯
 
-⚔️ *AÇÃO E FANTASIA:*
-• \`${prefix}armor\` - Armadura
-• \`${prefix}sword\` - Espada
-• \`${prefix}gun\` - Arma
-• \`${prefix}magic\` - Magia
-• \`${prefix}fantasy\` - Fantasia
+│╭─━─⋆｡°✩⚔️✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}armor — Armadura
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}sword — Espada
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}gun — Arma
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}magic — Magia
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}fantasy — Fantasia
+│╰─━─⋆｡°✩⚔️✩°｡⋆ ━─━╯
 
-🤖 *ESTILOS:*
-• \`${prefix}robot\` - Robô
-• \`${prefix}cyberpunk\` - Cyberpunk
-• \`${prefix}steampunk\` - Steampunk
+│╭─━─⋆｡°✩👻✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}vampire — Vampiro
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}demon — Demônio
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}angel — Anjo
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}ghost — Fantasma
+│╰─━─⋆｡°✩👻✩°｡⋆ ━─━╯
 
-👻 *CRIATURAS:*
-• \`${prefix}vampire\` - Vampiro
-• \`${prefix}demon\` - Demônio
-• \`${prefix}angel\` - Anjo
-• \`${prefix}ghost\` - Fantasma
+│╭─━─⋆｡°✩🎃✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}halloween — Halloween
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}christmas — Natal
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}summer — Verão
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}beach — Praia
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}winter — Inverno
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}snow — Neve
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}autumn — Outono
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}rain — Chuva
+│╰─━─⋆｡°✩🎃✩°｡⋆ ━─━╯
 
-🎃 *FESTAS E ESTAÇÕES:*
-• \`${prefix}halloween\` - Halloween
-• \`${prefix}christmas\` - Natal
-• \`${prefix}summer\` - Verão
-• \`${prefix}beach\` - Praia
-• \`${prefix}winter\` - Inverno
-• \`${prefix}snow\` - Neve
-• \`${prefix}autumn\` - Outono
-• \`${prefix}rain\` - Chuva
+│╭─━─⋆｡°✩🌿✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}animal — Animal
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}flower — Flor
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}tree — Árvore
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}forest — Floresta
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}mountain — Montanha
+│╰─━─⋆｡°✩🌿✩°｡⋆ ━─━╯
 
-🌿 *NATUREZA:*
-• \`${prefix}animal\` - Animal
-• \`${prefix}flower\` - Flor
-• \`${prefix}tree\` - Árvore
-• \`${prefix}forest\` - Floresta
-• \`${prefix}mountain\` - Montanha
+│╭─━─⋆｡°✩🌅✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}scenery — Cenário
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}city — Cidade
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}building — Prédio
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}street — Rua
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}night — Noite
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}sunset — Pôr do sol
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}sunrise — Nascer do sol
+│╰─━─⋆｡°✩🌅✩°｡⋆ ━─━╯
 
-🌅 *CENÁRIOS:*
-• \`${prefix}scenery\` - Cenário
-• \`${prefix}city\` - Cidade
-• \`${prefix}building\` - Prédio
-• \`${prefix}street\` - Rua
-• \`${prefix}night\` - Noite
-• \`${prefix}sunset\` - Pôr do sol
-• \`${prefix}sunrise\` - Nascer do sol
+│╭─━─⋆｡°✩☁️✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}clouds — Nuvens
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}sky — Céu
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}moon — Lua
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}stars — Estrelas
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}river — Rio
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}lake — Lago
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}ocean — Oceano
+│╰─━─⋆｡°✩☁️✩°｡⋆ ━─━╯
 
-☁️ *CÉUS E ÁGUAS:*
-• \`${prefix}clouds\` - Nuvens
-• \`${prefix}sky\` - Céu
-• \`${prefix}moon\` - Lua
-• \`${prefix}stars\` - Estrelas
-• \`${prefix}river\` - Rio
-• \`${prefix}lake\` - Lago
-• \`${prefix}ocean\` - Oceano
+│╭─━─⋆｡°✩🚗✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}train — Trem
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}car — Carro
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}bike — Bicicleta
+│╰─━─⋆｡°✩🚗✩°｡⋆ ━─━╯
 
-🚗 *VEÍCULOS:*
-• \`${prefix}train\` - Trem
-• \`${prefix}car\` - Carro
-• \`${prefix}bike\` - Bicicleta
+│╭─━─⋆｡°✩🏫✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}school — Escola
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}classroom — Sala de aula
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}library — Biblioteca
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}room — Quarto
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}bed — Cama
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}chair — Cadeira
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}table — Mesa
+│╰─━─⋆｡°✩🏫✩°｡⋆ ━─━╯
 
-🏫 *LOCAIS INTERNOS:*
-• \`${prefix}school\` - Escola
-• \`${prefix}classroom\` - Sala de aula
-• \`${prefix}library\` - Biblioteca
-• \`${prefix}room\` - Quarto
-• \`${prefix}bed\` - Cama
-• \`${prefix}chair\` - Cadeira
-• \`${prefix}table\` - Mesa
+│╭─━─⋆｡°✩🍰✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}food — Comida
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}drink — Bebida
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}coffee — Café
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}tea — Chá
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}cake — Bolo
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}chocolate — Chocolate
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}fruit — Fruta
+│╰─━─⋆｡°✩🍰✩°｡⋆ ━─━╯
 
-🍰 *COMIDAS E BEBIDAS:*
-• \`${prefix}food\` - Comida
-• \`${prefix}drink\` - Bebida
-• \`${prefix}coffee\` - Café
-• \`${prefix}tea\` - Chá
-• \`${prefix}cake\` - Bolo
-• \`${prefix}chocolate\` - Chocolate
-• \`${prefix}fruit\` - Fruta
+│╭─━─⋆｡°✩🎮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}genshin_impact — Genshin Impact
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}naruto — Naruto
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}one_piece — One Piece
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}attack_on_titan — Attack on Titan
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}my_hero_academia — My Hero Academia
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}demon_slayer — Demon Slayer
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}spy_x_family — Spy x Family
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}jojo — JoJo
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}dragon_ball — Dragon Ball
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}bleach — Bleach
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}tokyo_revengers — Tokyo Revengers
+│┊𖥨ํ∘̥⃟⸽⃟🪷￫ ${prefix}original — Original
+│╰─━─⋆｡°✩🎮✩°｡⋆ ━─━╯
 
-🎮 *ANIMES/JOGOS:*
-• \`${prefix}genshin_impact\` - Genshin Impact
-• \`${prefix}naruto\` - Naruto
-• \`${prefix}one_piece\` - One Piece
-• \`${prefix}attack_on_titan\` - Attack on Titan
-• \`${prefix}my_hero_academia\` - My Hero Academia
-• \`${prefix}demon_slayer\` - Demon Slayer
-• \`${prefix}spy_x_family\` - Spy x Family
-• \`${prefix}jojo\` - JoJo
-• \`${prefix}dragon_ball\` - Dragon Ball
-• \`${prefix}bleach\` - Bleach
-• \`${prefix}tokyo_revengers\` - Tokyo Revengers
-• \`${prefix}original\` - Original
-
-📌 *TOTAL: 89 comandos disponíveis*
-💡 *Cada comando retorna 5 imagens aleatórias em carrossel!*
-
-━━━━━━━━━━━━━━━
-© NEEXT LTDA - ${nickDoDono}
-`;
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯`;
 }
 
 module.exports = {
