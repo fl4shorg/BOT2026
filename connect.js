@@ -139,7 +139,18 @@ async function startBot() {
     }
 
     const { state, saveCreds } = await useMultiFileAuthState(pastaConexao);
-    const { version } = await fetchLatestBaileysVersion();
+    
+    // Buscar versão mais recente do WhatsApp Web
+    let version;
+    try {
+        const versionInfo = await fetchLatestBaileysVersion();
+        version = versionInfo.version;
+        console.log(`📱 Versão do WhatsApp Web detectada: [${version.join(', ')}]`);
+    } catch (err) {
+        // Fallback para versão conhecida que funciona em 2025
+        version = [2, 3000, 1015901307];
+        console.log(`⚠️  Usando versão manual do WhatsApp Web: [${version.join(', ')}]`);
+    }
 
     // Verificar arquivos de sessão existentes
     const arquivosExistentes = fs.readdirSync(pastaConexao).filter(f => f !== '.keep');
