@@ -2005,53 +2005,76 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 const random = response.data[Math.floor(Math.random() * response.data.length)];
                 const config = obterConfiguracoes();
 
-                // Envia imagem masculina
-                await sock.sendMessage(from, {
-                    image: { url: random.male },
-                    caption: `💙 *MASCULINA*\n\n© ${config.nomeDoBot}`,
-                    contextInfo: {
-                        forwardingScore: 100000,
-                        isForwarded: true,
-                        forwardedNewsletterMessageInfo: {
-                            newsletterJid: "120363289739581116@newsletter",
-                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
-                        },
-                        externalAdReply: {
-                            title: "💙 METADINHA MASCULINA",
-                            body: "© NEEXT LTDA • Instagram: @neet.tk",
-                            thumbnailUrl: random.male,
-                            mediaType: 1,
-                            sourceUrl: "https://www.neext.online"
+                // Baixa as imagens
+                const [maleImg, femaleImg] = await Promise.all([
+                    axios.get(random.male, { responseType: 'arraybuffer' }),
+                    axios.get(random.female, { responseType: 'arraybuffer' })
+                ]);
+
+                const maleBuffer = Buffer.from(maleImg.data);
+                const femaleBuffer = Buffer.from(femaleImg.data);
+
+                // Prepara as imagens para o carrossel
+                const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');
+                
+                const maleMedia = await prepareWAMessageMedia(
+                    { image: maleBuffer },
+                    { upload: sock.waUploadToServer }
+                );
+                
+                const femaleMedia = await prepareWAMessageMedia(
+                    { image: femaleBuffer },
+                    { upload: sock.waUploadToServer }
+                );
+
+                // Cria mensagem em carrossel
+                const carouselMessage = generateWAMessageFromContent(from, {
+                    viewOnceMessage: {
+                        message: {
+                            messageContextInfo: {
+                                deviceListMetadata: {},
+                                deviceListMetadataVersion: 2
+                            },
+                            interactiveMessage: {
+                                body: {
+                                    text: `💕 *Resultados da metadinha* 💕\n\n© ${config.nomeDoBot}`
+                                },
+                                carouselMessage: {
+                                    cards: [
+                                        {
+                                            header: {
+                                                imageMessage: maleMedia.imageMessage,
+                                                hasMediaAttachment: true
+                                            },
+                                            body: {
+                                                text: "Perfil Masculino 🧑"
+                                            },
+                                            nativeFlowMessage: {
+                                                buttons: []
+                                            }
+                                        },
+                                        {
+                                            header: {
+                                                imageMessage: femaleMedia.imageMessage,
+                                                hasMediaAttachment: true
+                                            },
+                                            body: {
+                                                text: "Perfil Feminino 👧"
+                                            },
+                                            nativeFlowMessage: {
+                                                buttons: []
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
                         }
                     }
-                }, { quoted: selinho });
+                }, { quoted: message });
 
-                // Aguarda um pouco entre os envios
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                // Envia imagem feminina
-                await sock.sendMessage(from, {
-                    image: { url: random.female },
-                    caption: `💖 *FEMININA*\n\n© ${config.nomeDoBot}`,
-                    contextInfo: {
-                        forwardingScore: 100000,
-                        isForwarded: true,
-                        forwardedNewsletterMessageInfo: {
-                            newsletterJid: "120363289739581116@newsletter",
-                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
-                        },
-                        externalAdReply: {
-                            title: "💖 METADINHA FEMININA",
-                            body: "© NEEXT LTDA • Instagram: @neet.tk",
-                            thumbnailUrl: random.female,
-                            mediaType: 1,
-                            sourceUrl: "https://www.neext.online"
-                        }
-                    }
-                }, { quoted: selinho });
-
+                await sock.relayMessage(from, carouselMessage.message, {});
                 await reagirMensagem(sock, message, "✅");
-                console.log('✅ Metadinhas enviadas com sucesso!');
+                console.log('✅ Metadinhas enviadas em carrossel com sucesso!');
 
             } catch (error) {
                 console.error('❌ Erro ao buscar metadinha:', error.message);
