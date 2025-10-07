@@ -14,8 +14,23 @@ author = "agent"
 task = "workflow.run"
 args = "Bot WhatsApp"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "WhatsApp Bot"
+
 [[workflows.workflow]]
 name = "Bot WhatsApp"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm start"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "WhatsApp Bot"
 author = "agent"
 
 [[workflows.workflow.tasks]]
