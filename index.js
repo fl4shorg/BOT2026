@@ -6877,17 +6877,21 @@ Seu ID foi salvo com segurança em nosso sistema!`;
         }
         break;
 
-        // Função simples para envio de GIFs usando método padrão do Baileys
+        // Função moderna para envio de GIFs - converte para MP4 usando ffmpeg
 async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = null) {
-    try {
-        console.log(`🎬 Enviando GIF: ${gifUrl}`);
+    const ffmpeg = require('fluent-ffmpeg');
+    const tmpInputPath = path.join(__dirname, `temp_gif_${Date.now()}.gif`);
+    const tmpOutputPath = path.join(__dirname, `temp_video_${Date.now()}.mp4`);
 
-        // Baixa o GIF com headers adequados
+    try {
+        console.log(`🎬 Baixando GIF: ${gifUrl}`);
+
+        // Baixa o GIF
         const response = await axios({
             method: 'GET',
             url: gifUrl,
             responseType: 'arraybuffer',
-            timeout: 15000,
+            timeout: 20000,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
@@ -6896,20 +6900,60 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
         const gifBuffer = Buffer.from(response.data);
         console.log(`📥 GIF baixado: ${gifBuffer.length} bytes`);
 
-        // Envia como vídeo com gifPlayback e mimetype correto
+        // Salva GIF temporariamente
+        fs.writeFileSync(tmpInputPath, gifBuffer);
+        
+        // Converte GIF para MP4 usando ffmpeg
+        await new Promise((resolve, reject) => {
+            ffmpeg(tmpInputPath)
+                .outputOptions([
+                    '-movflags', 'faststart',
+                    '-pix_fmt', 'yuv420p',
+                    '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2'
+                ])
+                .toFormat('mp4')
+                .on('end', () => {
+                    console.log('✅ GIF convertido para MP4');
+                    resolve();
+                })
+                .on('error', (err) => {
+                    console.error('❌ Erro na conversão:', err.message);
+                    reject(err);
+                })
+                .save(tmpOutputPath);
+        });
+
+        // Lê o MP4 convertido
+        const mp4Buffer = fs.readFileSync(tmpOutputPath);
+        console.log(`📹 MP4 pronto: ${mp4Buffer.length} bytes`);
+
+        // Envia como vídeo com gifPlayback
         await sock.sendMessage(from, {
-            video: gifBuffer,
+            video: mp4Buffer,
             gifPlayback: true,
             caption: caption,
             mentions: mentions,
             mimetype: 'video/mp4'
         }, quoted ? { quoted } : {});
 
-        console.log("✅ GIF enviado como vídeo MP4");
+        // Limpa arquivos temporários
+        if (fs.existsSync(tmpInputPath)) fs.unlinkSync(tmpInputPath);
+        if (fs.existsSync(tmpOutputPath)) fs.unlinkSync(tmpOutputPath);
+
+        console.log("✅ GIF enviado como MP4 convertido");
         return true;
 
     } catch (error) {
-        console.log("❌ Erro ao enviar GIF:", error.message);
+        console.log("❌ Erro ao processar GIF:", error.message);
+        
+        // Limpa arquivos temporários em caso de erro
+        try {
+            if (fs.existsSync(tmpInputPath)) fs.unlinkSync(tmpInputPath);
+            if (fs.existsSync(tmpOutputPath)) fs.unlinkSync(tmpOutputPath);
+        } catch (cleanupError) {
+            // Ignora erro de limpeza
+        }
+        
         return false;
     }
 }
