@@ -4578,15 +4578,16 @@ Seu ID foi salvo com segurança em nosso sistema!`;
 
             if (action === "on") {
                 const resultado = rpg.ativarRPG(from, true);
-                const menu = rpg.getMenuRPG();
+                const configBot = obterConfiguracoes();
+                const menu = rpg.getMenuRPG(configBot.prefix);
                 await reply(sock, from, `${resultado.mensagem}\n\n${menu}`);
             } else if (action === "off") {
                 const resultado = rpg.ativarRPG(from, false);
                 await reply(sock, from, resultado.mensagem);
             } else {
                 const isAtivo = rpg.isRPGAtivo(from);
-                const menu = rpg.getMenuRPG();
                 const configBot = obterConfiguracoes();
+                const menu = rpg.getMenuRPG(configBot.prefix);
                 await reply(sock, from, `🎮 *STATUS DO RPG*\n\n${isAtivo ? "✅ ATIVO" : "❌ INATIVO"}\n\n💡 *Uso:* \`${configBot.prefix}rpg on/off\`\n\n${menu}`);
             }
         }

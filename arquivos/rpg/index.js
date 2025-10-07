@@ -75,8 +75,54 @@ function getPerfil(userId) {
 
 // ==================== MENU ====================
 
-function getMenuRPG() {
-    return `🎮 *MENU RPG - NEEXTCITY*\n\n📊 *ECONOMIA:*\n• .perfil - Ver seu perfil\n• .depositar [valor] - Guardar no banco\n• .sacar [valor] - Sacar do banco\n• .daily - Coletar bônus diário\n\n💼 *TRABALHO:*\n• .trabalhos - Ver trabalhos disponíveis\n• .escolhertrabalho [id] - Escolher trabalho\n• .trabalhar - Trabalhar e ganhar gold\n\n🎓 *EDUCAÇÃO:*\n• .educacao - Ver níveis de educação\n• .estudar - Aumentar educação\n\n🎣 *ATIVIDADES:*\n• .pescar - Pescar peixes\n• .minerar - Minerar recursos\n• .coletar - Coletar itens\n• .cacar - Caçar animais\n\n🏪 *LOJA:*\n• .loja - Ver categorias\n• .loja [categoria] - Ver itens\n• .comprar [item] - Comprar item\n• .inventario - Ver seus itens\n• .vender [item] - Vender item\n\n🎮 *JOGOS:*\n• .tigrinho [valor] - Jogo do tigrinho\n• .assaltar @user - Assaltar jogador`;
+function getMenuRPG(prefix = '.') {
+    return `╭─━─━⋆｡°✩🎮✩°｡⋆ ━─━─╮
+│        𝐌𝐄𝐍𝐔 𝐑𝐏𝐆 - 𝐍𝐄𝐄𝐗𝐓𝐂𝐈𝐓𝐘
+╰─━─━⋆｡°✩🎮✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
+
+│╭─━─⋆｡°✩📊✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}perfil
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}depositar [valor]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}sacar [valor]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}daily
+│╰─━─⋆｡°✩📊✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩💼✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}trabalhos
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}escolhertrabalho [id]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}trabalhar
+│╰─━─⋆｡°✩💼✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🎓✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}educacao
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}estudar
+│╰─━─⋆｡°✩🎓✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🎣✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}pescar
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}minerar
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}coletar
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}cacar
+│╰─━─⋆｡°✩🎣✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🏪✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}loja
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}loja [categoria]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}comprar [item]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}inventario
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}vender [item]
+│╰─━─⋆｡°✩🏪✩°｡⋆ ━─━╯
+
+│╭─━─⋆｡°✩🎮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}tigrinho [valor]
+│┊𖥨ํ∘̥⃟⸽⃟🪙￫ ${prefix}assaltar @user
+│╰─━─⋆｡°✩🎮✩°｡⋆ ━─━╯
+
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
+━━━━━━━━━━━━━━━
+© NEEXT LTDA - Flash`;
 }
 
 // ==================== WRAPPERS ====================
