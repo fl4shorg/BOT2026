@@ -2938,9 +2938,9 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 // Pega o nome da pessoa do perfil WhatsApp
                 const senderName = message.pushName || "Usuário";
                 
-                // Monta o packname com o emoji e nome da pessoa
-                const packname = `𖥨ํ∘̥⃟🐦‍🔥${senderName}`;
-                const author = `『 ${senderName} 』`;
+                // Monta o packname e author apenas com o nome formatado
+                const packname = `『${senderName}』`;
+                const author = `『${senderName}』`;
 
                 console.log(`🏷️ Take figurinha para: "${senderName}"`);
 
