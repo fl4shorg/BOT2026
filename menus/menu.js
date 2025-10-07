@@ -275,69 +275,75 @@ function obterMenuDownload() {
 // ========================
 function obterMenuGamer() {
     const { prefix, nomeDoBot, nickDoDono } = obterConfiguracoes();
-    return `
-🎮 *JOGOS E ENTRETENIMENTO*
+    return `╭─━─━⋆｡°✩🎮✩°｡⋆ ━─━─╮
+│       𝐌𝐄𝐍𝐔 𝐆𝐀𝐌𝐄𝐑
+╰─━─━⋆｡°✩🎮✩°｡⋆ ━─━─╯
+╎
+╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
 
-⚠️ *Requer \`${prefix}modogamer on\` ativo no grupo*
+│╭─━─⋆｡°✩🎯✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}jogodavelha @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}resetjogodavelha
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}roletarussa @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}disparar
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}resetroleta
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}jogodaforca
+│╰─━─⋆｡°✩🎯✩°｡⋆ ━─━╯
 
-🎯 *JOGOS INTERATIVOS:*
-• \`${prefix}jogodavelha @user\` - Jogo da velha
-• \`${prefix}resetjogodavelha\` - Reset jogo da velha
-• \`${prefix}roletarussa @user\` - Roleta russa
-• \`${prefix}disparar\` - Atirar na roleta russa
-• \`${prefix}resetroleta\` - Reset roleta russa
-• \`${prefix}jogodaforca\` - Jogo da forca
+│╭─━─⋆｡°✩🔮✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}akinator
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}akinatorvoltar
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}akinatorparar
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ Responda com números 1-5
+│╰─━─⋆｡°✩🔮✩°｡⋆ ━─━╯
 
-🔮 *AKINATOR - ADIVINHAÇÃO:*
-• \`${prefix}akinator\` - Iniciar jogo do Akinator
-• \`${prefix}akinatorvoltar\` - Voltar pergunta
-• \`${prefix}akinatorparar\` - Encerrar jogo
-• Responda com números 1-5 durante o jogo
+│╭─━─⋆｡°✩♟️✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}xadrez @oponente
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}xadrez jogada e2e4
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}xadrez status
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}xadrez desistir
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}xadrez ranking
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}xadrez player [nome]
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}xadrez ajuda
+│╰─━─⋆｡°✩♟️✩°｡⋆ ━─━╯
 
-♟️ *XADREZ:*
-• \`${prefix}xadrez @oponente\` - Iniciar partida
-• \`${prefix}xadrez jogada e2e4\` - Fazer jogada
-• \`${prefix}xadrez status\` - Ver tabuleiro
-• \`${prefix}xadrez desistir\` - Desistir da partida
-• \`${prefix}xadrez ranking\` - Ver ranking
-• \`${prefix}xadrez player [nome]\` - Buscar jogador Chess.com
-• \`${prefix}xadrez ajuda\` - Ajuda completa
+│╭─━─⋆｡°✩🎉✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}eununca
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}impostor
+│╰─━─⋆｡°✩🎉✩°｡⋆ ━─━╯
 
-🎉 *DIVERSÃO:*
-• \`${prefix}eununca\` - Eu nunca poll
-• \`${prefix}impostor\` - Escolhe impostor aleatório
+│╭─━─⋆｡°✩💥✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}tapa @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}matar @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}atirar @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}atropelar @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}beijar @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}prender @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}sarra @user
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}dedo @user
+│╰─━─⋆｡°✩💥✩°｡⋆ ━─━╯
 
-💥 *AÇÕES DIVERTIDAS:*
-• \`${prefix}tapa @user\` - Dar tapa
-• \`${prefix}matar @user\` - Matar alguém
-• \`${prefix}atirar @user\` - Atirar em alguém
-• \`${prefix}atropelar @user\` - Atropelar
-• \`${prefix}beijar @user\` - Beijar alguém
-• \`${prefix}prender @user\` - Prender alguém
-• \`${prefix}sarra @user\` - Sarrar em alguém
-• \`${prefix}dedo @user\` - Mostrar dedo
+│╭─━─⋆｡°✩📊✩°｡⋆ ━─━╮
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankcorno
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankgay
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}ranklesbica
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankburro
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankfeio
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankbonito
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankgostoso
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankgostosa
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankfumante
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankmaconheiro
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankpobre
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}ranksad
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankemo
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankcasal
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankotaku
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}ranknazista
+│┊𖥨ํ∘̥⃟⸽⃟🎐￫ ${prefix}rankpau
+│╰─━─⋆｡°✩📊✩°｡⋆ ━─━╯
 
-📊 *RANKINGS DIVERTIDOS:*
-• \`${prefix}rankcorno\` - Rank dos cornos
-• \`${prefix}rankgay\` - Rank dos gays
-• \`${prefix}ranklesbica\` - Rank das lésbicas
-• \`${prefix}rankburro\` - Rank dos burros
-• \`${prefix}rankfeio\` - Rank dos feios
-• \`${prefix}rankbonito\` - Rank dos bonitos
-• \`${prefix}rankgostoso\` - Rank dos gostosos
-• \`${prefix}rankgostosa\` - Rank das gostosas
-• \`${prefix}rankfumante\` - Rank dos fumantes
-• \`${prefix}rankmaconheiro\` - Rank dos maconheiros
-• \`${prefix}rankpobre\` - Rank dos pobres
-• \`${prefix}ranksad\` - Rank dos tristes
-• \`${prefix}rankemo\` - Rank dos emos
-• \`${prefix}rankcasal\` - Rank de casais
-• \`${prefix}rankotaku\` - Rank dos otakus
-• \`${prefix}ranknazista\` - Rank dos nazistas
-• \`${prefix}rankpau\` - Rank de tamanho
-
-━━━━━━━━━━━━━━━
-© NEEXT LTDA - ${nickDoDono}
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯
 `;
 }
 
