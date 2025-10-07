@@ -7938,14 +7938,17 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 break;
             }
             
-            // Comando não encontrado - mensagem compacta
+            // Comando não encontrado - mensagem com visual personalizado
             const config = obterConfiguracoes();
             
-            await reply(sock, from, `❌ *COMANDO NÃO ENCONTRADO*
-
-📝 Comando: *${config.prefix}${command}*
-
-💡 Use *${config.prefix}menu* para ver os comandos`);
+            await reply(sock, from, `╭⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╮
+│╭─━─⋆｡°✩🛑✩°｡⋆ ━─━╮
+││￫ 𝑪𝑶𝑴𝑨𝑵𝑫𝑶 𝑵𝑨̃𝑶 𝑬𝑵𝑪𝑶𝑵𝑻𝑹𝑨𝑫𝑶 ❌
+││
+││📝 𝑪𝑶𝑴𝑨𝑵𝑫𝑶: ${config.prefix}${command}
+││💡 𝑼𝑺𝑬: ${config.prefix}menu para ver todos os comandos
+│╰─━─⋆｡°✩🛑✩°｡⋆ ━─━╯
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯`);
         }
         break;
     }
