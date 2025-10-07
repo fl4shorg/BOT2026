@@ -18,12 +18,12 @@ args = "Bot WhatsApp"
 name = "Bot WhatsApp"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node main.js"
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [deployment]
 deploymentTarget = "vm"
@@ -31,4 +31,4 @@ run = ["node", "main.js"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["ffmpeg"]
+packages = ["ffmpeg", "python3", "gcc", "gnumake", "pkg-config", "vips"]
