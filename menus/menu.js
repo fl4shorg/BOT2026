@@ -286,6 +286,13 @@ function obterMenuGamer() {
 • \`${prefix}disparar\` - Atirar na roleta russa
 • \`${prefix}resetjogodavelha\` - Reset jogo da velha
 • \`${prefix}resetroleta\` - Reset roleta russa
+• \`${prefix}forca\` - Jogo da forca
+
+🔮 *AKINATOR - ADIVINHAÇÃO:*
+• \`${prefix}akinator\` - Iniciar jogo do Akinator
+• \`${prefix}akinatorvoltar\` - Voltar pergunta
+• \`${prefix}akinatorparar\` - Encerrar jogo
+• Responda com números 1-5 durante o jogo
 
 ♟️ *XADREZ:*
 • \`${prefix}xadrez @oponente\` - Iniciar partida
@@ -296,7 +303,14 @@ function obterMenuGamer() {
 • \`${prefix}xadrez player [nome]\` - Buscar jogador Chess.com
 • \`${prefix}xadrez ajuda\` - Ajuda completa
 
-🎲 *DIVERSÃO:*
+🎲 *DAMAS:*
+• \`${prefix}damas @oponente\` - Iniciar partida
+• \`${prefix}damasjogada origem destino\` - Fazer jogada
+• \`${prefix}damastabuleiro\` - Ver tabuleiro
+• \`${prefix}damasparar\` - Encerrar partida
+• \`${prefix}damasajuda\` - Ver regras
+
+🎉 *DIVERSÃO:*
 • \`${prefix}eununca\` - Eu nunca poll
 • \`${prefix}impostor\` - Escolhe impostor aleatório
 
@@ -323,6 +337,7 @@ function obterMenuGamer() {
 • \`${prefix}ranksad\` - Rank dos tristes
 • \`${prefix}rankemo\` - Rank dos emos
 • \`${prefix}rankcasal\` - Rank de casais
+• \`${prefix}rankotaku\` - Rank dos otakus
 
 ━━━━━━━━━━━━━━━
 © NEEXT LTDA - ${nickDoDono}
