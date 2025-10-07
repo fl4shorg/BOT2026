@@ -184,8 +184,9 @@ async function startBot() {
         console.log("💾 Credenciais salvas em:", pastaConexao);
     });
 
-    // Flag para garantir que listeners sejam configurados apenas uma vez
+    // Flags para garantir que listeners e agendamentos sejam configurados apenas uma vez
     let listenersConfigurados = false;
+    let agendamentoIniciado = false;
     
     sock.ev.on("connection.update", async (update)=>{
         const { connection, lastDisconnect, qr } = update;
@@ -223,12 +224,17 @@ async function startBot() {
                 console.log("⏭️ Listeners já configurados, pulando...");
             }
             
-            // Inicia sistema de agendamento automático de grupos
-            const groupSchedule = require('./arquivos/grupo-schedule.js');
-            setInterval(() => {
-                groupSchedule.checkSchedules(sock);
-            }, 60000); // Verifica a cada 1 minuto
-            console.log("⏰ Sistema de agendamento de grupos iniciado!");
+            // Inicia sistema de agendamento automático de grupos (apenas UMA VEZ)
+            if (!agendamentoIniciado) {
+                const groupSchedule = require('./arquivos/grupo-schedule.js');
+                setInterval(() => {
+                    groupSchedule.checkSchedules(sock);
+                }, 60000); // Verifica a cada 1 minuto
+                agendamentoIniciado = true;
+                console.log("⏰ Sistema de agendamento de grupos iniciado!");
+            } else {
+                console.log("⏭️ Agendamento já iniciado, pulando...");
+            }
         } else if(connection==="close"){
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const reason = lastDisconnect?.error?.output?.payload?.message;

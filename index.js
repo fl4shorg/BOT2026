@@ -615,22 +615,40 @@ async function processarListaNegra(sock, participants, groupId, action) {
 // Função genérica para processar comandos Danbooru
 async function processarDanbooru(sock, from, message, tag, titulo) {
     console.log(`🎨 Comando danbooru/${tag} acionado`);
-    await reagirMensagem(sock, message, "⏳");
+    
+    try {
+        // Reage com loading apenas se a conexão estiver ativa
+        await reagirMensagem(sock, message, "⏳").catch(() => {});
+    } catch (e) {
+        console.log("⚠️ Não foi possível reagir (conexão instável)");
+    }
 
     try {
         const config = obterConfiguracoes();
         const apiUrl = `https://www.api.neext.online/danbooru/${tag}`;
         
-        // Faz 5 requisições em paralelo
-        const imagePromises = Array(5).fill(null).map(() => 
-            axios.get(apiUrl, { 
-                responseType: 'arraybuffer',
-                timeout: 15000,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                }
-            })
-        );
+        // Faz 5 requisições em paralelo com timeout e retry
+        const imagePromises = Array(5).fill(null).map(async () => {
+            try {
+                return await axios.get(apiUrl, { 
+                    responseType: 'arraybuffer',
+                    timeout: 20000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+            } catch (err) {
+                // Se falhar, tenta novamente após 1 segundo
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                return await axios.get(apiUrl, { 
+                    responseType: 'arraybuffer',
+                    timeout: 20000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+            }
+        });
 
         const imageResponses = await Promise.all(imagePromises);
         
@@ -681,15 +699,26 @@ async function processarDanbooru(sock, from, message, tag, titulo) {
         }, { quoted: message });
 
         await sock.relayMessage(from, carouselMessage.message, {});
-        await reagirMensagem(sock, message, "✅");
+        
+        try {
+            await reagirMensagem(sock, message, "✅");
+        } catch (e) {
+            console.log("⚠️ Não foi possível reagir com sucesso (conexão instável)");
+        }
+        
         console.log(`✅ ${tag} - Carrossel enviado com sucesso!`);
 
     } catch (error) {
         console.error(`❌ Erro ao buscar ${tag}:`, error.message);
-        await reagirMensagem(sock, message, "❌");
-        await sock.sendMessage(from, {
-            text: `❌ Erro ao buscar imagens de ${titulo}. Tente novamente!`
-        }, { quoted: message });
+        
+        try {
+            await reagirMensagem(sock, message, "❌");
+            await sock.sendMessage(from, {
+                text: `❌ Erro ao buscar imagens de ${titulo}. Tente novamente!\n\n💡 Motivo: ${error.message}`
+            }, { quoted: message });
+        } catch (sendError) {
+            console.error(`❌ Não foi possível enviar mensagem de erro:`, sendError.message);
+        }
     }
 }
 
