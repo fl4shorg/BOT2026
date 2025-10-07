@@ -831,7 +831,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 salvarDonosAdicionais(donosAdicionais);
                 
                 await reagirMensagem(sock, message, "✅");
-                await reply(sock, from, `✅ *${posicao.toUpperCase()} definido!*\n\n🔑 LID: \`${targetLid}\``, [targetUser]);
+                await reply(sock, from, `✅ *${posicao.toUpperCase()} definido com sucesso!*`, [targetUser]);
             } catch (err) {
                 console.error("❌ Erro ao definir dono:", err);
                 await reply(sock, from, "❌ Erro ao definir dono. Tente novamente.");
