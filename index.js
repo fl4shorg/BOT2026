@@ -6834,11 +6834,20 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             }
 
             const target = mentioned[0];
-            await sock.sendMessage(from, {
-                image: { url: "https://i.ibb.co/BK46Ssyy/21456a10884584ac06ed60363395b8db.jpg" },
-                caption: `👋 *TAPA GOSTOSO!*\n\n@${sender.split('@')[0]} deu um tapa gostoso em @${target.split('@')[0]}! 💥\n\n😏 Ai que delícia!`,
-                mentions: [sender, target]
-            });
+            
+            // Envia GIF de tapa
+            const gifEnviado = await enviarGif(
+                sock,
+                from,
+                "https://telegra.ph/file/841664f31eb7539c35a2d.mp4",
+                `👋 *TAPA GOSTOSO!*\n\n@${sender.split('@')[0]} deu um tapa gostoso em @${target.split('@')[0]}! 💥\n\n😏 Ai que delícia!`,
+                [sender, target],
+                message
+            );
+
+            if (!gifEnviado) {
+                await reply(sock, from, `👋 *TAPA GOSTOSO!*\n\n@${sender.split('@')[0]} deu um tapa gostoso em @${target.split('@')[0]}! 💥\n\n😏 Ai que delícia!`, [sender, target]);
+            }
         }
         break;
 
@@ -6869,6 +6878,176 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 await sock.sendMessage(from, {
                     image: { url: "https://i.ibb.co/jvxHn5jf/23afed681d95265b23cfc9f32b3c6a35.jpg" },
                     caption: `🤡 *RANKING DOS CORNOS*\n\n${ranking}\n\n😈 Os chifrudos do grupo! 🦌`,
+                    mentions: participants
+                });
+            } catch (err) {
+                await reply(sock, from, "❌ Erro ao gerar ranking.");
+            }
+        }
+        break;
+
+        case "rankgostoso": {
+            // Verifica se modo gamer está ativo
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                await reply(sock, from, "❌ Modo Gamer está desativado neste grupo! Use `.modogamer on` para ativar.");
+                break;
+            }
+
+            try {
+                const groupMetadata = await sock.groupMetadata(from);
+                const participants = groupMetadata.participants.map(p => p.id);
+
+                const shuffled = [...participants].sort(() => Math.random() - 0.5);
+                let ranking = shuffled.slice(0, Math.min(10, participants.length)).map((participant, index) => {
+                    const percentage = Math.floor(Math.random() * 100) + 1;
+                    return `${index + 1}. @${participant.split('@')[0]} - ${percentage}% 🔥`;
+                }).join('\n');
+
+                await sock.sendMessage(from, {
+                    image: { url: "https://telegra.ph/file/030489699735abe38e174.jpg" },
+                    caption: `🔥 *RANKING DOS GOSTOSOS*\n\n${ranking}\n\n😏 Os mais gostosos do grupo! 🔥`,
+                    mentions: participants
+                });
+            } catch (err) {
+                await reply(sock, from, "❌ Erro ao gerar ranking.");
+            }
+        }
+        break;
+
+        case "rankgostosa": {
+            // Verifica se modo gamer está ativo
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                await reply(sock, from, "❌ Modo Gamer está desativado neste grupo! Use `.modogamer on` para ativar.");
+                break;
+            }
+
+            try {
+                const groupMetadata = await sock.groupMetadata(from);
+                const participants = groupMetadata.participants.map(p => p.id);
+
+                const shuffled = [...participants].sort(() => Math.random() - 0.5);
+                let ranking = shuffled.slice(0, Math.min(10, participants.length)).map((participant, index) => {
+                    const percentage = Math.floor(Math.random() * 100) + 1;
+                    return `${index + 1}. @${participant.split('@')[0]} - ${percentage}% 🔥`;
+                }).join('\n');
+
+                await sock.sendMessage(from, {
+                    image: { url: "https://telegra.ph/file/dcff0d1e5ea578ade62fb.jpg" },
+                    caption: `🔥 *RANKING DAS GOSTOSAS*\n\n${ranking}\n\n😏 As mais gostosas do grupo! 🔥`,
+                    mentions: participants
+                });
+            } catch (err) {
+                await reply(sock, from, "❌ Erro ao gerar ranking.");
+            }
+        }
+        break;
+
+        case "ranknazista": {
+            // Verifica se modo gamer está ativo
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                await reply(sock, from, "❌ Modo Gamer está desativado neste grupo! Use `.modogamer on` para ativar.");
+                break;
+            }
+
+            try {
+                const groupMetadata = await sock.groupMetadata(from);
+                const participants = groupMetadata.participants.map(p => p.id);
+
+                const shuffled = [...participants].sort(() => Math.random() - 0.5);
+                let ranking = shuffled.slice(0, Math.min(10, participants.length)).map((participant, index) => {
+                    const percentage = Math.floor(Math.random() * 100) + 1;
+                    return `${index + 1}. @${participant.split('@')[0]} - ${percentage}% 卐`;
+                }).join('\n');
+
+                await sock.sendMessage(from, {
+                    image: { url: "https://telegra.ph/file/dcff0d1e5ea578ade62fb.jpg" },
+                    caption: `卐 *RANKING DOS NAZISTAS*\n\n${ranking}\n\n😈 Os mais nazistas do grupo! 卐`,
+                    mentions: participants
+                });
+            } catch (err) {
+                await reply(sock, from, "❌ Erro ao gerar ranking.");
+            }
+        }
+        break;
+
+        case "rankotaku": {
+            // Verifica se modo gamer está ativo
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                await reply(sock, from, "❌ Modo Gamer está desativado neste grupo! Use `.modogamer on` para ativar.");
+                break;
+            }
+
+            try {
+                const groupMetadata = await sock.groupMetadata(from);
+                const participants = groupMetadata.participants.map(p => p.id);
+
+                const shuffled = [...participants].sort(() => Math.random() - 0.5);
+                let ranking = shuffled.slice(0, Math.min(10, participants.length)).map((participant, index) => {
+                    const percentage = Math.floor(Math.random() * 100) + 1;
+                    return `${index + 1}. @${participant.split('@')[0]} - ${percentage}% 🎌`;
+                }).join('\n');
+
+                await sock.sendMessage(from, {
+                    image: { url: "https://telegra.ph/file/796eed26a8f761970d9f5.jpg" },
+                    caption: `🎌 *RANKING DOS OTAKUS*\n\n${ranking}\n\n😎 Os mais otakus do grupo! 🎌`,
+                    mentions: participants
+                });
+            } catch (err) {
+                await reply(sock, from, "❌ Erro ao gerar ranking.");
+            }
+        }
+        break;
+
+        case "rankpau": {
+            // Verifica se modo gamer está ativo
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                await reply(sock, from, "❌ Modo Gamer está desativado neste grupo! Use `.modogamer on` para ativar.");
+                break;
+            }
+
+            try {
+                const groupMetadata = await sock.groupMetadata(from);
+                const participants = groupMetadata.participants.map(p => p.id);
+
+                const shuffled = [...participants].sort(() => Math.random() - 0.5);
+                let ranking = shuffled.slice(0, Math.min(10, participants.length)).map((participant, index) => {
+                    const size = Math.floor(Math.random() * 30) + 1;
+                    return `${index + 1}. @${participant.split('@')[0]} - ${size}cm 🍆`;
+                }).join('\n');
+
+                await sock.sendMessage(from, {
+                    image: { url: "https://telegra.ph/file/ee6aed00378a0d1b88dda.jpg" },
+                    caption: `🍆 *RANKING DO PAU*\n\n${ranking}\n\n😏 Os tamanhos do grupo! 🍆`,
                     mentions: participants
                 });
             } catch (err) {
@@ -7157,7 +7336,7 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             const gifEnviado = await enviarGif(
                 sock,
                 from,
-                "https://media.tenor.com/LXB6kbzW_YgAAAAM/kiss-love.gif",
+                "https://telegra.ph/file/c9b5ed858237ebc9f7356.mp4",
                 `💋 *BEIJINHO!*\n\n@${sender.split('@')[0]} deu um beijinho em @${target.split('@')[0]}! 😘\n\n💕 Que fofo! 💋💋💋`,
                 [sender, target],
                 message
