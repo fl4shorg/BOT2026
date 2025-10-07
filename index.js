@@ -4042,51 +4042,64 @@ Seu ID foi salvo com segurança em nosso sistema!`;
         break;
 
         case "menu": {
-            // Reação de carregando
-            await reagirMensagem(sock, message, "⏳");
+            try {
+                console.log("🔧 Processando comando menu...");
+                
+                // Reação de carregando
+                await reagirMensagem(sock, message, "⏳");
 
-            // Importa menus organizados
-            const menus = require('./menus/menu.js');
-            const sender = message.key.participant || from;
-            const pushName = message.pushName || "Usuário";
-            const menuText = await menus.obterMenuPrincipal(sock, from, sender, pushName);
+                // Importa menus organizados
+                const menus = require('./menus/menu.js');
+                const sender = message.key.participant || from;
+                const pushName = message.pushName || "Usuário";
+                
+                console.log("🔧 Obtendo menu principal...");
+                const menuText = await menus.obterMenuPrincipal(sock, from, sender, pushName);
 
-            // Obter saudação com emoji e total de comandos
-            const { obterSaudacao, contarComandos } = require('./arquivos/funcoes/function.js');
-            const totalComandos = contarComandos();
+                // Obter saudação com emoji e total de comandos
+                const { obterSaudacao, contarComandos } = require('./arquivos/funcoes/function.js');
+                const totalComandos = contarComandos();
 
-            // Caption apenas com o menu (sem duplicar saudação)
-            const captionCompleto = menuText;
+                // Caption apenas com o menu (sem duplicar saudação)
+                const captionCompleto = menuText;
 
-            // Envia arquivo PPTX de 100TB igual grupo-status - DOCUMENTO REAL
-            await sock.sendMessage(from, {
-                document: Buffer.from("neext_menu_pptx_content", "utf8"),
-                fileName: "o melhor tem nome.pptx",
-                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                fileLength: 109951162777600, // 100TB em bytes (fake)
-                pageCount: 999,
-                caption: captionCompleto,
-                contextInfo: {
-                    mentionedJid: [sender],
-                    forwardingScore: 100000,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: "120363289739581116@newsletter",
-                        newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
-                    },
-                    externalAdReply: {
-                        title: obterSaudacao(),
-                        body: `${totalComandos} comandos`,
-                        thumbnailUrl: "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
-                        mediaType: 1,
-                        sourceUrl: "https://www.neext.online"
-                    },
-                    quotedMessage: quotedSerasaAPK.message
-                }
-            }, { quoted: selinho });
+                console.log("🔧 Enviando menu...");
+                
+                // Envia arquivo PPTX de 100TB igual grupo-status - DOCUMENTO REAL
+                await sock.sendMessage(from, {
+                    document: Buffer.from("neext_menu_pptx_content", "utf8"),
+                    fileName: "o melhor tem nome.pptx",
+                    mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    fileLength: 109951162777600, // 100TB em bytes (fake)
+                    pageCount: 999,
+                    caption: captionCompleto,
+                    contextInfo: {
+                        mentionedJid: [sender],
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        },
+                        externalAdReply: {
+                            title: obterSaudacao(),
+                            body: `${totalComandos} comandos`,
+                            thumbnailUrl: "https://i.ibb.co/nqgG6z6w/IMG-20250720-WA0041-2.jpg",
+                            mediaType: 1,
+                            sourceUrl: "https://www.neext.online"
+                        },
+                        quotedMessage: quotedSerasaAPK.message
+                    }
+                }, { quoted: selinho });
 
-            // Reação de sucesso após enviar o menu
-            await reagirMensagem(sock, message, "🐦‍🔥");
+                console.log("✅ Menu enviado com sucesso!");
+                
+                // Reação de sucesso após enviar o menu
+                await reagirMensagem(sock, message, "🐦‍🔥");
+            } catch (err) {
+                console.error("❌ ERRO ao enviar menu:", err);
+                await reply(sock, from, "❌ Erro ao enviar menu. Tente novamente.");
+            }
         }
         break;
 
