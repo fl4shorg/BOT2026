@@ -23,8 +23,8 @@ const UserAgent = require('user-agents');
 const moment = require('moment-timezone');
 const { Chess } = require('chess.js');
 
-// Sistema RPG - NeextCity
-const rpg = require('./arquivos/rpg.js');
+// Sistema RPG - NeextCity (Nova Versão)
+const rpg = require('./arquivos/rpg-new.js');
 
 const antilinkFile = path.join(__dirname, "antilink.json");
 // Sistema Anti-Spam Completo
@@ -4577,22 +4577,17 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             const action = args[0]?.toLowerCase();
 
             if (action === "on") {
-                if (rpg.toggleRPG(from, true)) {
-                    const configBot = obterConfiguracoes();
-                    await reply(sock, from, `🎮 **RPG ATIVADO!**\n\n🏙️ **Bem-vindos à NeextCity!**\n\n Para começar sua jornada:\n• Digite **${configBot.prefix}registrar** para se registrar\n• Escolha seu banco favorito\n• Comece a pescar, minerar e trabalhar!\n\n✨ **Comandos disponíveis:**\n• \`${configBot.prefix}pescar\` - Pesque e ganhe gold\n• \`${configBot.prefix}minerar\` - Minere recursos valiosos\n• \`${configBot.prefix}trabalhar\` - Trabalhe por dinheiro\n• \`${configBot.prefix}tigrinho\` - Jogue no cassino\n• \`${configBot.prefix}assalto\` - Assalte outros jogadores\n• \`${configBot.prefix}vermeusaldo\` - Veja seu saldo\n• \`${configBot.prefix}rank\` - Ranking dos mais ricos`);
-                } else {
-                    await reply(sock, from, "❌ Erro ao ativar o RPG.");
-                }
+                const resultado = rpg.ativarRPG(from, true);
+                const menu = rpg.getMenuRPG();
+                await reply(sock, from, `${resultado.mensagem}\n\n${menu}`);
             } else if (action === "off") {
-                if (rpg.toggleRPG(from, false)) {
-                    await reply(sock, from, "🎮 **RPG DESATIVADO!**\n\n👋 Até logo, NeextCity!");
-                } else {
-                    await reply(sock, from, "❌ Erro ao desativar o RPG.");
-                }
+                const resultado = rpg.ativarRPG(from, false);
+                await reply(sock, from, resultado.mensagem);
             } else {
                 const isAtivo = rpg.isRPGAtivo(from);
+                const menu = rpg.getMenuRPG();
                 const configBot = obterConfiguracoes();
-                await reply(sock, from, `🎮 **STATUS DO RPG**\n\n${isAtivo ? "✅ ATIVO" : "❌ INATIVO"}\n\n💡 **Uso:** \`${configBot.prefix}rpg on/off\``);
+                await reply(sock, from, `🎮 *STATUS DO RPG*\n\n${isAtivo ? "✅ ATIVO" : "❌ INATIVO"}\n\n💡 *Uso:* \`${configBot.prefix}rpg on/off\`\n\n${menu}`);
             }
         }
         break;
@@ -4616,42 +4611,17 @@ Seu ID foi salvo com segurança em nosso sistema!`;
 
             // Verifica se já está registrado
             if (rpg.isUsuarioRegistrado(userId)) {
-                const userData = rpg.obterDadosUsuario(userId);
-                await reply(sock, from, `✅ **Você já está registrado na NeextCity!**\n\n👤 **Nome:** ${userData.nome}\n${userData.banco.emoji} **Banco:** ${userData.banco.nome}\n💰 **Saldo:** ${userData.saldo} Gold`);
+                const resultado = rpg.getPerfil(userId);
+                await reply(sock, from, `✅ *Você já está registrado!*\n\n${resultado.mensagem}`);
                 break;
             }
 
-            // Se não tem argumentos, mostra como usar
-            if (args.length < 2) {
-                let bancosText = "🏦 **BANCOS DISPONÍVEIS:**\n\n";
-                rpg.bancos.forEach((banco, index) => {
-                    bancosText += `${index + 1}. ${banco.emoji} ${banco.nome}\n`;
-                });
-
-                const configBot = obterConfiguracoes();
-                await reply(sock, from, `🏙️ **REGISTRO NA NEEXTCITY**\n\n${bancosText}\n💡 **Como usar:**\n\`${configBot.prefix}registrar [nome] [número_do_banco]\`\n\n📝 **Exemplo:**\n\`${configBot.prefix}registrar João 3\` (para Nubank)`);
-                break;
-            }
-
-            const nome = args[0];
-            const bancoIndex = parseInt(args[1]) - 1;
-
-            if (!nome || nome.length < 2) {
-                await reply(sock, from, "❌ Nome deve ter pelo menos 2 caracteres.");
-                break;
-            }
-
-            if (isNaN(bancoIndex) || bancoIndex < 0 || bancoIndex >= rpg.bancos.length) {
-                await reply(sock, from, `❌ Número do banco inválido. Escolha entre 1 e ${rpg.bancos.length}.`);
-                break;
-            }
-
-            const banco = rpg.bancos[bancoIndex];
-
-            if (rpg.registrarUsuario(userId, nome, banco.id)) {
-                await reply(sock, from, `🎉 **REGISTRO CONCLUÍDO!**\n\n🏙️ **Bem-vindo à NeextCity!**\n\n👤 **Nome:** ${nome}\n${banco.emoji} **Banco:** ${banco.nome}\n💰 **Saldo inicial:** 100 Gold\n\n✨ **Agora você pode:**\n• /pescar - Ganhe gold pescando\n• /minerar - Encontre minerais valiosos\n• /trabalhar - Trabalhe por dinheiro\n• /tigrinho - Teste sua sorte no cassino\n• /assalto - Assalte outros jogadores\n• /vermeusaldo - Veja seu progresso`);
-            } else {
-                await reply(sock, from, "❌ Erro ao registrar. Tente novamente.");
+            // Registra o usuário
+            const resultado = rpg.registrar(userId, from);
+            await reply(sock, from, resultado.mensagem);
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "✅");
             }
         }
         break;
@@ -4678,23 +4648,10 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             }
 
             const resultado = rpg.pescar(userId);
-
-            if (resultado.erro) {
-                if (resultado.erro === 'Cooldown') {
-                    await reply(sock, from, resultado.mensagem);
-                } else {
-                    await reply(sock, from, `❌ ${resultado.erro}`);
-                }
-                break;
-            }
-
-            // Envia resultado sem imagem
             await reply(sock, from, resultado.mensagem);
 
             if (resultado.sucesso) {
                 await reagirMensagem(sock, message, "🎣");
-            } else {
-                await reagirMensagem(sock, message, "💔");
             }
         }
         break;
@@ -4721,23 +4678,10 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             }
 
             const resultado = rpg.minerar(userId);
-
-            if (resultado.erro) {
-                if (resultado.erro === 'Cooldown') {
-                    await reply(sock, from, resultado.mensagem);
-                } else {
-                    await reply(sock, from, `❌ ${resultado.erro}`);
-                }
-                break;
-            }
-
-            // Envia resultado sem imagem
             await reply(sock, from, resultado.mensagem);
 
             if (resultado.sucesso) {
                 await reagirMensagem(sock, message, "⛏️");
-            } else {
-                await reagirMensagem(sock, message, "💔");
             }
         }
         break;
@@ -4764,18 +4708,11 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             }
 
             const resultado = rpg.trabalhar(userId);
-
-            if (resultado.erro) {
-                if (resultado.erro === 'Cooldown') {
-                    await reply(sock, from, resultado.mensagem);
-                } else {
-                    await reply(sock, from, `❌ ${resultado.erro}`);
-                }
-                break;
-            }
-
             await reply(sock, from, resultado.mensagem);
-            await reagirMensagem(sock, message, "💼");
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "💼");
+            }
         }
         break;
 
@@ -5087,14 +5024,11 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             }
 
             const resultado = rpg.estudar(userId);
-
-            if (resultado.erro) {
-                await reply(sock, from, `❌ ${resultado.erro}`);
-                break;
-            }
-
             await reply(sock, from, resultado.mensagem);
-            await reagirMensagem(sock, message, "📚");
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "📚");
+            }
         }
         break;
 
@@ -5189,16 +5123,12 @@ Seu ID foi salvo com segurança em nosso sistema!`;
             }
 
             const categoria = args[0]?.toLowerCase();
-            const categoriasValidas = ['propriedades', 'animais', 'ferramentas', 'veiculos', 'negocios', 'tecnologia', 'decoracao', 'seguranca'];
-
-            if (categoria && !categoriasValidas.includes(categoria)) {
-                await reply(sock, from, "❌ Categoria inválida! Use: propriedades, animais, ferramentas, veiculos, negocios, tecnologia, decoracao, seguranca");
-                break;
-            }
-
-            const resultado = rpg.listarLoja(categoria);
+            const resultado = rpg.verLoja(categoria);
             await reply(sock, from, resultado.mensagem);
-            await reagirMensagem(sock, message, "🛒");
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "🛒");
+            }
         }
         break;
 
@@ -5252,20 +5182,17 @@ Seu ID foi salvo com segurança em nosso sistema!`;
 
             if (!args[0]) {
                 const config = obterConfiguracoes();
-                await reply(sock, from, `🛒 **COMO COMPRAR**\n\nUse: \`${config.prefix}comprar [item_id]\`\n\n💡 **Exemplo:**\n\`${config.prefix}comprar casa_simples\`\n\n📋 **Para ver itens:** \`${config.prefix}loja\``);
+                await reply(sock, from, `🛒 *COMO COMPRAR*\n\nUse: \`${config.prefix}comprar [item]\`\n\n💡 *Exemplo:*\n\`${config.prefix}comprar vara\`\n\n📋 *Para ver itens:* \`${config.prefix}loja\``);
                 break;
             }
 
             const itemId = args[0];
-            const resultado = rpg.comprarItem(userId, itemId);
-
-            if (resultado.erro) {
-                await reply(sock, from, `❌ ${resultado.erro}`);
-                break;
-            }
-
+            const resultado = rpg.comprar(userId, itemId);
             await reply(sock, from, resultado.mensagem);
-            await reagirMensagem(sock, message, "✅");
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "✅");
+            }
         }
         break;
 
@@ -5292,21 +5219,12 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 break;
             }
 
-            const resultado = rpg.obterPerfilCompleto(userId);
-
-            if (!resultado) {
-                await reply(sock, from, "❌ Erro ao carregar inventário.");
-                break;
+            const resultado = rpg.verInventario(userId);
+            await reply(sock, from, resultado.mensagem);
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "📦");
             }
-
-            let mensagem = `📦 **INVENTÁRIO DE ${resultado.usuario.nome.toUpperCase()}**\n\n`;
-            mensagem += `💰 **Saldo:** ${resultado.usuario.saldo} Gold\n`;
-            mensagem += `💎 **Valor do inventário:** ${resultado.valorInventario} Gold\n`;
-            mensagem += `📋 **Total de itens:** ${resultado.totalItens}\n\n`;
-            mensagem += resultado.inventarioTexto;
-
-            await reply(sock, from, mensagem);
-            await reagirMensagem(sock, message, "📦");
         }
         break;
 
@@ -5589,50 +5507,12 @@ Seu ID foi salvo com segurança em nosso sistema!`;
                 break;
             }
 
-            const perfilCompleto = rpg.obterPerfilCompleto(userId);
-            if (!perfilCompleto) {
-                await reply(sock, from, "❌ Erro ao carregar perfil.");
-                break;
+            const resultado = rpg.getPerfil(userId);
+            await reply(sock, from, resultado.mensagem);
+            
+            if (resultado.sucesso) {
+                await reagirMensagem(sock, message, "👤");
             }
-
-            const usuario = perfilCompleto.usuario;
-            const registroData = new Date(usuario.registrado).toLocaleDateString('pt-BR');
-
-            let mensagemPerfil = `👤 **PERFIL COMPLETO - ${usuario.nome.toUpperCase()}**\n\n`;
-            mensagemPerfil += `💰 **Saldo:** ${usuario.saldo} Gold\n`;
-            mensagemPerfil += `${usuario.banco.emoji} **Banco:** ${usuario.banco.nome}\n`;
-            mensagemPerfil += `📅 **Registro:** ${registroData}\n`;
-
-            // Educação
-            if (usuario.educacao && usuario.educacao.nivel > 0) {
-                mensagemPerfil += `🎓 **Nível educacional:** ${usuario.educacao.nivel}\n`;
-            }
-
-            mensagemPerfil += `\n📊 **ESTATÍSTICAS:**\n`;
-            mensagemPerfil += `🎣 Pescas: ${usuario.pescasFeitas || 0}\n`;
-            mensagemPerfil += `💼 Trabalhos: ${usuario.trabalhosFeitos || 0}\n`;
-            mensagemPerfil += `⛏️ Minerações: ${usuario.mineracoesFeitas || 0}\n`;
-
-            if (usuario.estudosFeitos > 0) {
-                mensagemPerfil += `📚 Estudos: ${usuario.estudosFeitos}\n`;
-            }
-            if (usuario.investimentosFeitos > 0) {
-                mensagemPerfil += `💼 Investimentos: ${usuario.investimentosFeitos}\n`;
-            }
-            if (usuario.apostasFeitas > 0) {
-                mensagemPerfil += `🎲 Apostas: ${usuario.apostasFeitas}\n`;
-            }
-
-            mensagemPerfil += `\n💎 **PATRIMÔNIO:**\n`;
-            mensagemPerfil += `📦 **Total de itens:** ${perfilCompleto.totalItens}\n`;
-            mensagemPerfil += `💰 **Valor do inventário:** ${perfilCompleto.valorInventario} Gold\n`;
-            mensagemPerfil += `🏆 **Patrimônio total:** ${usuario.saldo + perfilCompleto.valorInventario} Gold\n\n`;
-
-            mensagemPerfil += `📦 **INVENTÁRIO:**\n\n`;
-            mensagemPerfil += perfilCompleto.inventarioTexto;
-
-            await reply(sock, from, mensagemPerfil);
-            await reagirMensagem(sock, message, "👤");
         }
         break;
 
