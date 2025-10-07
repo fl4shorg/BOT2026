@@ -282,11 +282,11 @@ function obterMenuGamer() {
 
 🎯 *JOGOS INTERATIVOS:*
 • \`${prefix}jogodavelha @user\` - Jogo da velha
+• \`${prefix}resetjogodavelha\` - Reset jogo da velha
 • \`${prefix}roletarussa @user\` - Roleta russa
 • \`${prefix}disparar\` - Atirar na roleta russa
-• \`${prefix}resetjogodavelha\` - Reset jogo da velha
 • \`${prefix}resetroleta\` - Reset roleta russa
-• \`${prefix}forca\` - Jogo da forca
+• \`${prefix}jogodaforca\` - Jogo da forca
 
 🔮 *AKINATOR - ADIVINHAÇÃO:*
 • \`${prefix}akinator\` - Iniciar jogo do Akinator
@@ -331,6 +331,8 @@ function obterMenuGamer() {
 • \`${prefix}rankburro\` - Rank dos burros
 • \`${prefix}rankfeio\` - Rank dos feios
 • \`${prefix}rankbonito\` - Rank dos bonitos
+• \`${prefix}rankgostoso\` - Rank dos gostosos
+• \`${prefix}rankgostosa\` - Rank das gostosas
 • \`${prefix}rankfumante\` - Rank dos fumantes
 • \`${prefix}rankmaconheiro\` - Rank dos maconheiros
 • \`${prefix}rankpobre\` - Rank dos pobres
@@ -338,6 +340,8 @@ function obterMenuGamer() {
 • \`${prefix}rankemo\` - Rank dos emos
 • \`${prefix}rankcasal\` - Rank de casais
 • \`${prefix}rankotaku\` - Rank dos otakus
+• \`${prefix}ranknazista\` - Rank dos nazistas
+• \`${prefix}rankpau\` - Rank de tamanho
 
 ━━━━━━━━━━━━━━━
 © NEEXT LTDA - ${nickDoDono}
