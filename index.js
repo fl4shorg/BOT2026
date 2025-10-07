@@ -779,6 +779,57 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             });
             break;
 
+        case "calcular":
+        case "calc": {
+            if (args.length === 0) {
+                const config = obterConfiguracoes();
+                await reply(sock, from, `❌ Use: ${config.prefix}calcular [expressão]\n\n💡 Exemplos:\n• ${config.prefix}calcular 7+7\n• ${config.prefix}calcular 10*5\n• ${config.prefix}calcular 100/4\n• ${config.prefix}calcular (5+3)*2`);
+                break;
+            }
+
+            try {
+                const expressao = args.join(' ').trim();
+                
+                // Validação de segurança - só permite números, operadores matemáticos e parênteses
+                if (!/^[\d+\-*/(). ]+$/.test(expressao)) {
+                    await reply(sock, from, "❌ Expressão inválida! Use apenas números e operadores matemáticos (+, -, *, /, parênteses).");
+                    break;
+                }
+
+                // Calcula usando Function (mais seguro que eval)
+                const resultado = Function(`'use strict'; return (${expressao})`)();
+                
+                if (resultado === Infinity || resultado === -Infinity) {
+                    await reply(sock, from, "❌ Erro: Divisão por zero!");
+                    break;
+                }
+
+                if (isNaN(resultado)) {
+                    await reply(sock, from, "❌ Erro: Expressão matemática inválida!");
+                    break;
+                }
+
+                const mensagem = `🧮 *CALCULADORA*\n\n📝 Expressão: ${expressao}\n✅ Resultado: *${resultado}*`;
+                
+                await sock.sendMessage(from, {
+                    text: mensagem,
+                    contextInfo: {
+                        forwardingScore: 100000,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: "120363289739581116@newsletter",
+                            newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                        }
+                    }
+                }, { quoted: selinho });
+
+            } catch (error) {
+                console.error("❌ Erro no cálculo:", error);
+                await reply(sock, from, "❌ Erro ao calcular! Verifique se a expressão está correta.");
+            }
+        }
+        break;
+
             case 'dono':
     // garante que 'sender' está definido no escopo correto
     const sender = message.key.participant || from;
