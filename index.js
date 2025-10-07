@@ -7948,7 +7948,7 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 ││📝 𝑪𝑶𝑴𝑨𝑵𝑫𝑶: ${config.prefix}${command}
 ││💡 𝑼𝑺𝑬: &prefixmenu para ver todos os comandos
 │╰─━─⋆｡°✩🛑✩°｡⋆ ━─━╯
-╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯`);
+╰⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓⎔⎓╯`);
         }
         break;
     }
