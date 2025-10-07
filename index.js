@@ -2050,9 +2050,11 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             await reagirMensagem(sock, message, "⏳");
 
             try {
+                const config = obterConfiguracoes();
+                
                 // API Real do Pinterest
                 const response = await axios.get(`https://api.nekolabs.my.id/discovery/pinterest/search?q=${encodeURIComponent(query)}`, {
-                    timeout: 15000, // 15 segundos de timeout
+                    timeout: 15000,
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
                     }
@@ -2068,53 +2070,70 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     break;
                 }
 
-                // Pega até 6 imagens dos resultados
-                const imagesToSend = response.data.result.slice(0, 6);
-                console.log(`📥 Encontradas ${response.data.result.length} imagens, enviando ${imagesToSend.length}`);
+                // Pega até 5 imagens dos resultados
+                const imagesToSend = response.data.result.slice(0, 5);
+                console.log(`📥 Encontradas ${response.data.result.length} imagens, enviando ${imagesToSend.length} em carrossel`);
 
-                await reagirMensagem(sock, message, "✅");
+                // Baixa as imagens em paralelo
+                const imagePromises = imagesToSend.map(result => 
+                    axios.get(result.imageUrl, { responseType: 'arraybuffer', timeout: 15000 })
+                );
 
-                // Envia cada imagem encontrada
-                for (let i = 0; i < imagesToSend.length; i++) {
-                    const result = imagesToSend[i];
+                const imageResponses = await Promise.all(imagePromises);
+                
+                // Prepara as imagens para o carrossel
+                const { prepareWAMessageMedia } = require('@whiskeysockets/baileys');
+                
+                const mediaPromises = imageResponses.map(response => 
+                    prepareWAMessageMedia(
+                        { image: Buffer.from(response.data) },
+                        { upload: sock.waUploadToServer }
+                    )
+                );
 
-                    // Prepara a legenda da imagem
-                    const caption = `📌 *Pinterest Search Result ${i + 1}/${imagesToSend.length}*\n\n` +
-                                  `👤 **Autor:** ${result.author?.fullname || result.author?.name || 'Anônimo'}\n` +
-                                  `📝 **Descrição:** ${result.caption || 'Sem descrição'}\n` +
-                                  `👥 **Seguidores:** ${result.author?.followers || 0}\n\n` +
-                                  `🔗 **Link:** ${result.url}\n\n` +
-                                  `🔍 **Busca:** ${query}\n` +
-                                  `© NEEXT LTDA - Pinterest Search`;
+                const mediaArray = await Promise.all(mediaPromises);
 
-                    // Envia a imagem
-                    await sock.sendMessage(from, {
-                        image: { url: result.imageUrl },
-                        caption: caption,
-                        contextInfo: {
-                            forwardingScore: 100000,
-                            isForwarded: true,
-                            forwardedNewsletterMessageInfo: {
-                                newsletterJid: "120363289739581116@newsletter",
-                                newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
+                // Cria os cards do carrossel com informações do Pinterest
+                const cards = mediaArray.map((media, index) => {
+                    const result = imagesToSend[index];
+                    return {
+                        header: {
+                            imageMessage: media.imageMessage,
+                            hasMediaAttachment: true
+                        },
+                        body: {
+                            text: `📌 Pinterest - ${index + 1}/5\n\n👤 ${result.author?.fullname || result.author?.name || 'Anônimo'}\n📝 ${result.caption || 'Sem descrição'}`
+                        },
+                        nativeFlowMessage: {
+                            buttons: []
+                        }
+                    };
+                });
+
+                // Cria mensagem em carrossel
+                const carouselMessage = generateWAMessageFromContent(from, {
+                    viewOnceMessage: {
+                        message: {
+                            messageContextInfo: {
+                                deviceListMetadata: {},
+                                deviceListMetadataVersion: 2
                             },
-                            externalAdReply: {
-                                title: "📌 NEEXT PINTEREST SEARCH",
-                                body: `Resultado ${i + 1} de ${imagesToSend.length} • Instagram: @neet.tk`,
-                                thumbnailUrl: result.imageUrl,
-                                mediaType: 1,
-                                sourceUrl: result.url
+                            interactiveMessage: {
+                                body: {
+                                    text: `📌 *PINTEREST SEARCH* 📌\n\n🔍 Busca: "${query}"\n📸 ${imagesToSend.length} imagens encontradas\n\n© ${config.nomeDoBot}`
+                                },
+                                carouselMessage: {
+                                    cards: cards
+                                }
                             }
                         }
-                    }, { quoted: selinho });
-
-                    // Aguarda um pouco entre os envios para evitar spam
-                    if (i < imagesToSend.length - 1) {
-                        await new Promise(resolve => setTimeout(resolve, 1500));
                     }
-                }
+                }, { quoted: message });
 
-                console.log(`✅ ${imagesToSend.length} imagens do Pinterest enviadas com sucesso!`);
+                await sock.relayMessage(from, carouselMessage.message, {});
+                
+                await reagirMensagem(sock, message, "✅");
+                console.log(`✅ Pinterest - Carrossel enviado com sucesso!`);
 
             } catch (error) {
                 console.error('❌ Erro ao buscar no Pinterest:', error.message);
