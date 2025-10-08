@@ -5996,10 +5996,12 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
 
             // Verifica se bot é admin
+            console.log(`🔍 [FECHARGRUPO] Verificando se bot é admin no grupo ${from}`);
             const botAdmin = await botEhAdmin(sock, from);
+            console.log(`🔍 [FECHARGRUPO] Resultado botEhAdmin: ${botAdmin}`);
+            
             if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para fechar o grupo.");
-                break;
+                console.log(`⚠️ [FECHARGRUPO] Bot NÃO é admin - tentando fechar mesmo assim`);
             }
 
             try {
@@ -6009,7 +6011,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 console.log(`🔒 Grupo ${from} foi fechado por ${sender.split('@')[0]}`);
             } catch (err) {
                 console.error("❌ Erro ao fechar grupo:", err);
-                await reply(sock, from, "❌ Erro ao fechar o grupo. Verifique se o bot tem permissões de admin.");
+                await reply(sock, from, `❌ Erro ao fechar o grupo.\n\n💡 Detalhes: ${err.message}\n\nVerifique se o bot realmente é admin do grupo.`);
             }
         }
         break;
@@ -6032,10 +6034,12 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
 
             // Verifica se bot é admin
+            console.log(`🔍 [ABRIRGRUPO] Verificando se bot é admin no grupo ${from}`);
             const botAdmin = await botEhAdmin(sock, from);
+            console.log(`🔍 [ABRIRGRUPO] Resultado botEhAdmin: ${botAdmin}`);
+            
             if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para abrir o grupo.");
-                break;
+                console.log(`⚠️ [ABRIRGRUPO] Bot NÃO é admin - tentando abrir mesmo assim`);
             }
 
             try {
@@ -6045,7 +6049,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 console.log(`🔓 Grupo ${from} foi aberto por ${sender.split('@')[0]}`);
             } catch (err) {
                 console.error("❌ Erro ao abrir grupo:", err);
-                await reply(sock, from, "❌ Erro ao abrir o grupo. Verifique se o bot tem permissões de admin.");
+                await reply(sock, from, `❌ Erro ao abrir o grupo.\n\n💡 Detalhes: ${err.message}\n\nVerifique se o bot realmente é admin do grupo.`);
             }
         }
         break;
