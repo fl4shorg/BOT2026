@@ -5979,7 +5979,8 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         // ================== COMANDOS ADMINISTRATIVOS ==================
 
         case "fechargrupo":
-        case "fechar": {
+        case "fechar":
+        case "f": {
             // Só funciona em grupos
             if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
                 await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
@@ -6031,7 +6032,8 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         break;
 
         case "abrirgrupo":
-        case "abrir": {
+        case "abrir":
+        case "a": {
             // Só funciona em grupos
             if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
                 await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
