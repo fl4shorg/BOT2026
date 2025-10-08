@@ -5754,20 +5754,9 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                 const videoBuffer = Buffer.from(videoResponse.data);
 
-                const caption = `📱 *Vídeo do TikTok baixado!*
-
-👤 **Autor:** ${result.author?.nickname || result.author?.username || 'Desconhecido'}
-${result.video?.played ? `👁️ **Visualizações:** ${result.video.played}` : ''}
-${result.video?.commented ? `💬 **Comentários:** ${result.video.commented}` : ''}
-${result.video?.saved ? `💾 **Salvos:** ${result.video.saved}` : ''}
-${result.video?.shared ? `🔄 **Compartilhamentos:** ${result.video.shared}` : ''}
-🔗 **Link:** ${url}
-
-© NEEXT LTDA`;
-
                 await sock.sendMessage(from, {
                     video: videoBuffer,
-                    caption: caption,
+                    caption: "💕",
                     mimetype: 'video/mp4',
                     contextInfo: {
                         forwardingScore: 100000,
