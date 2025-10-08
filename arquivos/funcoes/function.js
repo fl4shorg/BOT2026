@@ -288,7 +288,7 @@ function contarComandos() {
         }
         
         const total = comandosPrincipais.size;
-        console.log(`📊 Comandos principais: ${totalPrincipais} | Hentai: ${totalHentai} | Total: ${total}`);
+        // console.log(`📊 Comandos principais: ${totalPrincipais} | Hentai: ${totalHentai} | Total: ${total}`);
         return total;
     } catch (error) {
         console.error('❌ Erro ao contar comandos automaticamente:', error);

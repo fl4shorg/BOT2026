@@ -4051,7 +4051,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     }
                 }, { quoted: selinho });
 
-                console.log("✅ Menu enviado com sucesso!");
+                // console.log("✅ Menu enviado com sucesso!");
                 
                 // Reação de sucesso após enviar o menu
                 await reagirMensagem(sock, message, "🐦‍🔥");

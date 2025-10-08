@@ -65,7 +65,7 @@ async function loadData() {
         
         // Migração de versão se necessário
         if (!dataCache.version || dataCache.version !== VERSION) {
-            console.log('🔄 Migrando dados do RPG para versão', VERSION);
+            // console.log('🔄 Migrando dados do RPG para versão', VERSION);
             dataCache.version = VERSION;
             if (!dataCache.players) dataCache.players = {};
             if (!dataCache.grupos) dataCache.grupos = {};
