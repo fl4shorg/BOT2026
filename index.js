@@ -5723,7 +5723,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 await reagirMensagem(sock, message, "⏳");
                 await reply(sock, from, "📱 Baixando vídeo do TikTok, aguarde...");
 
-                const apiUrl = `https://api.siputzx.my.id/api/d/tiktok?url=${encodeURIComponent(url)}`;
+                const apiUrl = `https://www.api.neext.online/download/tiktok?url=${encodeURIComponent(url)}`;
                 const response = await axios.get(apiUrl, {
                     timeout: 30000,
                     headers: {
@@ -5731,15 +5731,15 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     }
                 });
 
-                if (!response.data || !response.data.status || !response.data.data) {
+                if (!response.data || !response.data.success) {
                     await reagirMensagem(sock, message, "❌");
                     await reply(sock, from, "❌ Não foi possível baixar este vídeo do TikTok. Verifique o link.");
                     break;
                 }
 
-                const result = response.data.data;
+                const result = response.data;
 
-                if (!result.video || !result.video.noWatermark) {
+                if (!result.video || !result.video.url || !result.video.url.noWatermark) {
                     await reagirMensagem(sock, message, "❌");
                     await reply(sock, from, "❌ Vídeo não encontrado ou não disponível.");
                     break;
@@ -5747,7 +5747,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                 const videoResponse = await axios({
                     method: 'GET',
-                    url: result.video.noWatermark,
+                    url: result.video.url.noWatermark,
                     responseType: 'arraybuffer',
                     timeout: 60000
                 });
@@ -5756,10 +5756,11 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                 const caption = `📱 *Vídeo do TikTok baixado!*
 
-📝 **Título:** ${result.title || 'Sem título'}
-👤 **Autor:** ${result.author?.nickname || result.author?.uniqueId || 'Desconhecido'}
-❤️ **Likes:** ${result.statistics?.likeCount || 0}
-💬 **Comentários:** ${result.statistics?.commentCount || 0}
+👤 **Autor:** ${result.author?.nickname || result.author?.username || 'Desconhecido'}
+${result.video?.played ? `👁️ **Visualizações:** ${result.video.played}` : ''}
+${result.video?.commented ? `💬 **Comentários:** ${result.video.commented}` : ''}
+${result.video?.saved ? `💾 **Salvos:** ${result.video.saved}` : ''}
+${result.video?.shared ? `🔄 **Compartilhamentos:** ${result.video.shared}` : ''}
 🔗 **Link:** ${url}
 
 © NEEXT LTDA`;
