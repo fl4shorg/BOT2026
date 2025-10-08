@@ -181,7 +181,6 @@ async function startBot() {
         generateHighQualityLinkPreview:true,
         fireInitQueries:true,
         shouldSyncHistoryMessage:()=>true,
-        getMessage: async (key)=>undefined,
         retryRequestDelayMs:3000,
         defaultQueryTimeoutMs:15000,
         keepAliveIntervalMs:30000,
