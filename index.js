@@ -6553,6 +6553,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                         `🎯 Agora os membros podem usar jogos e comandos de diversão\n\n` +
                         `🎲 **Jogos disponíveis:**\n` +
                         `• ${config.prefix}eununca - Enquetes divertidas\n` +
+                        `• ${config.prefix}vab - Enquetes com perguntas aleatórias\n` +
                         `• ${config.prefix}jogodaforca - Jogo da forca\n` +
                         `• ${config.prefix}jogodavelha - Jogo da velha\n` +
                         `• ${config.prefix}roletarussa - Roleta russa\n\n` +
@@ -6647,6 +6648,44 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     selectableCount: 1
                 }
             });
+        }
+        break;
+
+        case "vab": {
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Modo Gamer está desativado neste grupo! Use \`${botConfig.prefix}modogamer on\` para ativar.`);
+                break;
+            }
+
+            try {
+                const vabData = JSON.parse(fs.readFileSync(path.join(__dirname, 'database', 'vab.json'), 'utf8'));
+                const perguntas = vabData.perguntas;
+                
+                if (!perguntas || perguntas.length === 0) {
+                    await reply(sock, from, "❌ Nenhuma pergunta disponível no momento.");
+                    break;
+                }
+
+                const perguntaAleatoria = perguntas[Math.floor(Math.random() * perguntas.length)];
+
+                await sock.sendMessage(from, {
+                    poll: {
+                        name: `❓ Você ${perguntaAleatoria}?`,
+                        values: ["✅ SIM", "❌ NÃO", "🤔 TALVEZ"],
+                        selectableCount: 1
+                    }
+                });
+            } catch (error) {
+                console.error("Erro ao carregar vab.json:", error);
+                await reply(sock, from, "❌ Erro ao carregar perguntas. Tente novamente mais tarde.");
+            }
         }
         break;
 
