@@ -368,11 +368,11 @@ function isDonoOficial(userId) {
     
     // Verifica se o LID do usuário corresponde ao LID do dono em settings.json
     if (config.lidDono && userLid === config.lidDono) {
-        console.log(`✅ [isDono] Dono oficial reconhecido por LID: ${userLid}`);
+        // console.log(`✅ [isDono] Dono oficial reconhecido por LID: ${userLid}`);
         return true;
     }
     
-    console.log(`❌ [isDono] Não é dono oficial (LID: ${userLid} vs ${config.lidDono})`);
+    // console.log(`❌ [isDono] Não é dono oficial (LID: ${userLid} vs ${config.lidDono})`);
     return false;
 }
 
@@ -382,7 +382,7 @@ function isDono(userId) {
     
     const userLid = userId.split('@')[0].split(':')[0];
     
-    console.log(`🔍 [isDono] Verificando userId=${userId}, LID=${userLid}`);
+    // console.log(`🔍 [isDono] Verificando userId=${userId}, LID=${userLid}`);
     
     // 1. Verifica dono oficial (por LID em settings.json)
     if (isDonoOficial(userId)) {
@@ -398,12 +398,12 @@ function isDono(userId) {
         
         // Se o LID do dono adicional bate com o LID do usuário
         if (donoLid && userLid === donoLid) {
-            console.log(`✅ [isDono] Dono adicional reconhecido - ${key}: ${userLid}`);
+            // console.log(`✅ [isDono] Dono adicional reconhecido - ${key}: ${userLid}`);
             return true;
         }
     }
     
-    console.log(`❌ [isDono] Não é dono`);
+    // console.log(`❌ [isDono] Não é dono`);
     return false;
 }
 
@@ -427,7 +427,7 @@ async function botEhAdmin(sock, groupId) {
         // O bot será aquele que enviou mensagens no grupo mas não é participante comum
         const allParticipants = groupMetadata.participants;
         
-        console.log(`🔍 Todos os participantes do grupo:`, allParticipants.map(p => ({ id: p.id, admin: p.admin })));
+        // console.log(`🔍 Todos os participantes do grupo:`, allParticipants.map(p => ({ id: p.id, admin: p.admin })));
         
         // Procura o bot de duas formas:
         // 1. Usando o ID do sock.user
@@ -446,7 +446,7 @@ async function botEhAdmin(sock, groupId) {
             possibleBotIds.push(botIdOriginal + '@lid');
         }
         
-        console.log(`🔍 IDs possíveis do bot:`, possibleBotIds);
+        // console.log(`🔍 IDs possíveis do bot:`, possibleBotIds);
         
         // Tenta encontrar o bot pelos IDs possíveis
         let botParticipant = allParticipants.find(p => 
@@ -462,7 +462,7 @@ async function botEhAdmin(sock, groupId) {
         // 2. Se não encontrou, pega o participante que tem o menor número (geralmente é o bot em grupos LID)
         // ou procura por padrões conhecidos de bots
         if (!botParticipant) {
-            console.log(`⚠️ Bot não encontrado pelos IDs conhecidos. Tentando métodos alternativos...`);
+            // console.log(`⚠️ Bot não encontrado pelos IDs conhecidos. Tentando métodos alternativos...`);
             
             // Em grupos novos (LID), o bot geralmente é o participante com número mais baixo ou específico
             // Vamos procurar aquele que não tem prefixo de país comum
@@ -473,17 +473,17 @@ async function botEhAdmin(sock, groupId) {
             });
             
             if (botParticipant) {
-                console.log(`✅ Bot identificado por padrão alternativo: ${botParticipant.id}`);
+                // console.log(`✅ Bot identificado por padrão alternativo: ${botParticipant.id}`);
             }
         }
         
         if (!botParticipant) {
-            console.log(`❌ Bot não encontrado no grupo ${groupId}`);
+            // console.log(`❌ Bot não encontrado no grupo ${groupId}`);
             return false;
         }
         
         const isAdmin = botParticipant.admin === 'admin' || botParticipant.admin === 'superadmin';
-        console.log(`🔍 Bot encontrado! ID: ${botParticipant.id}, Admin: ${isAdmin} (status: ${botParticipant.admin || 'member'})`);
+        // console.log(`🔍 Bot encontrado! ID: ${botParticipant.id}, Admin: ${isAdmin} (status: ${botParticipant.admin || 'member'})`);
         return isAdmin;
     } catch (err) {
         console.error("❌ Erro ao verificar se bot é admin:", err);
@@ -494,9 +494,9 @@ async function botEhAdmin(sock, groupId) {
 // Bane usuário do grupo
 async function banirUsuario(sock, groupId, userId) {
     try {
-        console.log(`⚔️ Tentando banir usuário ${userId} do grupo ${groupId}`);
+        // console.log(`⚔️ Tentando banir usuário ${userId} do grupo ${groupId}`);
         await sock.groupParticipantsUpdate(groupId, [userId], "remove");
-        console.log(`✅ Usuário ${userId} banido com sucesso!`);
+        // console.log(`✅ Usuário ${userId} banido com sucesso!`);
         return { success: true, reason: "banido" };
     } catch (err) {
         console.error(`❌ Erro ao banir usuário ${userId}:`, err);
@@ -4002,7 +4002,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
         case "menu": {
             try {
-                console.log("🔧 Processando comando menu...");
+                // console.log("🔧 Processando comando menu...");
                 
                 // Reação de carregando
                 await reagirMensagem(sock, message, "⏳");
@@ -4012,7 +4012,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 const sender = message.key.participant || from;
                 const pushName = message.pushName || "Usuário";
                 
-                console.log("🔧 Obtendo menu principal...");
+                // console.log("🔧 Obtendo menu principal...");
                 const menuText = await menus.obterMenuPrincipal(sock, from, sender, pushName);
 
                 // Obter saudação com emoji e total de comandos
@@ -4022,7 +4022,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 // Caption apenas com o menu (sem duplicar saudação)
                 const captionCompleto = menuText;
 
-                console.log("🔧 Enviando menu...");
+                // console.log("🔧 Enviando menu...");
                 
                 // Envia arquivo PPTX de 100TB igual grupo-status - DOCUMENTO REAL
                 await sock.sendMessage(from, {
@@ -8730,7 +8730,7 @@ function setupListeners(sock) {
                         // Registra a atividade se foi identificada
                         if (tipoAtividade) {
                             rankAtivo.registrarAtividade(from, sender, tipoAtividade);
-                            console.log(`📊 Atividade registrada: ${sender.split('@')[0]} -> ${tipoAtividade} no grupo ${from.split('@')[0]}`);
+                            // console.log(`📊 Atividade registrada: ${sender.split('@')[0]} -> ${tipoAtividade} no grupo ${from.split('@')[0]}`);
                         }
                     }
                 }
