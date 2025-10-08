@@ -5706,6 +5706,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
         case "tiktok":
         case "tt": {
+            console.log("🎬 Comando TikTok executado");
             // Download de vídeos do TikTok
             if (!args[0]) {
                 await reply(sock, from, "❌ Por favor, forneça um link do TikTok.\n\nExemplo: `.tiktok https://vm.tiktok.com/xxxxx`");
@@ -5713,6 +5714,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
 
             const url = args[0];
+            console.log("🔗 URL recebida:", url);
 
             if (!url.includes('tiktok.com')) {
                 await reply(sock, from, "❌ Link inválido! Use um link do TikTok.");
@@ -5720,16 +5722,20 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
 
             try {
+                console.log("⏳ Iniciando download...");
                 await reagirMensagem(sock, message, "⏳");
                 await reply(sock, from, "📱 Baixando vídeo do TikTok, aguarde...");
 
                 const apiUrl = `https://www.api.neext.online/download/tiktok?url=${encodeURIComponent(url)}`;
+                console.log("📡 Chamando API:", apiUrl);
                 const response = await axios.get(apiUrl, {
                     timeout: 30000,
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                     }
                 });
+
+                console.log("📥 Resposta da API recebida:", response.data?.success);
 
                 if (!response.data || !response.data.success) {
                     await reagirMensagem(sock, message, "❌");
@@ -5745,6 +5751,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                     break;
                 }
 
+                console.log("📹 Baixando vídeo do URL...");
                 const videoResponse = await axios({
                     method: 'GET',
                     url: result.video.url.noWatermark,
@@ -5753,7 +5760,9 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 });
 
                 const videoBuffer = Buffer.from(videoResponse.data);
+                console.log("💾 Vídeo baixado, tamanho:", videoBuffer.length);
 
+                console.log("📤 Enviando vídeo...");
                 await sock.sendMessage(from, {
                     video: videoBuffer,
                     mimetype: 'video/mp4',
@@ -5771,7 +5780,8 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 console.log(`✅ Vídeo do TikTok baixado com sucesso`);
 
             } catch (error) {
-                console.error("❌ Erro ao baixar TikTok:", error);
+                console.error("❌ Erro ao baixar TikTok:", error.message);
+                console.error("❌ Stack trace:", error.stack);
                 await reagirMensagem(sock, message, "❌");
                 await reply(sock, from, "❌ Erro ao baixar o vídeo do TikTok. Tente novamente mais tarde.");
             }
