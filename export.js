@@ -47,6 +47,3 @@ module.exports = {
     logMensagem,
     formatJid,
 };
-
-// Para debug
-console.log("Export.js carregado ✅", { prefix, botNome });
