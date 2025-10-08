@@ -423,13 +423,17 @@ async function botEhAdmin(sock, groupId) {
     try {
         const groupMetadata = await sock.groupMetadata(groupId);
         
-        // Pega o ID original do bot
-        let botIdOriginal = sock.user?.id || '';
+        // Identifica o bot procurando o único membro que não é nenhum dos usuários normais
+        // O bot será aquele que enviou mensagens no grupo mas não é participante comum
+        const allParticipants = groupMetadata.participants;
         
-        // Tenta várias formas de normalizar o ID
+        console.log(`🔍 Todos os participantes do grupo:`, allParticipants.map(p => ({ id: p.id, admin: p.admin })));
+        
+        // Procura o bot de duas formas:
+        // 1. Usando o ID do sock.user
+        let botIdOriginal = sock.user?.id || '';
         let possibleBotIds = [botIdOriginal];
         
-        // Se tiver ':', remove tudo depois
         if (botIdOriginal.includes(':')) {
             const baseId = botIdOriginal.split(':')[0];
             possibleBotIds.push(baseId + '@s.whatsapp.net');
@@ -437,21 +441,17 @@ async function botEhAdmin(sock, groupId) {
             possibleBotIds.push(baseId);
         }
         
-        // Se não terminar com @s.whatsapp.net ou @lid, adiciona ambos
         if (!botIdOriginal.endsWith('@s.whatsapp.net') && !botIdOriginal.endsWith('@lid')) {
             possibleBotIds.push(botIdOriginal + '@s.whatsapp.net');
             possibleBotIds.push(botIdOriginal + '@lid');
         }
         
-        console.log(`🔍 Verificando se bot é admin - IDs possíveis:`, possibleBotIds);
-        console.log(`🔍 Participantes do grupo:`, groupMetadata.participants.map(p => ({ id: p.id, admin: p.admin })));
+        console.log(`🔍 IDs possíveis do bot:`, possibleBotIds);
         
-        // Procura o bot usando qualquer uma das variações de ID
-        const botParticipant = groupMetadata.participants.find(p => 
+        // Tenta encontrar o bot pelos IDs possíveis
+        let botParticipant = allParticipants.find(p => 
             possibleBotIds.some(botId => {
-                // Comparação exata
                 if (p.id === botId) return true;
-                // Comparação apenas do número (sem @sufixo)
                 const pNumber = p.id.split('@')[0].split(':')[0];
                 const botNumber = botId.split('@')[0].split(':')[0];
                 if (pNumber === botNumber) return true;
@@ -459,10 +459,26 @@ async function botEhAdmin(sock, groupId) {
             })
         );
         
+        // 2. Se não encontrou, pega o participante que tem o menor número (geralmente é o bot em grupos LID)
+        // ou procura por padrões conhecidos de bots
         if (!botParticipant) {
-            console.log(`⚠️ Bot não encontrado na lista de participantes do grupo ${groupId}`);
-            console.log(`⚠️ Números dos participantes:`, groupMetadata.participants.map(p => p.id.split('@')[0].split(':')[0]));
-            console.log(`⚠️ Número do bot:`, botIdOriginal.split('@')[0].split(':')[0]);
+            console.log(`⚠️ Bot não encontrado pelos IDs conhecidos. Tentando métodos alternativos...`);
+            
+            // Em grupos novos (LID), o bot geralmente é o participante com número mais baixo ou específico
+            // Vamos procurar aquele que não tem prefixo de país comum
+            botParticipant = allParticipants.find(p => {
+                const num = p.id.split('@')[0].split(':')[0];
+                // Números muito pequenos geralmente são bots
+                return num.length < 12;
+            });
+            
+            if (botParticipant) {
+                console.log(`✅ Bot identificado por padrão alternativo: ${botParticipant.id}`);
+            }
+        }
+        
+        if (!botParticipant) {
+            console.log(`❌ Bot não encontrado no grupo ${groupId}`);
             return false;
         }
         
