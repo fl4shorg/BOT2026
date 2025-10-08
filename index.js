@@ -5995,16 +5995,30 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
-            // Verifica se bot é admin
-            console.log(`🔍 [FECHARGRUPO] Verificando se bot é admin no grupo ${from}`);
-            const botAdmin = await botEhAdmin(sock, from);
-            console.log(`🔍 [FECHARGRUPO] Resultado botEhAdmin: ${botAdmin}`);
-            
-            if (!botAdmin) {
-                console.log(`⚠️ [FECHARGRUPO] Bot NÃO é admin - tentando fechar mesmo assim`);
-            }
-
             try {
+                // Verifica o estado atual do grupo
+                const groupMetadata = await sock.groupMetadata(from);
+                const grupoFechado = groupMetadata.announce || false;
+                
+                console.log(`🔍 [FECHARGRUPO] Estado do grupo: ${grupoFechado ? 'FECHADO' : 'ABERTO'} (announce: ${groupMetadata.announce})`);
+                
+                if (grupoFechado) {
+                    // Grupo já está fechado
+                    await reagirMensagem(sock, message, "ℹ️");
+                    await reply(sock, from, "ℹ️ *O GRUPO JÁ ESTÁ FECHADO!*\n\nApenas admins podem enviar mensagens.");
+                    console.log(`ℹ️ [FECHARGRUPO] Grupo ${from} já estava fechado`);
+                    break;
+                }
+
+                // Grupo está aberto, então vamos fechar
+                console.log(`🔍 [FECHARGRUPO] Verificando se bot é admin no grupo ${from}`);
+                const botAdmin = await botEhAdmin(sock, from);
+                console.log(`🔍 [FECHARGRUPO] Resultado botEhAdmin: ${botAdmin}`);
+                
+                if (!botAdmin) {
+                    console.log(`⚠️ [FECHARGRUPO] Bot NÃO é admin - tentando fechar mesmo assim`);
+                }
+
                 await sock.groupSettingUpdate(from, 'announcement');
                 await reagirMensagem(sock, message, "🔒");
                 await reply(sock, from, "🔒 *GRUPO FECHADO!*\n\nApenas admins podem enviar mensagens agora.");
@@ -6033,16 +6047,30 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
-            // Verifica se bot é admin
-            console.log(`🔍 [ABRIRGRUPO] Verificando se bot é admin no grupo ${from}`);
-            const botAdmin = await botEhAdmin(sock, from);
-            console.log(`🔍 [ABRIRGRUPO] Resultado botEhAdmin: ${botAdmin}`);
-            
-            if (!botAdmin) {
-                console.log(`⚠️ [ABRIRGRUPO] Bot NÃO é admin - tentando abrir mesmo assim`);
-            }
-
             try {
+                // Verifica o estado atual do grupo
+                const groupMetadata = await sock.groupMetadata(from);
+                const grupoFechado = groupMetadata.announce || false;
+                
+                console.log(`🔍 [ABRIRGRUPO] Estado do grupo: ${grupoFechado ? 'FECHADO' : 'ABERTO'} (announce: ${groupMetadata.announce})`);
+                
+                if (!grupoFechado) {
+                    // Grupo já está aberto
+                    await reagirMensagem(sock, message, "ℹ️");
+                    await reply(sock, from, "ℹ️ *O GRUPO JÁ ESTÁ ABERTO!*\n\nTodos os membros já podem enviar mensagens.");
+                    console.log(`ℹ️ [ABRIRGRUPO] Grupo ${from} já estava aberto`);
+                    break;
+                }
+
+                // Grupo está fechado, então vamos abrir
+                console.log(`🔍 [ABRIRGRUPO] Verificando se bot é admin no grupo ${from}`);
+                const botAdmin = await botEhAdmin(sock, from);
+                console.log(`🔍 [ABRIRGRUPO] Resultado botEhAdmin: ${botAdmin}`);
+                
+                if (!botAdmin) {
+                    console.log(`⚠️ [ABRIRGRUPO] Bot NÃO é admin - tentando abrir mesmo assim`);
+                }
+
                 await sock.groupSettingUpdate(from, 'not_announcement');
                 await reagirMensagem(sock, message, "🔓");
                 await reply(sock, from, "🔓 *GRUPO ABERTO!*\n\nTodos os membros podem enviar mensagens agora.");
