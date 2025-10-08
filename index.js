@@ -6284,21 +6284,22 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
-            // Verifica se bot é admin
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para resetar o link do grupo.");
-                break;
-            }
-
             try {
+                console.log(`🔍 [RESETLINK] Verificando se bot é admin no grupo ${from}`);
+                const botAdmin = await botEhAdmin(sock, from);
+                console.log(`🔍 [RESETLINK] Resultado botEhAdmin: ${botAdmin}`);
+                
+                if (!botAdmin) {
+                    console.log(`⚠️ [RESETLINK] Bot NÃO é admin - tentando resetar link mesmo assim`);
+                }
+
                 const newLink = await sock.groupRevokeInvite(from);
                 await reagirMensagem(sock, message, "🔗");
                 await reply(sock, from, `🔗 *LINK DO GRUPO RESETADO!*\n\n✅ Novo link: https://chat.whatsapp.com/${newLink}\n\n⚠️ O link anterior foi invalidado!`);
                 console.log(`🔗 Link do grupo ${from} foi resetado por ${sender.split('@')[0]}`);
             } catch (err) {
                 console.error("❌ Erro ao resetar link:", err);
-                await reply(sock, from, "❌ Erro ao resetar o link do grupo. Verifique se o bot tem permissões de admin.");
+                await reply(sock, from, `❌ Erro ao resetar o link do grupo.\n\n💡 Detalhes: ${err.message}\n\nVerifique se o bot realmente é admin do grupo.`);
             }
         }
         break;
@@ -6321,14 +6322,15 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
-            // Verifica se bot é admin
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para alterar configurações do grupo.");
-                break;
-            }
-
             try {
+                console.log(`🔍 [ATIVARSOLICITACAO] Verificando se bot é admin no grupo ${from}`);
+                const botAdmin = await botEhAdmin(sock, from);
+                console.log(`🔍 [ATIVARSOLICITACAO] Resultado botEhAdmin: ${botAdmin}`);
+                
+                if (!botAdmin) {
+                    console.log(`⚠️ [ATIVARSOLICITACAO] Bot NÃO é admin - tentando ativar mesmo assim`);
+                }
+
                 await sock.groupToggleEphemeral(from, false);
                 await sock.groupSettingUpdate(from, 'locked');
                 await reagirMensagem(sock, message, "✅");
@@ -6336,7 +6338,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 console.log(`✅ Solicitação de entrada ativada no grupo ${from} por ${sender.split('@')[0]}`);
             } catch (err) {
                 console.error("❌ Erro ao ativar solicitação:", err);
-                await reply(sock, from, "❌ Erro ao ativar solicitação de entrada. Verifique se o bot tem permissões de admin.");
+                await reply(sock, from, `❌ Erro ao ativar solicitação de entrada.\n\n💡 Detalhes: ${err.message}\n\nVerifique se o bot realmente é admin do grupo.`);
             }
         }
         break;
@@ -6359,21 +6361,22 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
-            // Verifica se bot é admin
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para alterar configurações do grupo.");
-                break;
-            }
-
             try {
+                console.log(`🔍 [DESATIVARSOLICITACAO] Verificando se bot é admin no grupo ${from}`);
+                const botAdmin = await botEhAdmin(sock, from);
+                console.log(`🔍 [DESATIVARSOLICITACAO] Resultado botEhAdmin: ${botAdmin}`);
+                
+                if (!botAdmin) {
+                    console.log(`⚠️ [DESATIVARSOLICITACAO] Bot NÃO é admin - tentando desativar mesmo assim`);
+                }
+
                 await sock.groupSettingUpdate(from, 'unlocked');
                 await reagirMensagem(sock, message, "❌");
                 await reply(sock, from, "❌ *SOLICITAÇÃO DE ENTRADA DESATIVADA!*\n\nQualquer pessoa com o link pode entrar no grupo agora.");
                 console.log(`❌ Solicitação de entrada desativada no grupo ${from} por ${sender.split('@')[0]}`);
             } catch (err) {
                 console.error("❌ Erro ao desativar solicitação:", err);
-                await reply(sock, from, "❌ Erro ao desativar solicitação de entrada. Verifique se o bot tem permissões de admin.");
+                await reply(sock, from, `❌ Erro ao desativar solicitação de entrada.\n\n💡 Detalhes: ${err.message}\n\nVerifique se o bot realmente é admin do grupo.`);
             }
         }
         break;
@@ -6432,13 +6435,6 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 break;
             }
 
-            // Verifica se bot é admin
-            const botAdmin = await botEhAdmin(sock, from);
-            if (!botAdmin) {
-                await reply(sock, from, "❌ O bot precisa ser admin para mudar o nome do grupo.");
-                break;
-            }
-
             const novoNome = args.join(" ").trim();
             if (!novoNome) {
                 await reply(sock, from, `❌ Use: ${config.prefix}mudargrupo <novo nome>\n\nExemplo: ${config.prefix}mudargrupo NEEXT LTDA - Grupo Oficial`);
@@ -6451,13 +6447,21 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
 
             try {
+                console.log(`🔍 [MUDARGRUPO] Verificando se bot é admin no grupo ${from}`);
+                const botAdmin = await botEhAdmin(sock, from);
+                console.log(`🔍 [MUDARGRUPO] Resultado botEhAdmin: ${botAdmin}`);
+                
+                if (!botAdmin) {
+                    console.log(`⚠️ [MUDARGRUPO] Bot NÃO é admin - tentando mudar nome mesmo assim`);
+                }
+
                 await sock.groupUpdateSubject(from, novoNome);
                 await reagirMensagem(sock, message, "✏️");
                 await reply(sock, from, `✏️ *NOME DO GRUPO ALTERADO!*\n\n📝 Novo nome: "${novoNome}"\n👤 Alterado por: @${sender.split('@')[0]}`, [sender]);
                 console.log(`✏️ Nome do grupo ${from} alterado para "${novoNome}" por ${sender.split('@')[0]}`);
             } catch (err) {
                 console.error("❌ Erro ao alterar nome do grupo:", err);
-                await reply(sock, from, "❌ Erro ao alterar o nome do grupo. Verifique se o bot tem permissões de admin.");
+                await reply(sock, from, `❌ Erro ao alterar o nome do grupo.\n\n💡 Detalhes: ${err.message}\n\nVerifique se o bot realmente é admin do grupo.`);
             }
         }
         break;
