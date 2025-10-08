@@ -8752,10 +8752,45 @@ function setupListeners(sock) {
                                 [sender]
                             );
                             
-                            // Reseta o jogo
-                            delete anagramaAtivo[from];
-                            delete anagramaPalavraAtual[from];
-                            delete anagramaMessageId[from];
+                            // Carrega a próxima palavra automaticamente
+                            try {
+                                const anagramaData = JSON.parse(fs.readFileSync(path.join(__dirname, 'database', 'anagrama.json'), 'utf8'));
+                                const palavras = anagramaData.palavras;
+                                
+                                if (palavras && palavras.length > 0) {
+                                    const palavraObj = palavras[Math.floor(Math.random() * palavras.length)];
+                                    const palavraOriginal = palavraObj.palavra.toUpperCase();
+                                    const dica = palavraObj.dica.toUpperCase();
+                                    let anagrama = embaralharPalavra(palavraOriginal);
+                                    
+                                    while (anagrama === palavraOriginal && palavraOriginal.length > 3) {
+                                        anagrama = embaralharPalavra(palavraOriginal);
+                                    }
+
+                                    anagramaPalavraAtual[from] = {
+                                        palavra: palavraOriginal,
+                                        dica: dica,
+                                        anagrama: anagrama
+                                    };
+
+                                    const botConfig = obterConfiguracoes();
+                                    const mensagem = `╭━━ ⪩ 「 *Próxima palavra* 」\n❏ ⌁ ⚠︎ Anagrama: *${anagrama}*\n❏ ⌁ ⚠︎ Dica: *${dica}*\n❏ ⌁ ⚠︎ Bot *${botConfig.nomeDoBot}* - ANAGRAMA \n╰━━━ ⪨`;
+
+                                    const sentMsg = await sock.sendMessage(from, { text: mensagem });
+                                    anagramaMessageId[from] = sentMsg.key.id;
+                                } else {
+                                    await reply(sock, from, "✅ Parabéns! O jogo de anagrama foi finalizado.");
+                                    delete anagramaAtivo[from];
+                                    delete anagramaPalavraAtual[from];
+                                    delete anagramaMessageId[from];
+                                }
+                            } catch (error) {
+                                console.error("Erro ao carregar próxima palavra do anagrama:", error);
+                                await reply(sock, from, "✅ Parabéns! O jogo de anagrama foi finalizado.");
+                                delete anagramaAtivo[from];
+                                delete anagramaPalavraAtual[from];
+                                delete anagramaMessageId[from];
+                            }
                         } else {
                             // Errou!
                             await reagirMensagem(sock, normalized, "❌");
