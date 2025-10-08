@@ -135,7 +135,7 @@ function logMensagem(m, text = "", isCommand = false, sock = null) {
     if (mensagensRegistradas.has(logKey)) return;
     mensagensRegistradas.add(logKey);
 
-    const tipo = isCommand || (conteudo.startsWith(prefix)) ? "[COMANDO]" : "[MENSAGEM]";
+    const tipo = isCommand || (conteudo.startsWith(prefix)) ? "COMANDO" : "MENSAGEM";
     const local = isGroup ? "GRUPO" : "PV";
     
     // Detecta se é LID ou número tradicional
@@ -167,15 +167,21 @@ function logMensagem(m, text = "", isCommand = false, sock = null) {
     
     if (fromMe) infoRemetente += " [EU]";
 
+    // Monta informações adicionais
+    let detalhes = [];
+    if (isGroup) {
+        detalhes.push(`│ 📍 Grupo ID: ${jid.split('@')[0]}`);
+        if (senderJid) detalhes.push(`│ 👤 Sender: ${senderJid}`);
+    } else {
+        detalhes.push(`│ 👤 RemoteJid: ${jid}`);
+    }
+
     const logText = `
-───────────────────────────────
-${tipo} ${local}
-De: ${infoRemetente}
-${isGroup ? `📍 Grupo ID: ${jid.split('@')[0]}` : ''}
-${isGroup && senderJid ? `👤 Sender: ${senderJid}` : ''}
-${!isGroup ? `👤 RemoteJid: ${jid}` : ''}
-Conteúdo: ${conteudo}
-───────────────────────────────`;
+╭──〔 ${tipo} ${local} 〕──⪩
+│ De: ${infoRemetente}
+${detalhes.join('\n')}
+│ Conteúdo: ${conteudo}
+╰─────────⪨`;
 
     console.log(logText);
 }
