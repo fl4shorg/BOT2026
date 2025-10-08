@@ -1339,7 +1339,6 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 │╰─━─⋆｡°✩🤖✩°｡⋆ ━─━╯
 
 │╭─━─⋆｡°✩📊 ESTATÍSTICAS ✩°｡⋆ ━─━╮
-││￫ 𝑳𝑰𝑺𝑻𝑨 𝑵𝑬𝑮𝑹𝑨:       ${config.listanegra ? config.listanegra.length : 0} usuários
 ││￫ 𝑷𝑹𝑶𝑻𝑬𝑪𝑶̃𝑬𝑺 𝑨𝑻𝑰𝑽𝑨𝑫𝑨𝑺: ${featuresAtivas}/15
 ││￫ 𝑵𝑰́𝑽𝑬𝑳 𝑫𝑬 𝑺𝑬𝑮𝑼𝑹𝑨𝑵𝑪̧𝑨: ${nivelSeguranca}
 │╰─━─⋆｡°✩📊✩°｡⋆ ━─━╯
@@ -1433,7 +1432,6 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 `${getStatusIcon('antipalavrao')} **Antipalavrao:** ${getStatusText('antipalavrao')}\n` +
                 `${getStatusIcon('x9')} **X9:** ${getStatusText('x9')}\n\n` +
                 `📊 **ESTATÍSTICAS**\n\n` +
-                `📋 **Lista Negra:** ${config.listanegra ? config.listanegra.length : 0} usuários\n` +
                 `📊 **Proteções Ativas:** ${featuresAtivas}/13\n` +
                 `🔒 **Nível de Segurança:** ${featuresAtivas >= 9 ? "🟢 ALTO" : featuresAtivas >= 5 ? "🟡 MÉDIO" : "🔴 BAIXO"}\n\n` +
                 `⚙️ **COMANDOS**\n\n` +
@@ -1465,83 +1463,6 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         }
         break;
 
-        // ==== SISTEMA DE LISTA NEGRA ====
-        case "listanegra":
-        case "blacklist": {
-            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
-                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
-                break;
-            }
-
-            const sender = message.key.participant || from;
-            const ehAdmin = await isAdmin(sock, from, sender);
-            const ehDono = isDono(sender);
-
-            if (!ehAdmin && !ehDono) {
-                await reply(sock, from, "❌ Apenas admins podem usar este comando.");
-                break;
-            }
-
-            const acao = args[0]?.toLowerCase();
-            const numero = args[1];
-
-            if (acao === "add" || acao === "adicionar") {
-                if (!numero) {
-                    await reply(sock, from, `❌ Use: ${config.prefix}listanegra add @usuario ou ${config.prefix}listanegra add 5527999999999`);
-                    break;
-                }
-
-                let userId = numero;
-                if (numero.startsWith('@')) {
-                    userId = numero.replace('@', '') + '@s.whatsapp.net';
-                } else if (!numero.includes('@')) {
-                    userId = numero + '@s.whatsapp.net';
-                }
-
-                const resultado = antiSpam.adicionarListaNegra(userId, from);
-                if (resultado) {
-                    await reagirMensagem(sock, message, "✅");
-                    await reply(sock, from, `✅ *USUÁRIO ADICIONADO À LISTA NEGRA*\n\n👤 Usuário: @${userId.split('@')[0]}\n⚠️ Será banido automaticamente ao entrar no grupo`, [userId]);
-                } else {
-                    await reply(sock, from, "❌ Erro ao adicionar usuário à lista negra");
-                }
-            }
-            else if (acao === "remove" || acao === "remover") {
-                if (!numero) {
-                    await reply(sock, from, `❌ Use: ${config.prefix}listanegra remove @usuario ou ${config.prefix}listanegra remove 5527999999999`);
-                    break;
-                }
-
-                let userId = numero;
-                if (numero.startsWith('@')) {
-                    userId = numero.replace('@', '') + '@s.whatsapp.net';
-                } else if (!numero.includes('@')) {
-                    userId = numero + '@s.whatsapp.net';
-                }
-
-                const resultado = antiSpam.removerListaNegra(userId, from);
-                if (resultado) {
-                    await reagirMensagem(sock, message, "✅");
-                    await reply(sock, from, `✅ *USUÁRIO REMOVIDO DA LISTA NEGRA*\n\n👤 Usuário: @${userId.split('@')[0]}\n✅ Não será mais banido automaticamente`, [userId]);
-                } else {
-                    await reply(sock, from, "❌ Erro ao remover usuário da lista negra");
-                }
-            }
-            else if (acao === "list" || acao === "listar" || acao === "ver") {
-                const config = antiSpam.carregarConfigGrupo(from);
-                if (!config || !config.listanegra || config.listanegra.length === 0) {
-                    await reply(sock, from, "📋 *LISTA NEGRA VAZIA*\n\nNenhum usuário na lista negra deste grupo.");
-                } else {
-                    const usuarios = config.listanegra.map((user, index) => `${index + 1}. @${user.split('@')[0]}`).join('\n');
-                    await reply(sock, from, `📋 *LISTA NEGRA DO GRUPO*\n\n${usuarios}\n\n⚠️ Total: ${config.listanegra.length} usuários\n💡 Serão banidos automaticamente ao entrar`, config.listanegra);
-                }
-            }
-            else {
-                await reply(sock, from, `📋 *SISTEMA DE LISTA NEGRA*\n\n📝 *Comandos disponíveis:*\n• \`${config.prefix}listanegra add @usuario\` - Adicionar\n• \`${config.prefix}listanegra remove @usuario\` - Remover\n• \`${config.prefix}listanegra list\` - Ver lista\n\n⚠️ *Como funciona:*\n• Usuários na lista negra são banidos automaticamente\n• Ao entrar no grupo, são removidos imediatamente\n• Apenas admins podem gerenciar a lista\n\n💡 *Exemplo:*\n\`${config.prefix}listanegra add 5527999999999\``);
-            }
-        }
-        break;
-
         case "status-anti":
         case "anti-status": {
             if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
@@ -1567,7 +1488,6 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 `💰 Antipagamento: ${getStatus('antipagamento')}\n` +
                 `🌊 Antiflod: ${getStatus('antiflod')}\n` +
                 `📊 X9 Monitor: ${getStatus('x9')}\n\n` +
-                `📋 Lista Negra: ${config.listanegra ? config.listanegra.length : 0} usuários\n\n` +
                 `💡 *Use os comandos individuais para ativar/desativar*`;
 
             await reply(sock, from, statusMsg);

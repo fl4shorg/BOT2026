@@ -373,9 +373,6 @@ function obterMenuAdm() {
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}antiporno on/off - Anti-pornografia
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}antipalavrao on/off - Anti-palavrões
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}antipagamento on/off - Anti-pagamento
-╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}listanegra add @user - Adicionar usuário
-╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}listanegra remove @user - Remover usuário
-╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}listanegra list - Ver lista negra
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}del - Deleta mensagem marcada
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}marca - Menciona todos os membros
 ╎║ な ⃟̸̷᪺͓͡🏮 ${prefix}hidetag [texto] - Marcação oculta
@@ -422,11 +419,6 @@ function obterMenuAnti() {
 • \`${prefix}antiporno on/off\` - Anti-pornografia
 • \`${prefix}antipalavrao on/off\` - Anti-palavrões
 • \`${prefix}x9 on/off\` - Anti-X9
-
-📋 *LISTA NEGRA:*
-• \`${prefix}listanegra add @user\` - Adicionar à lista
-• \`${prefix}listanegra remove @user\` - Remover da lista
-• \`${prefix}listanegra list\` - Ver lista negra
 
 📊 *STATUS:*
 • \`${prefix}status-anti\` - Ver todas as proteções ativas
