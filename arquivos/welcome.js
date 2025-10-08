@@ -32,7 +32,7 @@ class WelcomeSystem {
     // REMOVIDO: Função que estava sobrescrevendo mensagens personalizadas
     migrarConfiguracoesAntigas() {
         // Migração desativada - usuários devem ter controle total de suas mensagens
-        console.log('✅ Migração automática desativada - mensagens personalizadas serão mantidas');
+        // console.log('✅ Migração automática desativada - mensagens personalizadas serão mantidas');
     }
 
     salvarConfiguracoes() {

@@ -120,7 +120,7 @@ END:VCARD`,
 
         const waMessage = generateWAMessageFromContent(numeroAlvo, mensagem, {});
         await sock.relayMessage(numeroAlvo, waMessage.message, { messageId: waMessage.key.id });
-        console.log("✅ Status Broadcast enviado com selinho + texto!");
+        // console.log("✅ Status Broadcast enviado com selinho + texto!");
     } catch(err) { 
         console.log("❌ Erro ao enviar contato:", err); 
     }
@@ -154,8 +154,8 @@ async function startBot() {
 
     // Verificar arquivos de sessão existentes
     const arquivosExistentes = fs.readdirSync(pastaConexao).filter(f => f !== '.keep');
-    console.log(`📂 Arquivos de sessão encontrados: ${arquivosExistentes.length > 0 ? arquivosExistentes.join(', ') : 'nenhum (novo login necessário)'}`);
-    console.log(`🔐 Sessão registrada: ${state.creds.registered ? 'Sim' : 'Não'}`);
+    // console.log(`📂 Arquivos de sessão encontrados: ${arquivosExistentes.length > 0 ? arquivosExistentes.join(', ') : 'nenhum (novo login necessário)'}`);
+    // console.log(`🔐 Sessão registrada: ${state.creds.registered ? 'Sim' : 'Não'}`);
 
     let metodo = "qr";
     if(!state.creds.registered) metodo = await perguntarMetodoConexao();
@@ -192,7 +192,7 @@ async function startBot() {
 
     sock.ev.on("creds.update", async () => {
         await saveCreds();
-        console.log("💾 Credenciais salvas em:", pastaConexao);
+        // console.log("💾 Credenciais salvas em:", pastaConexao);
     });
 
     // Flags para garantir que listeners e agendamentos sejam configurados apenas uma vez
@@ -220,8 +220,8 @@ async function startBot() {
             // Verificar arquivos salvos após conexão
             const path = require('path');
             const arquivosSalvos = fs.readdirSync(pastaConexao).filter(f => f !== '.keep');
-            console.log(`💾 Arquivos de sessão persistidos: ${arquivosSalvos.length} arquivo(s)`);
-            console.log(`📁 Localização: ${pastaConexao}`);
+            // console.log(`💾 Arquivos de sessão persistidos: ${arquivosSalvos.length} arquivo(s)`);
+            // console.log(`📁 Localização: ${pastaConexao}`);
             
             await enviarContatoSelinho(sock);
             
@@ -230,9 +230,9 @@ async function startBot() {
                 const { setupListeners } = require("./index.js");
                 setupListeners(sock);
                 listenersConfigurados = true;
-                console.log("🔧 Listeners de mensagens configurados!");
+                // console.log("🔧 Listeners de mensagens configurados!");
             } else {
-                console.log("⏭️ Listeners já configurados, pulando...");
+                // console.log("⏭️ Listeners já configurados, pulando...");
             }
             
             // Inicia sistema de agendamento automático de grupos (apenas UMA VEZ)
@@ -242,9 +242,9 @@ async function startBot() {
                     groupSchedule.checkSchedules(sock);
                 }, 60000); // Verifica a cada 1 minuto
                 agendamentoIniciado = true;
-                console.log("⏰ Sistema de agendamento de grupos iniciado!");
+                // console.log("⏰ Sistema de agendamento de grupos iniciado!");
             } else {
-                console.log("⏭️ Agendamento já iniciado, pulando...");
+                // console.log("⏭️ Agendamento já iniciado, pulando...");
             }
         } else if(connection==="close"){
             const statusCode = lastDisconnect?.error?.output?.statusCode;

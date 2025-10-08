@@ -1,7 +1,31 @@
 // Sistema Anti-Spam Completo para WhatsApp Bot
+// Silencia logs do TensorFlow
+process.env.TF_CPP_MIN_LOG_LEVEL = '3';
+
 const fs = require('fs');
 const path = require('path');
 const tf = require('@tensorflow/tfjs-node');
+
+// Intercepta stdout e stderr para filtrar logs do NSFWJS
+const originalStdoutWrite = process.stdout.write.bind(process.stdout);
+const originalStderrWrite = process.stderr.write.bind(process.stderr);
+
+process.stdout.write = (chunk, encoding, callback) => {
+    const message = chunk.toString();
+    if (message.includes('modelOrUrl') || message.includes('MobileNetV2') || message.includes('NSFWJS')) {
+        return true;
+    }
+    return originalStdoutWrite(chunk, encoding, callback);
+};
+
+process.stderr.write = (chunk, encoding, callback) => {
+    const message = chunk.toString();
+    if (message.includes('modelOrUrl') || message.includes('MobileNetV2') || message.includes('NSFWJS')) {
+        return true;
+    }
+    return originalStderrWrite(chunk, encoding, callback);
+};
+
 const nsfw = require('nsfwjs');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
@@ -12,9 +36,7 @@ let nsfwModel = null;
 async function carregarModeloNSFW() {
     if (!nsfwModel) {
         try {
-            console.log('🔄 Carregando modelo NSFW para detecção de pornografia...');
             nsfwModel = await nsfw.load();
-            console.log('✅ Modelo NSFW carregado com sucesso!');
         } catch (err) {
             console.error('❌ Erro ao carregar modelo NSFW:', err);
         }

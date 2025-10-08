@@ -1,7 +1,11 @@
 // Environment Configuration Module
 // Centralizes all environment variables and provides secure defaults
 
+// Silencia temporariamente os logs do dotenv
+const originalLog = console.log;
+console.log = () => {};
 require('dotenv').config();
+console.log = originalLog;
 
 const config = {
     // Bot Owner Configuration

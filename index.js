@@ -9140,7 +9140,7 @@ function setupListeners(sock) {
         }
     });
 
-    console.log('🔧 Listeners configurados com sucesso!');
+    // console.log('🔧 Listeners configurados com sucesso!');
 }
 
 // Exporta a função
