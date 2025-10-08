@@ -5756,7 +5756,6 @@ async function handleCommand(sock, message, command, args, from, quoted) {
 
                 await sock.sendMessage(from, {
                     video: videoBuffer,
-                    caption: "💕",
                     mimetype: 'video/mp4',
                     contextInfo: {
                         forwardingScore: 100000,
@@ -5766,7 +5765,7 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                             newsletterName: "🐦‍🔥⃝ 𝆅࿙⵿ׂ𝆆𝝢𝝣𝝣𝝬𝗧𓋌𝗟𝗧𝗗𝗔⦙⦙ꜣྀ"
                         }
                     }
-                }, { quoted: message });
+                }, { quoted: selinho2 });
 
                 await reagirMensagem(sock, message, "✅");
                 console.log(`✅ Vídeo do TikTok baixado com sucesso`);
