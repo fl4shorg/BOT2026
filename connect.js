@@ -157,6 +157,9 @@ async function startBot() {
     // console.log(`📂 Arquivos de sessão encontrados: ${arquivosExistentes.length > 0 ? arquivosExistentes.join(', ') : 'nenhum (novo login necessário)'}`);
     // console.log(`🔐 Sessão registrada: ${state.creds.registered ? 'Sim' : 'Não'}`);
 
+    // Flag para saber se é primeira conexão
+    const isPrimeiraConexao = !state.creds.registered;
+
     let metodo = "qr";
     if(!state.creds.registered) metodo = await perguntarMetodoConexao();
 
@@ -223,15 +226,16 @@ async function startBot() {
             // console.log(`💾 Arquivos de sessão persistidos: ${arquivosSalvos.length} arquivo(s)`);
             // console.log(`📁 Localização: ${pastaConexao}`);
             
-            // Atualiza o recado do bot quando conecta
-            try {
-                const moment = require('moment-timezone');
-                const dataHora = moment().tz('America/Sao_Paulo').format('DD/MM/YYYY HH:mm:ss');
-                const recado = `『 𖥨ํ∘̥⃟🩸G᥆ddᥲrd ᥴ᥆ᥒᥱᥴtᥲd᥆! ${dataHora} 』`;
-                await sock.updateProfileStatus(recado);
-                console.log(`✅ Recado atualizado: ${recado}`);
-            } catch (err) {
-                console.log("⚠️ Erro ao atualizar recado:", err.message);
+            // Atualiza o recado do bot APENAS na primeira conexão
+            if (isPrimeiraConexao) {
+                try {
+                    const moment = require('moment-timezone');
+                    const dataHora = moment().tz('America/Sao_Paulo').format('DD/MM/YYYY HH:mm:ss');
+                    const recado = `『 𖥨ํ∘̥⃟🩸G᥆ddᥲrd ᥴ᥆ᥒᥱᥴtᥲd᥆! ${dataHora} 』`;
+                    await sock.updateProfileStatus(recado);
+                } catch (err) {
+                    // Silencioso - não mostra erro no terminal
+                }
             }
             
             await enviarContatoSelinho(sock);
