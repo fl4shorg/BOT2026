@@ -4000,6 +4000,27 @@ async function handleCommand(sock, message, command, args, from, quoted) {
         }
         break;
 
+        case "reiniciar": {
+            const sender = message.key.participant || from;
+
+            // Verifica se é o dono
+            if (!isDono(sender)) {
+                await reply(sock, from, "❌ Apenas o dono pode reiniciar o bot!");
+                break;
+            }
+
+            await reagirMensagem(sock, message, "🔄");
+            await reply(sock, from, "🔄 *REINICIANDO BOT...*\n\n⏳ Aguarde alguns segundos\n🤖 O bot voltará em breve!");
+            
+            console.log("🔄 Bot reiniciando por comando do dono...");
+            
+            // Aguarda 2 segundos e reinicia o processo
+            setTimeout(() => {
+                process.exit(0);
+            }, 2000);
+        }
+        break;
+
         case "menu": {
             try {
                 // console.log("🔧 Processando comando menu...");
@@ -8688,10 +8709,19 @@ function setupListeners(sock) {
                 
                 // Verifica antipv (bloqueio de PV para não-donos)
                 if (!isGroup) {
+                    delete require.cache[require.resolve('./settings/settings.json')];
                     const config = require('./settings/settings.json');
-                    if (config.antipv && !isDono(sender)) {
-                        console.log(`🚫 PV bloqueado: ${sender.split('@')[0]} (ANTIPV ativo)`);
-                        continue; // Ignora completamente mensagens de PV de não-donos
+                    
+                    if (config.antipv) {
+                        const ehDono = isDono(sender);
+                        const senderLid = sender.split('@')[0].split(':')[0];
+                        
+                        if (!ehDono) {
+                            console.log(`🚫 PV bloqueado: ${senderLid} (ANTIPV ativo - não é dono)`);
+                            continue; // Ignora completamente mensagens de PV de não-donos
+                        } else {
+                            console.log(`✅ PV liberado: ${senderLid} (é dono)`);
+                        }
                     }
                 }
 
