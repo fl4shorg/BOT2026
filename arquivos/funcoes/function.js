@@ -3,6 +3,10 @@
 // ---------------------------
 const cfonts = require("cfonts");
 
+// Cores ANSI
+const roxo = '\x1b[35m';
+const reset = '\x1b[0m';
+
 // ---------------------------
 // Configurações do Bot
 // ---------------------------
@@ -170,18 +174,18 @@ function logMensagem(m, text = "", isCommand = false, sock = null) {
     // Monta informações adicionais
     let detalhes = [];
     if (isGroup) {
-        detalhes.push(`│ 📍 Grupo ID: ${jid.split('@')[0]}`);
-        if (senderJid) detalhes.push(`│ 👤 Sender: ${senderJid}`);
+        detalhes.push(`${roxo}│ 📍 Grupo ID: ${jid.split('@')[0]}${reset}`);
+        if (senderJid) detalhes.push(`${roxo}│ 👤 Sender: ${senderJid}${reset}`);
     } else {
-        detalhes.push(`│ 👤 RemoteJid: ${jid}`);
+        detalhes.push(`${roxo}│ 👤 RemoteJid: ${jid}${reset}`);
     }
 
     const logText = `
-╭──〔 ${tipo} ${local} 〕──⪩
-│ De: ${infoRemetente}
+${roxo}╭──〔 ${tipo} ${local} 〕──⪩${reset}
+${roxo}│ De: ${infoRemetente}${reset}
 ${detalhes.join('\n')}
-│ Conteúdo: ${conteudo}
-╰─────────⪨`;
+${roxo}│ Conteúdo: ${conteudo}${reset}
+${roxo}╰─────────⪨${reset}`;
 
     console.log(logText);
 }
