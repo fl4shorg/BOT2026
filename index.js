@@ -103,6 +103,21 @@ const quotedCarrinho = {
     message: { documentMessage: { title: "🛒 Neext Ltda", fileName: "Neext.pdf", mimetype: "application/pdf", fileLength: 999999, pageCount: 1 } }
 };
 
+// Sistema de Anagrama (jogos de palavras)
+const anagramaAtivo = {};
+const anagramaPalavraAtual = {};
+const anagramaMessageId = {};
+
+// Função para embaralhar palavra
+function embaralharPalavra(palavra) {
+    const arr = palavra.split('');
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.join('');
+}
+
 // System NEEXT (status do sistema) para usar no grupo-status
 const quotedSerasaAPK = {
     key: { participant: "0@s.whatsapp.net", remoteJid: "0@s.whatsapp.net" },
@@ -6685,6 +6700,88 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             } catch (error) {
                 console.error("Erro ao carregar vab.json:", error);
                 await reply(sock, from, "❌ Erro ao carregar perguntas. Tente novamente mais tarde.");
+            }
+        }
+        break;
+
+        case "anagrama": {
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Modo Gamer está desativado neste grupo! Use \`${botConfig.prefix}modogamer on\` para ativar.`);
+                break;
+            }
+
+            const opcao = args[0];
+            
+            if (!opcao) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `🔤 *ANAGRAMA - DESCUBRA A PALAVRA*\n\n*1 PARA ATIVAR / 0 PARA DESATIVAR 💖*\n\nExemplo: ${botConfig.prefix}anagrama 1`);
+                break;
+            }
+
+            if (opcao === "1") {
+                if (anagramaAtivo[from]) {
+                    await reply(sock, from, "⚠️ Já existe um jogo de anagrama ativo neste grupo!");
+                    break;
+                }
+
+                try {
+                    const anagramaData = JSON.parse(fs.readFileSync(path.join(__dirname, 'database', 'anagrama.json'), 'utf8'));
+                    const palavras = anagramaData.palavras;
+                    
+                    if (!palavras || palavras.length === 0) {
+                        await reply(sock, from, "❌ Nenhuma palavra disponível no momento.");
+                        break;
+                    }
+
+                    const palavraObj = palavras[Math.floor(Math.random() * palavras.length)];
+                    const palavraOriginal = palavraObj.palavra.toUpperCase();
+                    const dica = palavraObj.dica.toUpperCase();
+                    let anagrama = embaralharPalavra(palavraOriginal);
+                    
+                    while (anagrama === palavraOriginal && palavraOriginal.length > 3) {
+                        anagrama = embaralharPalavra(palavraOriginal);
+                    }
+
+                    anagramaAtivo[from] = true;
+                    anagramaPalavraAtual[from] = {
+                        palavra: palavraOriginal,
+                        dica: dica,
+                        anagrama: anagrama
+                    };
+
+                    const botConfig = obterConfiguracoes();
+                    const mensagem = `╭━━ ⪩ 「 *Descubra a palavra* 」
+❏ ⌁ ⚠︎ Anagrama: *${anagrama}*
+❏ ⌁ ⚠︎ Dica: *${dica}*
+❏ ⌁ ⚠︎ Bot *${botConfig.nomeDoBot}* - ANAGRAMA 
+╰━━━ ⪨`;
+
+                    const sentMsg = await sock.sendMessage(from, { text: mensagem });
+                    anagramaMessageId[from] = sentMsg.key.id;
+
+                } catch (error) {
+                    console.error("Erro ao carregar anagrama.json:", error);
+                    await reply(sock, from, "❌ Erro ao carregar palavras. Tente novamente mais tarde.");
+                }
+            } else if (opcao === "0") {
+                if (!anagramaAtivo[from]) {
+                    await reply(sock, from, "⚠️ Não há jogo de anagrama ativo neste grupo!");
+                    break;
+                }
+
+                delete anagramaAtivo[from];
+                delete anagramaPalavraAtual[from];
+                delete anagramaMessageId[from];
+                await reply(sock, from, "✅ Jogo de anagrama desativado com sucesso!");
+            } else {
+                await reply(sock, from, "*1 PARA ATIVAR / 0 PARA DESATIVAR 💖*");
             }
         }
         break;
