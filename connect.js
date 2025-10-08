@@ -181,7 +181,7 @@ async function startBot() {
         generateHighQualityLinkPreview:true,
         fireInitQueries:true,
         shouldSyncHistoryMessage:()=>true,
-        getMessage: async (key)=>({conversation:"⚠️ Mensagem não encontrada"}),
+        getMessage: async (key)=>undefined,
         retryRequestDelayMs:3000,
         defaultQueryTimeoutMs:15000,
         keepAliveIntervalMs:30000,
