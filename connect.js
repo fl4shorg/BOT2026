@@ -223,6 +223,17 @@ async function startBot() {
             // console.log(`💾 Arquivos de sessão persistidos: ${arquivosSalvos.length} arquivo(s)`);
             // console.log(`📁 Localização: ${pastaConexao}`);
             
+            // Atualiza o recado do bot quando conecta
+            try {
+                const moment = require('moment-timezone');
+                const dataHora = moment().tz('America/Sao_Paulo').format('DD/MM/YYYY HH:mm:ss');
+                const recado = `『 𖥨ํ∘̥⃟🩸G᥆ddᥲrd ᥴ᥆ᥒᥱᥴtᥲd᥆! ${dataHora} 』`;
+                await sock.updateProfileStatus(recado);
+                console.log(`✅ Recado atualizado: ${recado}`);
+            } catch (err) {
+                console.log("⚠️ Erro ao atualizar recado:", err.message);
+            }
+            
             await enviarContatoSelinho(sock);
             
             // Configura listeners de mensagens após conectar (apenas UMA VEZ)
