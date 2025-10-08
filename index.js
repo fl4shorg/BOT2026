@@ -8735,6 +8735,46 @@ function setupListeners(sock) {
                         }
                     }
                     
+                    // Sistema de verificação do Anagrama
+                    if (anagramaAtivo[from] && anagramaPalavraAtual[from]) {
+                        const respostaUsuario = text.trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        const palavraCorreta = anagramaPalavraAtual[from].palavra.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        
+                        if (respostaUsuario === palavraCorreta) {
+                            // Acertou!
+                            await reagirMensagem(sock, normalized, "🎉");
+                            await reply(sock, from, 
+                                `🎉 *PARABÉNS! VOCÊ ACERTOU!* 🎉\n\n` +
+                                `✅ Resposta correta: *${anagramaPalavraAtual[from].palavra}*\n` +
+                                `🏆 @${sender.split('@')[0]} descobriu a palavra!\n\n` +
+                                `💡 O anagrama era: *${anagramaPalavraAtual[from].anagrama}*\n` +
+                                `📝 Dica: *${anagramaPalavraAtual[from].dica}*`,
+                                [sender]
+                            );
+                            
+                            // Reseta o jogo
+                            delete anagramaAtivo[from];
+                            delete anagramaPalavraAtual[from];
+                            delete anagramaMessageId[from];
+                        } else {
+                            // Errou!
+                            await reagirMensagem(sock, normalized, "❌");
+                            await reply(sock, from, 
+                                `❌ *RESPOSTA INCORRETA!*\n\n` +
+                                `💭 Você respondeu: *${text.trim().toUpperCase()}*\n` +
+                                `✅ Resposta correta era: *${anagramaPalavraAtual[from].palavra}*\n\n` +
+                                `💡 O anagrama era: *${anagramaPalavraAtual[from].anagrama}*\n` +
+                                `📝 Dica: *${anagramaPalavraAtual[from].dica}*\n\n` +
+                                `🔄 Tente novamente no próximo jogo!`
+                            );
+                            
+                            // Reseta o jogo
+                            delete anagramaAtivo[from];
+                            delete anagramaPalavraAtual[from];
+                            delete anagramaMessageId[from];
+                        }
+                    }
+                    
                     // Sistema de jogadas do Jogo da Velha
                     if (global.jogoDaVelha && global.jogoDaVelha[from] && global.jogoDaVelha[from].ativo) {
                         const jogo = global.jogoDaVelha[from];
