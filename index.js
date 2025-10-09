@@ -1133,7 +1133,10 @@ async function handleCommand(sock, message, command, args, from, quoted) {
                 const groupMetadata = await sock.groupMetadata(from);
                 const participants = groupMetadata.participants.map(p => p.id);
                 const mensagem = `📢 Marcação geral:\n` + participants.map((p, i) => `${i+1}. @${p.split("@")[0]}`).join("\n");
-                await reply(sock, from, mensagem);
+                await sock.sendMessage(from, {
+                    text: mensagem,
+                    mentions: participants
+                });
             } catch(err) {
                 console.error("❌ Erro ao marcar participantes:", err);
                 await reply(sock, from, "❌ Falha ao marcar todos no grupo.");
@@ -7457,6 +7460,136 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
 
             if (!gifEnviado) {
                 await reply(sock, from, `🍑 *SARRADA!*\n\n@${sender.split('@')[0]} deu uma sarrada em @${target.split('@')[0]}! 🔥\n\n😈 Que safadeza! 🔥🔥🔥`, [sender, target]);
+            }
+        }
+        break;
+
+        case "bam": {
+            // Verifica se modo gamer está ativo
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Modo Gamer está desativado neste grupo! Use \`${botConfig.prefix}modogamer on\` para ativar.`);
+                break;
+            }
+
+            const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
+            const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
+            }
+
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}bam @usuario`);
+                break;
+            }
+
+            // Primeira mensagem: Usuário banido
+            await sock.sendMessage(from, {
+                text: `🔨 *USUÁRIO BANIDO COM SUCESSO!*\n\n@${target.split('@')[0]} foi banido do grupo! 👋`,
+                mentions: [target]
+            });
+
+            // Aguarda 2 segundos
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Segunda mensagem: Pegadinha com GIF
+            const gifEnviado = await enviarGif(
+                sock,
+                from,
+                "https://files.catbox.moe/tezqn1.gif",
+                `😂 *VOCÊ CAIU NA PEGADINHA!*\n\nNinguém foi banido, era brincadeira! 🤣🤣🤣`,
+                [sender, target],
+                message
+            );
+
+            if (!gifEnviado) {
+                await sock.sendMessage(from, {
+                    text: `😂 *VOCÊ CAIU NA PEGADINHA!*\n\nNinguém foi banido, era brincadeira! 🤣🤣🤣`,
+                    mentions: [sender, target]
+                });
+            }
+        }
+        break;
+
+        case "cafune": {
+            // Verifica se modo gamer está ativo
+            if (!from.endsWith('@g.us') && !from.endsWith('@lid')) {
+                await reply(sock, from, "❌ Este comando só pode ser usado em grupos.");
+                break;
+            }
+
+            const config = antiSpam.carregarConfigGrupo(from);
+            if (!config || !config.modogamer) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Modo Gamer está desativado neste grupo! Use \`${botConfig.prefix}modogamer on\` para ativar.`);
+                break;
+            }
+
+            const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
+            const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
+            }
+
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}cafune @usuario`);
+                break;
+            }
+
+            // Envia vídeo de cafuné
+            try {
+                const axios = require('axios');
+                const response = await axios({
+                    method: 'GET',
+                    url: 'https://files.catbox.moe/1342p2.mp4',
+                    responseType: 'arraybuffer',
+                    timeout: 30000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                const videoBuffer = Buffer.from(response.data);
+
+                await sock.sendMessage(from, {
+                    video: videoBuffer,
+                    caption: `🥰 *CAFUNÉ GOSTOSO!*\n\n@${sender.split('@')[0]} fez um cafuné em @${target.split('@')[0]}! 💆‍♀️\n\n😌 Que relaxante! 💕`,
+                    mentions: [sender, target]
+                }, { quoted: message });
+            } catch (error) {
+                console.error('❌ Erro ao enviar vídeo de cafuné:', error);
+                await sock.sendMessage(from, {
+                    text: `🥰 *CAFUNÉ GOSTOSO!*\n\n@${sender.split('@')[0]} fez um cafuné em @${target.split('@')[0]}! 💆‍♀️\n\n😌 Que relaxante! 💕`,
+                    mentions: [sender, target]
+                });
             }
         }
         break;
