@@ -6819,14 +6819,25 @@ async function handleCommand(sock, message, command, args, from, quoted) {
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-
-            if (!mentioned || mentioned.length === 0) {
-                await reply(sock, from, `❌ Marque alguém para dar um tapa!\n\nExemplo: ${config.prefix}tapa @usuario`);
-                break;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
             }
 
-            const target = mentioned[0];
+            if (!target) {
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${config.prefix}tapa @usuario`);
+                break;
+            }
             
             // Envia GIF de tapa
             const gifEnviado = await enviarGif(
@@ -7145,15 +7156,26 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-
-            if (!mentioned || mentioned.length === 0) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Marque alguém para matar!\n\nExemplo: ${botConfig.prefix}matar @usuario`);
-                break;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
             }
 
-            const target = mentioned[0];
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}matar @usuario`);
+                break;
+            }
 
             // Envia GIF usando método simples
             const gifEnviado = await enviarGif(
@@ -7187,15 +7209,26 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-
-            if (!mentioned || mentioned.length === 0) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Marque alguém para atirar!\n\nExemplo: ${botConfig.prefix}atirar @usuario`);
-                break;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
             }
 
-            const target = mentioned[0];
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}atirar @usuario`);
+                break;
+            }
 
             // Envia GIF usando método simples
             const gifEnviado = await enviarGif(
@@ -7275,10 +7308,23 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
+            }
 
-            if (!mentioned || mentioned.length === 0) {
-                await reply(sock, from, `❌ Marque alguém para prender!\n\nExemplo: ${config.prefix}prender @usuario`);
+            if (!target) {
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${config.prefix}prender @usuario`);
                 break;
             }
 
@@ -7289,7 +7335,6 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
                 "tráfico de sorrisos", "porte de sorriso fatal", "estelionato sentimental"
             ];
 
-            const target = mentioned[0];
             const crime = crimes[Math.floor(Math.random() * crimes.length)];
 
             await sock.sendMessage(from, {
@@ -7315,15 +7360,26 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-
-            if (!mentioned || mentioned.length === 0) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Marque alguém para beijar!\n\nExemplo: ${botConfig.prefix}beijar @usuario`);
-                break;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
             }
 
-            const target = mentioned[0];
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}beijar @usuario`);
+                break;
+            }
 
             // Envia GIF de beijo
             const gifEnviado = await enviarGif(
@@ -7356,15 +7412,26 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-
-            if (!mentioned || mentioned.length === 0) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Marque alguém para atropelar!\n\nExemplo: ${botConfig.prefix}atropelar @usuario`);
-                break;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
             }
 
-            const target = mentioned[0];
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}atropelar @usuario`);
+                break;
+            }
 
             // Envia GIF de atropelamento
             const gifEnviado = await enviarGif(
@@ -7397,15 +7464,26 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-
-            if (!mentioned || mentioned.length === 0) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Marque alguém para fazer dedo!\n\nExemplo: ${botConfig.prefix}dedo @usuario`);
-                break;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
             }
 
-            const target = mentioned[0];
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}dedo @usuario`);
+                break;
+            }
 
             // Envia GIF de dedo
             const gifEnviado = await enviarGif(
@@ -7438,15 +7516,26 @@ async function enviarGif(sock, from, gifUrl, caption, mentions = [], quoted = nu
             }
 
             const sender = message.key.participant || from;
+            let target = null;
+            
+            // Verifica se marcou alguém com @
             const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-
-            if (!mentioned || mentioned.length === 0) {
-                const botConfig = obterConfiguracoes();
-                await reply(sock, from, `❌ Marque alguém para sarrar!\n\nExemplo: ${botConfig.prefix}sarra @usuario`);
-                break;
+            
+            // Ou se marcou uma mensagem
+            const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+            
+            if (mentioned && mentioned.length > 0) {
+                target = mentioned[0];
+            } else if (quotedMsg && quotedParticipant) {
+                target = quotedParticipant;
             }
 
-            const target = mentioned[0];
+            if (!target) {
+                const botConfig = obterConfiguracoes();
+                await reply(sock, from, `❌ Marque alguém ou responda a mensagem de alguém!\n\nExemplo: ${botConfig.prefix}sarra @usuario`);
+                break;
+            }
 
             // Envia GIF de sarrada/dança
             const gifEnviado = await enviarGif(
