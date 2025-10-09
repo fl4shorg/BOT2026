@@ -160,9 +160,29 @@ const contextAnuncio = {
     }
 };
 
-// Mensagens já processadas (evita duplicadas)
-const processedMessages = new Set();
-setInterval(() => processedMessages.clear(), 5 * 60 * 1000);
+// Mensagens já processadas (evita duplicadas) - Sistema melhorado
+const processedMessages = new Map();
+const MAX_PROCESSED_MESSAGES = 1000;
+
+// Limpa mensagens antigas (mais de 2 minutos) a cada 30 segundos
+setInterval(() => {
+    const now = Date.now();
+    const twoMinutesAgo = now - (2 * 60 * 1000);
+    
+    for (const [messageId, timestamp] of processedMessages.entries()) {
+        if (timestamp < twoMinutesAgo) {
+            processedMessages.delete(messageId);
+        }
+    }
+    
+    // Limite de segurança: se passar de 1000 mensagens, limpa as mais antigas
+    if (processedMessages.size > MAX_PROCESSED_MESSAGES) {
+        const entries = Array.from(processedMessages.entries());
+        entries.sort((a, b) => a[1] - b[1]); // Ordena por timestamp
+        const toDelete = entries.slice(0, entries.length - MAX_PROCESSED_MESSAGES);
+        toDelete.forEach(([id]) => processedMessages.delete(id));
+    }
+}, 30000);
 
 // Sistema de Xadrez - Chess Games
 const chessGames = new Map();
@@ -8611,10 +8631,16 @@ function setupListeners(sock) {
                 // Ignora mensagens próprias
                 if (message.key.fromMe) continue;
                 
-                // Verifica se já foi processada
+                // Verifica se já foi processada (com timestamp)
                 const messageId = message.key.id;
-                if (processedMessages.has(messageId)) continue;
-                processedMessages.add(messageId);
+                if (processedMessages.has(messageId)) {
+                    // Se já foi processada recentemente (menos de 2 segundos), ignora completamente
+                    const lastProcessed = processedMessages.get(messageId);
+                    if (Date.now() - lastProcessed < 2000) {
+                        continue;
+                    }
+                }
+                processedMessages.set(messageId, Date.now());
                 
                 // Log da mensagem recebida
                 const from = message.key.remoteJid;

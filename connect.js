@@ -15,6 +15,10 @@ const settings = require("./settings/settings.json");
 
 const prefix = settings.prefix; // pega exatamente o que está no JSON
 
+// Controle global de listeners para evitar duplicação
+let listenersConfigurados = false;
+let agendamentoIniciado = false;
+
 async function perguntarMetodoConexao() {
     // Verifica se há método predefinido no ambiente
     const metodoEnv = process.env.BOT_CONNECTION_METHOD;
@@ -174,17 +178,20 @@ async function startBot() {
         browser: ["MacOS","Safari","16.5"],
         logger,
         version,
-        syncFullHistory:true,
-        markOnlineOnConnect:true,
-        syncContacts:true,
-        syncChats:true,
-        generateHighQualityLinkPreview:true,
-        fireInitQueries:true,
-        shouldSyncHistoryMessage:()=>true,
-        retryRequestDelayMs:3000,
-        defaultQueryTimeoutMs:15000,
-        keepAliveIntervalMs:30000,
-        connectTimeoutMs:60000,
+        syncFullHistory: false,
+        markOnlineOnConnect: true,
+        syncContacts: false,
+        syncChats: false,
+        generateHighQualityLinkPreview: true,
+        fireInitQueries: false,
+        shouldSyncHistoryMessage: () => false,
+        retryRequestDelayMs: 1000,
+        defaultQueryTimeoutMs: 20000,
+        keepAliveIntervalMs: 10000,
+        connectTimeoutMs: 60000,
+        emitOwnEvents: false,
+        fireInitQueries: false,
+        printQRInTerminal: false,
     });
 
     if(metodo==="pairing" && !state.creds.registered){
@@ -202,10 +209,6 @@ async function startBot() {
         await saveCreds();
         // console.log("💾 Credenciais salvas em:", pastaConexao);
     });
-
-    // Flags para garantir que listeners e agendamentos sejam configurados apenas uma vez
-    let listenersConfigurados = false;
-    let agendamentoIniciado = false;
     
     sock.ev.on("connection.update", async (update)=>{
         const { connection, lastDisconnect, qr } = update;
