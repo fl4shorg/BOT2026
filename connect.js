@@ -19,6 +19,26 @@ const prefix = settings.prefix; // pega exatamente o que está no JSON
 let listenersConfigurados = false;
 let agendamentoIniciado = false;
 
+// Controle de reconexão com backoff exponencial
+let reconnectionAttempt = 0;
+let reconnectionTimer = null;
+
+function scheduleReconnect(startFn, label = 'reconectar') {
+    // Exponencial com jitter: 2s, 4s, 8s... até 60s + 0-2s aleatório
+    const baseDelay = Math.min(60000, 2000 * Math.pow(2, Math.max(0, reconnectionAttempt - 1)));
+    const jitter = Math.floor(Math.random() * 2000);
+    const delay = baseDelay + jitter;
+    if (reconnectionTimer) {
+        clearTimeout(reconnectionTimer);
+        reconnectionTimer = null;
+    }
+    console.log(`🔁 A tentar ${label} em ${Math.round(delay / 1000)}s (tentativa ${reconnectionAttempt})`);
+    reconnectionTimer = setTimeout(() => {
+        reconnectionTimer = null;
+        startFn();
+    }, delay);
+}
+
 async function perguntarMetodoConexao() {
     // Verifica se há método predefinido no ambiente
     const metodoEnv = process.env.BOT_CONNECTION_METHOD;
@@ -227,6 +247,12 @@ async function startBot() {
         if(connection==="open"){
             mostrarBanner();
             console.log(`✅ Conectado ao sistema da Neext em ${new Date().toLocaleString()}`);
+            // Reset do controle de reconexão
+            if (reconnectionTimer) {
+                clearTimeout(reconnectionTimer);
+                reconnectionTimer = null;
+            }
+            reconnectionAttempt = 0;
             
             // Verificar arquivos salvos após conexão
             const path = require('path');
@@ -278,7 +304,7 @@ async function startBot() {
                                          reason && (reason.includes('logged out') || reason.includes('invalid'));
             
             const shouldReconnect = !isPermanentAuthError;
-            console.log(`❌ Conexão fechada (${statusCode || 'desconhecido'}). Reconectando... (${shouldReconnect?"sim":"não"})`);
+            console.log(`❌ Conexão fechada (${statusCode || 'desconhecido'})${reason ? `: ${reason}` : ''}. Reconectando... (${shouldReconnect?"sim":"não"})`);
             
             if(isPermanentAuthError){
                 console.log("🔄 Sessão PERMANENTEMENTE inválida! Limpando credenciais...");
@@ -301,7 +327,8 @@ async function startBot() {
                     process.exit(1);
                 }
             } else if(shouldReconnect){
-                setTimeout(()=>startBot(),5000);
+                reconnectionAttempt += 1;
+                scheduleReconnect(startBot, 'reconectar');
             }
         }
     });

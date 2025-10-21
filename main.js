@@ -7,6 +7,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
+const dns = require('dns');
 
 // Console colors for better output
 const colors = {
@@ -76,6 +79,25 @@ async function startBot() {
         // Validate environment
         validateDependencies();
         
+        // Ajustes globais de rede para maior estabilidade
+        try {
+            // Keep-alive agressivo e limit de sockets
+            const keepAliveAgentHttp = new http.Agent({ keepAlive: true, maxSockets: 50, keepAliveMsecs: 15000 });
+            const keepAliveAgentHttps = new https.Agent({ keepAlive: true, maxSockets: 50, keepAliveMsecs: 15000 });
+            // Força IPv4 quando possível para reduzir problemas de DNS/Happy Eyeballs (efetivo em runtime)
+            try { dns.setDefaultResultOrder('ipv4first'); } catch (_) {}
+            // Configura axios globalmente se presente
+            try {
+                const axios = require('axios');
+                axios.defaults.timeout = 20000;
+                axios.defaults.httpAgent = keepAliveAgentHttp;
+                axios.defaults.httpsAgent = keepAliveAgentHttps;
+                axios.defaults.headers.common['Connection'] = 'keep-alive';
+            } catch (_) { /* axios pode não estar carregado aqui */ }
+        } catch (netErr) {
+            logWarning(`Não foi possível aplicar ajustes de rede: ${netErr.message}`);
+        }
+
         // Ensure connection directory exists
         ensureDirectoryExists('./conexao');
         
